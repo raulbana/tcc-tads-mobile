@@ -1,4 +1,9 @@
 import styled from 'styled-components/native';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../../utils/scales';
 
 interface StepProps {
   isActive: boolean;
@@ -14,9 +19,9 @@ export const ProgressBarContainer = styled.View`
 
 export const Step = styled.View<StepProps>`
   flex: 1;
-  height: 8px;
-  border-radius: 8px;
-  margin: 0 2px;
+  height: ${verticalScale(8)}px;
+  border-radius: ${moderateScale(4)}px;
+  margin: ${horizontalScale(0)} ${verticalScale(2)}px;
   background-color: ${({isActive, isCompleted, theme}) =>
     isCompleted
       ? theme.colors.purple_03

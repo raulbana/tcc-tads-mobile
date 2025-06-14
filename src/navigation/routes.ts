@@ -6,10 +6,12 @@ import {
 import {ParamListBase, RouteProp, Theme} from '@react-navigation/native';
 import OnboardingHome from '../modules/onboarding/OnboardingHome/OnboardingHome';
 import Home from '../modules/core/Home/Home';
+import OnboardingQuestion from '../modules/onboarding/OnboardingQuestion/OnboardingQuestion';
 
 export type ParamList = {
   Home: undefined;
   OnboardingHome: undefined;
+  OnboardingQuestion: undefined;
 };
 
 export type RouteName = keyof ParamList;
@@ -28,6 +30,8 @@ export interface Route<Name extends RouteName = RouteName> {
   params?: ParamList[Name];
 }
 
+export type NavigationStackProp = NativeStackNavigationProp<ParamList>;
+
 const routes: Route[] = [
   {
     name: 'Home',
@@ -37,6 +41,11 @@ const routes: Route[] = [
   {
     name: 'OnboardingHome',
     component: OnboardingHome,
+    options: undefined,
+  },
+  {
+    name: 'OnboardingQuestion',
+    component: OnboardingQuestion,
     options: undefined,
   },
 ];

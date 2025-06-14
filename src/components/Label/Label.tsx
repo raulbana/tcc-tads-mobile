@@ -1,7 +1,7 @@
 import React from 'react';
 import {TextStyle, StyleProp} from 'react-native';
 import {TextProps as TypographyProps} from '../../theme';
-import * as S from './style';
+import * as S from './styles';
 
 interface LabelProps {
   typography: TypographyProps;

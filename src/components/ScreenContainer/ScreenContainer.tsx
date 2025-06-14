@@ -1,7 +1,7 @@
 import React from 'react';
 import {ViewProps, ScrollViewProps} from 'react-native';
 
-import * as S from './style';
+import * as S from './styles';
 import Label from '../Label/Label';
 import theme from '../../theme/theme';
 

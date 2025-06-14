@@ -1,11 +1,14 @@
-import * as S from './style';
+import * as S from './styles';
 
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import Label from '../../../components/Label/Label';
 import theme from '../../../theme/theme';
 import Button from '../../../components/Button/Button';
+import useOnboardingHome from './useOnboardingHome';
 
 const OnboardingHome = () => {
+  const {navigateToQuestionnaire} = useOnboardingHome();
+
   return (
     <ScreenContainer>
       <S.Wrapper>
@@ -18,19 +21,20 @@ const OnboardingHome = () => {
           textBreakStrategy="balanced">
           <Label
             typography={theme.typography.title.b3}
-            text={'Incontinência Urinária! '}
-            color={theme.colors.gray_08}>
-            <Label
-              typography={theme.typography.title.h3}
-              text={'Vamos começar?'}
-              color={theme.colors.gray_08}
-            />
-          </Label>
+            text={'Incontinência Urinária!\n'}
+            color={theme.colors.gray_08}
+          />
         </Label>
+        <Label
+          typography={theme.typography.title.h3}
+          text={'Vamos começar?'}
+          color={theme.colors.gray_08}
+          textAlign="center"
+        />
         <S.Container>
           <S.Illustration />
           <S.ButtonContainer>
-            <Button text={'Continuar'} onPress={() => {}} />
+            <Button text={'Continuar'} onPress={navigateToQuestionnaire} />
           </S.ButtonContainer>
         </S.Container>
       </S.Wrapper>

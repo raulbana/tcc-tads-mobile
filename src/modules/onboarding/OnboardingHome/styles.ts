@@ -25,4 +25,5 @@ export const Wrapper = styled.View`
   flex-direction: column;
   flex: 1;
   padding: ${verticalScale(32)}px ${horizontalScale(8)}px;
+  gap: ${verticalScale(16)}px;
 `;
