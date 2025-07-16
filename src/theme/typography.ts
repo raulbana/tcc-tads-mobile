@@ -53,6 +53,11 @@ export interface Typography {
     sb3: TextProps;
     sb4: TextProps;
     sb5: TextProps;
+    m1: TextProps;
+    m2: TextProps;
+    m3: TextProps;
+    m4: TextProps;
+    m5: TextProps;
   };
 }
 const typography: Typography = {
@@ -88,23 +93,29 @@ const typography: Typography = {
     m5: {fontSize: '20', fontWeight: '500', fontFamily: fonts.medium},
   },
   title: {
-    h1: {fontSize: '32', fontWeight: '700', fontFamily: fonts.bold},
-    h2: {fontSize: '28', fontWeight: '700', fontFamily: fonts.bold},
-    h3: {fontSize: '24', fontWeight: '700', fontFamily: fonts.bold},
-    h4: {fontSize: '20', fontWeight: '700', fontFamily: fonts.bold},
-    h5: {fontSize: '18', fontWeight: '700', fontFamily: fonts.bold},
+    h1: {fontSize: '32', fontWeight: '400', fontFamily: fonts.regular},
+    h2: {fontSize: '28', fontWeight: '400', fontFamily: fonts.regular},
+    h3: {fontSize: '24', fontWeight: '400', fontFamily: fonts.regular},
+    h4: {fontSize: '20', fontWeight: '400', fontFamily: fonts.regular},
+    h5: {fontSize: '18', fontWeight: '400', fontFamily: fonts.regular},
 
-    b1: {fontSize: '32', fontWeight: '600', fontFamily: fonts.semiBold},
-    b2: {fontSize: '28', fontWeight: '600', fontFamily: fonts.semiBold},
-    b3: {fontSize: '24', fontWeight: '600', fontFamily: fonts.semiBold},
-    b4: {fontSize: '20', fontWeight: '600', fontFamily: fonts.semiBold},
-    b5: {fontSize: '18', fontWeight: '600', fontFamily: fonts.semiBold},
+    b1: {fontSize: '32', fontWeight: '700', fontFamily: fonts.bold},
+    b2: {fontSize: '28', fontWeight: '700', fontFamily: fonts.bold},
+    b3: {fontSize: '24', fontWeight: '700', fontFamily: fonts.bold},
+    b4: {fontSize: '20', fontWeight: '700', fontFamily: fonts.bold},
+    b5: {fontSize: '18', fontWeight: '700', fontFamily: fonts.bold},
 
-    sb1: {fontSize: '32', fontWeight: '500', fontFamily: fonts.medium},
-    sb2: {fontSize: '28', fontWeight: '500', fontFamily: fonts.medium},
-    sb3: {fontSize: '24', fontWeight: '500', fontFamily: fonts.medium},
-    sb4: {fontSize: '20', fontWeight: '500', fontFamily: fonts.medium},
-    sb5: {fontSize: '18', fontWeight: '500', fontFamily: fonts.medium},
+    sb1: {fontSize: '32', fontWeight: '600', fontFamily: fonts.semiBold},
+    sb2: {fontSize: '28', fontWeight: '600', fontFamily: fonts.semiBold},
+    sb3: {fontSize: '24', fontWeight: '600', fontFamily: fonts.semiBold},
+    sb4: {fontSize: '20', fontWeight: '600', fontFamily: fonts.semiBold},
+    sb5: {fontSize: '18', fontWeight: '600', fontFamily: fonts.semiBold},
+
+    m1: {fontSize: '32', fontWeight: '500', fontFamily: fonts.medium},
+    m2: {fontSize: '28', fontWeight: '500', fontFamily: fonts.medium},
+    m3: {fontSize: '24', fontWeight: '500', fontFamily: fonts.medium},
+    m4: {fontSize: '20', fontWeight: '500', fontFamily: fonts.medium},
+    m5: {fontSize: '18', fontWeight: '500', fontFamily: fonts.medium},
   },
 };
 

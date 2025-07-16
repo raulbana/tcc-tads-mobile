@@ -12,6 +12,20 @@ const colors = {
   gray_06: '#A8B3C4',
   gray_07: '#6D7785',
   gray_08: '#1A1A1A',
+
+  error: '#FF4D4F',
+  error_02: '#FF7875',
+  info: '#1677FF',
+  info_02: '#40A9FF',
+  info_03: '#69C0FF',
+  warning: '#FAAD14',
+  warning_02: '#FFC069',
+  success: '#52C41A',
+  success_02: '#73D13D',
+
+
+
+  white: '#FFFFFF',
 };
 
 export default colors;

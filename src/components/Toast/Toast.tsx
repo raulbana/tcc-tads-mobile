@@ -1,0 +1,46 @@
+import React from 'react';
+import * as S from './styles';
+import Label from '../Label/Label';
+import useToast from './useToast';
+import theme from '../../theme/theme';
+
+export type ToastType = 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING';
+
+interface ToastProps {
+  type: ToastType;
+  message: string | React.ReactNode;
+  duration?: number;
+  icon?: React.ReactNode;
+  onClose?: () => void;
+  isOpen: boolean;
+}
+
+const Toast: React.FC<ToastProps> = ({
+  type,
+  message,
+  duration = 3000,
+  icon,
+  onClose,
+  isOpen,
+}) => {
+  const {opacity, getTextColor} = useToast(isOpen, duration, onClose);
+
+  if (!isOpen) return null;
+
+  return (
+    <S.AnimatedToastContainer style={{opacity}} type={type}>
+      {icon && <S.IconContainer>{icon}</S.IconContainer>}
+      {typeof message === 'string' ? (
+        <Label
+          typography={theme.typography.paragraph.r4}
+          color={getTextColor(type)}
+          text={message}
+        />
+      ) : (
+        message
+      )}
+    </S.AnimatedToastContainer>
+  );
+};
+
+export default Toast;
