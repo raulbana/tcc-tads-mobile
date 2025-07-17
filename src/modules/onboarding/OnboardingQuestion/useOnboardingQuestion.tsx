@@ -1,42 +1,26 @@
-import {useState, useCallback, useEffect} from 'react';
-import {Question} from '../../../types/question';
+import {useState, useCallback} from 'react';
 import {useForm} from 'react-hook-form';
 import {ICIQAnswers, iciqSchema} from './schema/questionnaire';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {QuestionProps} from './components/QuestionSection/QuestionSection';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
-import onboardingServices from '../services/onboardingServices';
+import useOnboardingQueries from '../services/onboardingQueryFactory';
 
 const useOnboardingQuestion = () => {
-  const [questionList, setQuestionList] = useState<Question[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isToastOpen, setIsToastOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const getQuestions = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await onboardingServices.getQuestions();
-      const questionResponse = response;
-      setQuestionList(questionResponse);
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-      setErrorMessage(
-        'Erro ao carregar perguntas. Tente novamente mais tarde.',
-      );
-      setIsToastOpen(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const {getQuestions} = useOnboardingQueries(['onboarding', 'questions']);
+  const {data: questionList = [], isLoading, error} = getQuestions();
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  useEffect(() => {
-    getQuestions();
-  }, []);
+  if (error && !isToastOpen) {
+    setErrorMessage('Erro ao carregar perguntas. Tente novamente mais tarde.');
+    setIsToastOpen(true);
+  }
 
   const {
     handleSubmit,
@@ -120,7 +104,6 @@ const useOnboardingQuestion = () => {
     control,
     onSubmitAnswer,
     errors,
-    setIsLoading,
     questionInputs,
     currentQuestionIndex,
     isToastOpen,
@@ -130,4 +113,4 @@ const useOnboardingQuestion = () => {
   };
 };
 
-export {useOnboardingQuestion};
+export default useOnboardingQuestion;
