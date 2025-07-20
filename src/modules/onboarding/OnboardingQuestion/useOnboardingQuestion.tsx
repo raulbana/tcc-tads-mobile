@@ -17,10 +17,12 @@ const useOnboardingQuestion = () => {
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  if (error && !isToastOpen) {
-    setErrorMessage('Erro ao carregar perguntas. Tente novamente mais tarde.');
-    setIsToastOpen(true);
-  }
+  useEffect(() => {
+    if (error && !isToastOpen) {
+      setErrorMessage('Erro ao carregar perguntas. Tente novamente mais tarde.');
+      setIsToastOpen(true);
+    }
+  }, [error, isToastOpen]);
 
   const {
     handleSubmit,
