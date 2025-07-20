@@ -4,7 +4,7 @@ import * as S from './styles';
 import StepLabel from './components/StepLabel/StepLabel';
 import QuestionSection from './components/QuestionSection/QuestionSection';
 import ProgressBarStepped from '../../../components/ProgressBarStepped/ProgressBarStepped';
-import {useOnboardingQuestion} from './useOnboardingQuestion';
+import useOnboardingQuestion from './useOnboardingQuestion';
 import Loader from '../../../components/Loader/Loader';
 import Toast from '../../../components/Toast/Toast';
 
