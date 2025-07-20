@@ -20,11 +20,10 @@ export const onboardingQueryFactory = (queryKey: QueryKey) => {
       })),
     }),
     getQuestionById: (id: string) => useQuery<Question | undefined>({
-      queryKey: [...queryKey, id],
-      queryFn: async () => {
-        const questions = await onboardingServices.getQuestions();
-        return findQuestionById(id, questions);
-      },
+      queryKey: [...queryKey, 'questions'],
+      queryFn: () => onboardingServices.getQuestions(),
+      staleTime: 1000 * 60 * 5,
+      select: (questions: Question[]) => findQuestionById(id, questions),
     }),
   };
 };
