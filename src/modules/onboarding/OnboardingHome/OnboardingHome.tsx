@@ -34,7 +34,7 @@ const OnboardingHome = () => {
         <S.Container>
           <S.Illustration />
           <S.ButtonContainer>
-            <Button text={'Continuar'} onPress={navigateToQuestionnaire} />
+              <Button text={'Continuar'} onPress={navigateToQuestionnaire} />
           </S.ButtonContainer>
         </S.Container>
       </S.Wrapper>

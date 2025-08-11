@@ -2,14 +2,21 @@ import {
   NativeStackNavigationOptions,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-
 import {ParamListBase, RouteProp, Theme} from '@react-navigation/native';
+import BottomStack from '../components/BottomStack/BottomStack';
 import OnboardingHome from '../modules/onboarding/OnboardingHome/OnboardingHome';
-import Home from '../modules/core/Home/Home';
 import OnboardingQuestion from '../modules/onboarding/OnboardingQuestion/OnboardingQuestion';
 
-export type ParamList = {
+export type MainTabParamList = {
   Home: undefined;
+  Diary: undefined;
+  Exercises: undefined;
+  Contents: undefined;
+  Account: undefined;
+};
+
+export type ParamList = {
+  MainTabs: undefined;
   OnboardingHome: undefined;
   OnboardingQuestion: undefined;
 };
@@ -34,8 +41,8 @@ export type NavigationStackProp = NativeStackNavigationProp<ParamList>;
 
 const routes: Route[] = [
   {
-    name: 'Home',
-    component: Home,
+    name: 'MainTabs',
+    component: BottomStack,
     options: undefined,
   },
   {

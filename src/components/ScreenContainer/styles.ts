@@ -4,12 +4,13 @@ import {
   horizontalScale,
   verticalScale,
 } from '../../utils/scales';
+import theme from '../../theme/theme';
 
 
 
 export const StyledContainer = styled.View`
   flex: 1;
-  background-color: #fff;
+  background-color: ${theme.colors.white};
   margin-top: ${verticalScale(32)}px;
   padding-bottom: ${verticalScale(16)}px;
   padding-horizontal: ${horizontalScale(16)}px;
@@ -17,9 +18,9 @@ export const StyledContainer = styled.View`
 
 export const StyledSafeArea = styled(SafeAreaView)`
   flex: 1;
-  background-color: #fff;
-  margin-top: ${verticalScale(32)}px;
+  background-color: ${theme.colors.white};
   padding-bottom: ${verticalScale(16)}px;
+  padding-top: ${verticalScale(32)}px;
   padding-horizontal: ${horizontalScale(16)}px;
 `;
 

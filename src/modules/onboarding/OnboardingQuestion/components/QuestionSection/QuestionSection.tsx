@@ -99,12 +99,12 @@ const QuestionSection: React.FC<QuestionProps> = ({
         )}
       />
       <S.ButtonContainer>
-        <Button
-          text={'Continuar'}
-          onPress={() => {
-            onContinue(id as keyof ICIQAnswers);
-          }}
-        />
+          <Button
+            text={'Continuar'}
+            onPress={() => {
+              onContinue(id as keyof ICIQAnswers);
+            }}
+          />
       </S.ButtonContainer>
     </S.Wrapper>
   );
