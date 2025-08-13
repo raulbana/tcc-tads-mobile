@@ -20,7 +20,7 @@ const BottomStack: React.FC = () => {
         <S.BarContainer>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
-            const cfg = items.find(i => i.name === (route.name as any));
+            const cfg = items.find(i => i.name === route.name);
             if (!cfg) return null;
             const onPress = () => {
               const event = navigation.emit({
