@@ -31,6 +31,7 @@ export interface Typography {
     b3: TextProps;
     b4: TextProps;
     b5: TextProps;
+    m0: TextProps;
     m1: TextProps;
     m2: TextProps;
     m3: TextProps;
@@ -86,6 +87,7 @@ const typography: Typography = {
     b4: {fontSize: '18', fontWeight: '700', fontFamily: fonts.bold},
     b5: {fontSize: '20', fontWeight: '700', fontFamily: fonts.bold},
 
+    m0: {fontSize: '10', fontWeight: '500', fontFamily: fonts.medium},
     m1: {fontSize: '12', fontWeight: '500', fontFamily: fonts.medium},
     m2: {fontSize: '14', fontWeight: '500', fontFamily: fonts.medium},
     m3: {fontSize: '16', fontWeight: '500', fontFamily: fonts.medium},

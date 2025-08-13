@@ -13,6 +13,13 @@ const colors = {
   gray_07: '#6D7785',
   gray_08: '#1A1A1A',
 
+  default_green: '#00B545',
+  checked_green: '#07BA67',
+  pastel_green: '#D5FFCF',
+  pastel_blue: '#CFDEFF',
+  pastel_red: '#FFEAEA',
+  pastel_yellow: '#FDFFD1',
+
   error: '#FF4D4F',
   error_02: '#FF7875',
   info: '#1677FF',

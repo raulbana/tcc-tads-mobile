@@ -2,10 +2,6 @@ import { useQuery, QueryKey } from '@tanstack/react-query';
 import { Question } from '../../../types/question';
 import onboardingServices from '../services/onboardingServices';
 
-function findQuestionById(id: string, questions: Question[]): Question | undefined {
-  return questions.find(q => q.id === id);
-}
-
 export const onboardingQueryFactory = (queryKey: QueryKey) => {
   return {
     getQuestions: () => useQuery<Question[]>({
@@ -18,12 +14,6 @@ export const onboardingQueryFactory = (queryKey: QueryKey) => {
       select: (data: Question[]) => data.map((question) => ({
         ...question,
       })),
-    }),
-    getQuestionById: (id: string) => useQuery<Question | undefined>({
-      queryKey: [...queryKey, 'questions'],
-      queryFn: () => onboardingServices.getQuestions(),
-      staleTime: 1000 * 60 * 5,
-      select: (questions: Question[]) => findQuestionById(id, questions),
     }),
   };
 };

@@ -1,0 +1,1 @@
+export type LeakageLevel = 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH'

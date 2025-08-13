@@ -10,6 +10,7 @@ module.exports = {
       "safe": false,
       "allowUndefined": true
     }
-  ]
+  ],
+  'react-native-worklets/plugin',
   ]
 };
