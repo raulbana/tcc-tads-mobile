@@ -29,7 +29,7 @@ const BottomStack: React.FC = () => {
                 canPreventDefault: true,
               });
               if (!focused && !event.defaultPrevented) {
-                navigation.navigate(route.name as never);
+                navigation.navigate(route.name as keyof MainTabParamList);
               }
             };
             return (
