@@ -23,7 +23,7 @@ export function useCalendar() {
   );
 
   const daysFlat: DayItem[] = useMemo(() => {
-    const backendMap: Record<string, any> = data ?? {};
+    const backendMap: Record<string, CalendarDayData> = data ?? {};
 
     const selectedMonth = monthRef.month();
     const selectedYear = monthRef.year();
