@@ -17,6 +17,7 @@ export interface CalendarTileProps {
   isSelected?: boolean;
   isDisabled?: boolean;
   onPress?: () => void;
+  width?: number;
 }
 
 const CalendarTile: React.FC<CalendarTileProps> = props => {
