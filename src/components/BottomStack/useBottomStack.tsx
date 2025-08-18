@@ -9,12 +9,17 @@ import {MainTabParamList} from '../../navigation/routes';
 import theme from '../../theme/theme';
 import {moderateScale} from '../../utils/scales';
 import {JSX} from 'react';
+import Home from '../../modules/core/Home/Home';
+import Diary from '../../modules/diary/Diary';
 
 export interface BottomStackItemConfig {
   name: keyof MainTabParamList;
   label: string;
   icon: (focused: boolean, color: string, size?: number) => JSX.Element;
+  component: React.FC;
 }
+
+const Placeholder: React.FC = () => null;
 
 export const useBottomStack = () => {
   const defaultSize = moderateScale(28);
@@ -25,6 +30,7 @@ export const useBottomStack = () => {
       icon: (f, c, s = defaultSize) => (
         <House weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
+      component: Home,
     },
     {
       name: 'Diary',
@@ -32,6 +38,7 @@ export const useBottomStack = () => {
       icon: (f, c, s = defaultSize) => (
         <CalendarCheck weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
+      component: Diary,
     },
     {
       name: 'Exercises',
@@ -39,6 +46,7 @@ export const useBottomStack = () => {
       icon: (f, c, s = defaultSize) => (
         <Barbell weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
+      component: Placeholder,
     },
     {
       name: 'Contents',
@@ -46,6 +54,7 @@ export const useBottomStack = () => {
       icon: (f, c, s = defaultSize) => (
         <Book weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
+      component: Placeholder,
     },
     {
       name: 'Account',
@@ -53,6 +62,7 @@ export const useBottomStack = () => {
       icon: (f, c, s = defaultSize) => (
         <UserCircle weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
+      component: Placeholder,
     },
   ];
   return {

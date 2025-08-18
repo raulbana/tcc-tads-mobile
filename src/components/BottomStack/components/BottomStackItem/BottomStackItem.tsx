@@ -3,7 +3,6 @@ import * as S from './styles';
 import Label from '../../../Label/Label';
 import theme from '../../../../theme/theme';
 import {BottomStackItemConfig} from '../../useBottomStack';
-import {moderateScale} from '../../../../utils/scales';
 
 interface BottomStackItemProps {
   item: BottomStackItemConfig;

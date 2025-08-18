@@ -4,9 +4,6 @@ import {MainTabParamList} from '../../navigation/routes';
 import {useBottomStack} from './useBottomStack';
 import * as S from './styles';
 import BottomStackItem from './components/BottomStackItem/BottomStackItem';
-import Home from '../../modules/core/Home/Home';
-
-const Placeholder: React.FC = () => null;
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -49,7 +46,7 @@ const BottomStack: React.FC = () => {
         <Tab.Screen
           key={item.name}
           name={item.name}
-          component={item.name === 'Home' ? Home : Placeholder}
+          component={item.component}
         />
       ))}
     </Tab.Navigator>
