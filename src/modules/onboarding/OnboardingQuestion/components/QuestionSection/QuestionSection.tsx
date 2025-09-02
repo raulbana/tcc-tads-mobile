@@ -6,105 +6,121 @@ import theme from '../../../../../theme/theme';
 import DatePicker from '../../../../../components/DatePicker/DatePicker';
 import RadioButtonGroup from '../../../../../components/RadioButtonGroup/RadioButtonGroup';
 import Button from '../../../../../components/Button/Button';
-import {Control, Controller} from 'react-hook-form';
+import Input from '../../../../../components/Input/Input';
+import SliderInput from '../../../../../components/Slider/SliderInput';
+import {Control, useFormState} from 'react-hook-form';
 import {ICIQAnswers} from '../../schema/questionnaire';
-import SliderQuestion from '../../../../../components/Slider/SliderInput';
+import {useQuestionSection} from './useQuestionSection';
+
 export interface QuestionProps {
   question: Question;
-  control?: Control<ICIQAnswers>;
-  onContinue: (field: keyof ICIQAnswers) => void;
+  control: Control<ICIQAnswers>;
+  onContinue: (id: keyof ICIQAnswers) => void;
+  setValue: (name: keyof ICIQAnswers, value: any) => void;
 }
 
 const QuestionSection: React.FC<QuestionProps> = ({
   question,
   control,
   onContinue,
+  setValue,
 }) => {
-  const validDate = (value?: string | number | string[] | Date) => {
-    if (typeof value === 'string') {
-      const date = new Date(value);
-      return !isNaN(date.getTime()) ? date : null;
-    }
-    if (typeof value === 'number') {
-      const date = new Date(value);
-      return !isNaN(date.getTime()) ? date : null;
-    }
-    if (Array.isArray(value) && value.length > 0) {
-      const date = new Date(value[0]);
-      return !isNaN(date.getTime()) ? date : null;
-    }
-    if (value instanceof Date && !isNaN(value.getTime())) {
-      return value;
-    }
-    return null;
-  };
+  const {text: questionText, type, options, min, max, step} = question;
 
-  const {id, text, type, options, min, max, step} = question;
+  const {errors} = useFormState({control});
+  const fieldError = errors[question.id as keyof ICIQAnswers];
+
+  const {
+    localValue,
+    validDate,
+    handleContinue,
+    handleTextChange,
+    handleDateChange,
+    handleRadioChange,
+    handleSliderChange,
+    handleCheckboxGroupChange,
+  } = useQuestionSection({question, control, onContinue, setValue});
+
+  const renderInputByType = () => {
+    switch (type) {
+      case 'text':
+        return (
+          <Input
+            value={localValue as string}
+            onChangeText={handleTextChange}
+            placeholder="Digite sua resposta"
+            error={fieldError?.message}
+            required={question.required}
+            onChange={handleTextChange}
+          />
+        );
+
+      case 'date':
+        return (
+          <DatePicker
+            value={validDate(localValue) ?? new Date()}
+            onChange={(date: Date) => {
+              handleDateChange(date.toISOString());
+            }}
+            onCancel={() => {}}
+            modal={false}
+            maximumDate={new Date()}
+            mode="date"
+          />
+        );
+
+      case 'radio':
+        return (
+          <RadioButtonGroup
+            options={options || []}
+            value={localValue as string}
+            onChange={handleRadioChange}
+          />
+        );
+
+      case 'slider':
+        return (
+          <SliderInput
+            value={localValue as number}
+            onValueChange={handleSliderChange}
+            min={min ?? 0}
+            max={max}
+            step={step}
+          />
+        );
+
+      case 'checkbox':
+        return (
+          <RadioButtonGroup
+            options={options || []}
+            value={localValue as string[]}
+            onChange={(updated: string[] | string) => {
+              const arr = Array.isArray(updated) ? updated : [updated];
+              handleCheckboxGroupChange(arr);
+            }}
+            multiSelect={true}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <S.Wrapper>
-      <Label
-        typography={theme.typography.title.h4}
-        color={theme.colors.gray_08}
-        text={text}
-      />
-      <Controller
-        control={control}
-        name={id as keyof ICIQAnswers}
-        render={({field: {onChange: onFieldChange, value}}) => (
-          <>
-            {type === 'date' && (
-              <DatePicker
-                value={validDate(value) ?? new Date()}
-                onChange={(date: Date) => {
-                  onFieldChange(date.toISOString());
-                }}
-                onCancel={() => {}}
-                modal={false}
-                maximumDate={new Date()}
-                mode="date"
-              />
-            )}
-            {type === 'radio' && (
-              <RadioButtonGroup
-                options={options || []}
-                value={value}
-                onChange={selected => {
-                  onFieldChange(selected);
-                }}
-              />
-            )}
-            {type === 'slider' && (
-              <SliderQuestion
-                value={value as number}
-                onValueChange={selected => {
-                  onFieldChange(selected);
-                }}
-                min={min ?? 0}
-                max={max}
-                step={step}
-              />
-            )}
-            {type === 'checkbox' && (
-              <RadioButtonGroup
-                options={options || []}
-                value={value}
-                onChange={selected => {
-                  onFieldChange(selected);
-                }}
-                multiSelect={true}
-              />
-            )}
-          </>
-        )}
-      />
+      <S.QuestionContainer>
+        <Label
+          typography={theme.typography.title.h4}
+          color={theme.colors.gray_08}
+          text={questionText}
+        />
+
+        <S.InputContainer>{renderInputByType()}</S.InputContainer>
+      </S.QuestionContainer>
+
       <S.ButtonContainer>
-          <Button
-            text={'Continuar'}
-            onPress={() => {
-              onContinue(id as keyof ICIQAnswers);
-            }}
-          />
+        <Button text="Continuar" onPress={handleContinue} />
       </S.ButtonContainer>
     </S.Wrapper>
   );

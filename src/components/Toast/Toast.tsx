@@ -32,7 +32,7 @@ const Toast: React.FC<ToastProps> = ({
       {icon && <S.IconContainer>{icon}</S.IconContainer>}
       {typeof message === 'string' ? (
         <Label
-          typography={theme.typography.paragraph.r4}
+          typography={theme.typography.paragraph.r2}
           color={getTextColor(type)}
           text={message}
         />

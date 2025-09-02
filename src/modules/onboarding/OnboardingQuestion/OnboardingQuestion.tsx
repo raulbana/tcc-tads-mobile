@@ -49,6 +49,7 @@ const OnboardingQuestion = () => {
             question={questionInputs[currentQuestionIndex].question}
             control={questionInputs[currentQuestionIndex].control}
             onContinue={questionInputs[currentQuestionIndex].onContinue}
+            setValue={questionInputs[currentQuestionIndex].setValue}
           />
         )}
       </S.Wrapper>

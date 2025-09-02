@@ -1,13 +1,11 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import Label from '../Label/Label';
 import theme from '../../theme/theme';
 import DatePicker from 'react-native-date-picker';
 import useDatePicker from './useDatePicker';
 import Input from '../Input/Input';
 import * as S from './styles';
-import 'moment/locale/pt-br';
 import moment from 'moment';
-import {TouchableOpacity} from 'react-native';
 
 type DatePickerInputProps = {
   label?: string;
@@ -20,6 +18,7 @@ type DatePickerInputProps = {
   mode?: 'date' | 'time' | 'datetime';
   modal?: boolean;
   placeholder?: string;
+  disabled?: boolean;
 };
 
 const DatePickerInput: React.FC<DatePickerInputProps> = ({
@@ -33,8 +32,21 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
   mode = 'date',
   modal = false,
   placeholder,
+  disabled = false,
 }) => {
-  const {isOpen, setIsOpen} = useDatePicker();
+  const {isOpen, openModal, closeModal} = useDatePicker();
+
+  const displayValue = useMemo(() => {
+    if (!value) return '';
+    switch (mode) {
+      case 'time':
+        return moment(value).format('HH:mm');
+      case 'datetime':
+        return moment(value).format('DD/MM/YYYY HH:mm');
+      default:
+        return moment(value).format('DD/MM/YYYY');
+    }
+  }, [value, mode]);
 
   return (
     <S.Container>
@@ -46,45 +58,61 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
         />
       )}
 
-      {modal && (
-        <TouchableOpacity onPress={() => setIsOpen(true)}>
+      {modal ? (
+        <S.InputPressable disabled={disabled} onPress={openModal}>
           <Input
             type="date"
-            onChange={inputValue => {
-              const date = inputValue ? new Date(inputValue) : new Date();
-              onChange(date);
+            value={displayValue}
+            placeholder={
+              placeholder ??
+              (mode === 'time' ? 'Selecione o horário' : 'Selecione a data')
+            }
+            disabled={true}
+            onFocus={() => {
+              if (!disabled) openModal();
             }}
-            disabled={false}
-            value={value ? moment(value).format('DD/mm/YYYY') : ''}
-            onFocus={() => setIsOpen(true)}
-            placeholder={placeholder ?? 'Selecione uma data'}
+            onChange={() => {}}
           />
-        </TouchableOpacity>
+        </S.InputPressable>
+      ) : (
+        <Input
+          type="date"
+          value={displayValue}
+          placeholder={
+            placeholder ??
+            (mode === 'time' ? 'Selecione o horário' : 'Selecione a data')
+          }
+          disabled={disabled}
+          onChange={str => {
+            if (!str) return;
+            const dt = new Date(str);
+            if (!isNaN(dt.getTime())) onChange(dt);
+          }}
+        />
       )}
+
       <DatePicker
         modal={modal}
-        mode={mode}
-        onDateChange={date => {
-          if (!date) return;
-          if (modal) return;
-          onChange(date);
-          setIsOpen(false);
-        }}
         open={modal ? isOpen : true}
-        date={value}
-        onConfirm={date => {
-          onChange(date);
-          setIsOpen(false);
-        }}
-        onCancel={() => {
-          onCancel();
-          setIsOpen(false);
-        }}
-        maximumDate={maximumDate}
+        date={value || new Date()}
+        mode={mode}
         minimumDate={minimumDate}
+        maximumDate={maximumDate}
         locale="pt-BR"
         theme="light"
         dividerColor={theme.colors.gray_04}
+        onConfirm={date => {
+          onChange(date);
+          closeModal();
+        }}
+        onCancel={() => {
+          onCancel();
+          closeModal();
+        }}
+        onDateChange={date => {
+          if (modal) return;
+          onChange(date);
+        }}
       />
     </S.Container>
   );

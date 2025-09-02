@@ -9,6 +9,21 @@ export const Wrapper = styled.View`
   flex: 1;
 `;
 
+export const QuestionContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: ${verticalScale(24)}px;
+  max-width: ${moderateScale(400)}px;
+  width: 100%;
+`;
+
+export const InputContainer = styled.View`
+  width: 100%;
+  align-items: center;
+  gap: ${verticalScale(16)}px;
+`;
+
 export const ButtonContainer = styled.View`
   width: 100%;
   flex: 1;

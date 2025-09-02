@@ -1,15 +1,41 @@
-import {useMemo, useState, useCallback} from 'react';
+import {useMemo, useState, useCallback, useEffect} from 'react';
 import moment, {Moment} from 'moment';
-import {DayItem} from '../../../../components/Calendar/components/CalendarTile/CalendarTile';
-import {LeakageLevel} from '../../../../types/diary';
+import {
+  CalendarDayData,
+  LeakageLevel,
+  UrinationData,
+} from '../../../../types/diary';
 import {
   buildMonthMatrix,
   formatToFirstLetterUppercase,
   getMonthIsoRange,
 } from '../../../../utils/calendarUtils';
 import useDiaryQueries from '../../services/diaryQueryFactory';
+import {useWindowDimensions} from 'react-native';
+import {horizontalScale} from '../../../../utils/scales';
 
 export function useCalendar() {
+  const [isRegisterModalOpen, setIsRegisterModalOpen] =
+    useState<boolean>(false);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+  const [isEditingModalOpen, setIsEditingModalOpen] = useState<boolean>(false);
+
+  const [selectedRegisterItem, setSelectedRegisterItem] =
+    useState<UrinationData | null>(null);
+
+  const [selectedDayItem, setSelectedDayItem] =
+    useState<CalendarDayData | null>(null);
+
+  const onPressDay = useCallback((dayItem: CalendarDayData) => {
+    setSelectedDayItem(dayItem);
+    setIsRegisterModalOpen(true);
+  }, []);
+
+  const COLUMNS = 6;
+  const CELL_GAP = horizontalScale(8);
+  const PADDING_H = horizontalScale(16);
+
   const [monthRef, setMonthRef] = useState<Moment>(moment());
 
   const matrix = useMemo(() => buildMonthMatrix(monthRef), [monthRef]);
@@ -22,7 +48,16 @@ export function useCalendar() {
     new Date(to),
   );
 
-  const daysFlat: DayItem[] = useMemo(() => {
+  const onEditRegister = useCallback(
+    (register: UrinationData) => {
+      setIsRegisterModalOpen(false);
+      setSelectedRegisterItem(register);
+      setIsEditingModalOpen(true);
+    },
+    [selectedDayItem, selectedRegisterItem],
+  );
+
+  const daysFlat: CalendarDayData[] = useMemo(() => {
     const backendMap: Record<string, CalendarDayData> = data ?? {};
 
     const selectedMonth = monthRef.month();
@@ -66,6 +101,18 @@ export function useCalendar() {
     setMonthRef(moment({year, month: monthIndex0Based, date: 1}));
   }, []);
 
+  const {width: screenWidth} = useWindowDimensions();
+  const tileWidth = Math.floor(
+    (screenWidth - PADDING_H * 2 - CELL_GAP * (COLUMNS - 1)) / COLUMNS,
+  );
+  const rows = useMemo(() => {
+    const out: CalendarDayData[][] = [];
+    for (let i = 0; i < daysFlat.length; i += COLUMNS) {
+      out.push(daysFlat.slice(i, i + COLUMNS));
+    }
+    return out;
+  }, [daysFlat]);
+
   return {
     monthRef,
     monthLabel: formatToFirstLetterUppercase(monthRef.format('MMMM [de] YYYY')),
@@ -76,5 +123,19 @@ export function useCalendar() {
     goPrevMonth,
     goNextMonth,
     setMonth,
+    tileWidth,
+    rows,
+    COLUMNS,
+    isRegisterModalOpen,
+    setIsRegisterModalOpen,
+    onPressDay,
+    selectedDayItem,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    isEditingModalOpen,
+    setIsEditingModalOpen,
+    selectedRegisterItem,
+    setSelectedRegisterItem,
+    onEditRegister,
   };
 }

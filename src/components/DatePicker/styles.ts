@@ -1,9 +1,12 @@
 import styled from 'styled-components/native';
-import { verticalScale } from '../../utils/scales';
+import {verticalScale} from '../../utils/scales';
 
 export const Container = styled.View`
-  display: flex;
   flex-direction: column;
-  flex:1;
-  gap: ${verticalScale(16)}px;
+  width: 100%;
+  gap: ${verticalScale(12)}px;
+`;
+
+export const InputPressable = styled.TouchableOpacity`
+  width: 100%;
 `;
