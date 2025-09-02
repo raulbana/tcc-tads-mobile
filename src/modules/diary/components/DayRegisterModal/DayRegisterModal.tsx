@@ -92,17 +92,18 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
     {key: 'reason', label: 'Motivo'},
   ];
 
+  const dateIsoString = useMemo(() => dayItem.date.toISOString(), [dayItem.date]);
   const rows: TableRow[] = useMemo(
     () =>
       records.map((r, idx) => ({
-        id: `${dayItem.date.toISOString()}-${idx}`,
+        id: `${dateIsoString}-${idx}`,
         time: r.time,
         amount: amountLabel[r.amount] ?? r.amount,
         urgency: r.urgency,
         leakage: r.leakage,
         reason: r.reason || '—',
       })),
-    [records, dayItem.date],
+    [records, dateIsoString],
   );
 
   const hasRealData = !!dayItem.urinationData?.length;

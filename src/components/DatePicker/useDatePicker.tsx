@@ -2,9 +2,6 @@ import {useState} from 'react';
 
 const useDatePicker = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const openModal = () => {
-    setIsOpen(true);
-    console.log('opened')
   }
   const closeModal = () => setIsOpen(false);
   return {isOpen, openModal, closeModal, setIsOpen};

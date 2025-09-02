@@ -98,7 +98,7 @@ const useOnboardingQuestion = () => {
         setIsToastOpen(true);
       }
     },
-    [getValues, trigger, questionList, getFieldState, setValue, errorMessage],
+    [getValues, trigger, questionList.length, getFieldState, setValue, errorMessage],
   );
 
   const onCloseToast = () => {
