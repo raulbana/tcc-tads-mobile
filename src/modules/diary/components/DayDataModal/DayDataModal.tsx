@@ -9,6 +9,7 @@ export interface DayDataModalProps {
   onSubmit: (data: DayDataFormValues) => void;
   selectedValues?: DayDataFormValues;
   title: string;
+  baseDate?: Date;
 }
 
 const DayDataModal: React.FC<DayDataModalProps> = ({
@@ -17,10 +18,15 @@ const DayDataModal: React.FC<DayDataModalProps> = ({
   onSubmit,
   title,
   selectedValues,
+  baseDate,
 }) => {
   return (
     <BottomModal isOpen={isOpen} onClose={onClose} title={title}>
-      <DayDataForm onSubmit={onSubmit} defaultValues={selectedValues} />
+      <DayDataForm
+        onSubmit={onSubmit}
+        defaultValues={selectedValues}
+        baseDate={baseDate}
+      />
     </BottomModal>
   );
 };

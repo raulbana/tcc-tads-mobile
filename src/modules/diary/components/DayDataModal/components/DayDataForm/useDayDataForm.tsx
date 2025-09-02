@@ -15,6 +15,7 @@ export type DayDataFormValues = UrinationData;
 export interface UseDayDataFormParams {
   defaultValues?: Partial<DayDataFormValues>;
   onSubmit: (data: DayDataFormValues) => void;
+  baseDate?: Date;
 }
 
 const buildDefaults = (dv?: Partial<DayDataFormValues>): DayDataRawForm => {
@@ -28,10 +29,8 @@ const buildDefaults = (dv?: Partial<DayDataFormValues>): DayDataRawForm => {
   return {
     time,
     amount: (dv?.amount as DayDataRawForm['amount']) || 'LOW',
-    urgency:
-      dv?.urgency === true ? 'YES' : 'NO',
-    leakage:
-      dv?.leakage === true ? 'YES' : 'NO',
+    urgency: dv?.urgency === true ? 'YES' : 'NO',
+    leakage: dv?.leakage === true ? 'YES' : 'NO',
     reason: dv?.reason || '',
   };
 };
@@ -39,6 +38,7 @@ const buildDefaults = (dv?: Partial<DayDataFormValues>): DayDataRawForm => {
 export function useDayDataForm({
   defaultValues,
   onSubmit,
+  baseDate,
 }: UseDayDataFormParams) {
   const {
     control,
@@ -79,6 +79,18 @@ export function useDayDataForm({
 
   const handleConfirm = handleSubmit(submit);
 
+  const currentTimeDate = useMemo(() => {
+    const base = baseDate ? moment(baseDate) : moment();
+    const t = moment(timeString, 'HH:mm');
+    return base
+      .clone()
+      .hour(t.isValid() ? t.hour() : 0)
+      .minute(t.isValid() ? t.minute() : 0)
+      .second(0)
+      .millisecond(0)
+      .toDate();
+  }, [baseDate, timeString]);
+
   return {
     control,
     errors,
@@ -88,5 +100,6 @@ export function useDayDataForm({
     timeString,
     volumeOptions,
     yesNoOptions,
+    currentTimeDate,
   };
 }

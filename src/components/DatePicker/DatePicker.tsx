@@ -26,7 +26,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
   value,
   onChange,
   minimumDate,
-  maximumDate = new Date(),
+  maximumDate,
   required,
   onCancel,
   mode = 'date',
@@ -98,6 +98,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
         mode={mode}
         minimumDate={minimumDate}
         maximumDate={maximumDate}
+        is24hourSource="locale"
         locale="pt-BR"
         theme="light"
         dividerColor={theme.colors.gray_04}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Controller} from 'react-hook-form';
 import {useDayDataForm, DayDataFormValues} from './useDayDataForm';
 import * as S from './styles';
@@ -16,6 +16,7 @@ export interface DayDataFormProps {
   onSubmit: (data: DayDataFormValues) => void;
   onCancel?: () => void;
   loading?: boolean;
+  baseDate?: Date;
 }
 
 const DayDataForm: React.FC<DayDataFormProps> = ({
@@ -23,11 +24,16 @@ const DayDataForm: React.FC<DayDataFormProps> = ({
   onSubmit,
   onCancel,
   loading,
+  baseDate,
 }) => {
-  const {control, errors, isValid, handleConfirm, setTimeFromDate, timeString} =
-    useDayDataForm({defaultValues, onSubmit});
-
-  const currentTimeDate = moment(timeString, 'HH:mm').toDate();
+  const {
+    control,
+    errors,
+    isValid,
+    handleConfirm,
+    setTimeFromDate,
+    currentTimeDate,
+  } = useDayDataForm({defaultValues, onSubmit, baseDate});
 
   return (
     <S.FormContainer>
@@ -47,12 +53,6 @@ const DayDataForm: React.FC<DayDataFormProps> = ({
               value={currentTimeDate}
               onChange={setTimeFromDate}
               onCancel={() => {}}
-              maximumDate={new Date()}
-              minimumDate={
-                defaultValues?.time
-                  ? moment(defaultValues.time, 'HH:mm').toDate()
-                  : undefined
-              }
             />
           )}
         />

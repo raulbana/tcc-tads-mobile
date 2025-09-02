@@ -85,6 +85,7 @@ const Calendar: React.FC = () => {
         onSubmit={formData => {
           console.log('Add: ', formData);
         }}
+        baseDate={selectedDayItem?.date}
       />
 
       {selectedRegisterItem && (
@@ -95,13 +96,8 @@ const Calendar: React.FC = () => {
           onSubmit={formData => {
             console.log('Edit: ', formData);
           }}
-          selectedValues={
-            selectedRegisterItem
-              ? {
-                  ...selectedRegisterItem,
-                }
-              : undefined
-          }
+          selectedValues={selectedRegisterItem}
+          baseDate={selectedDayItem?.date}
         />
       )}
     </S.Container>
