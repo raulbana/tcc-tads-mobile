@@ -55,7 +55,7 @@ export function useDayDataForm({
 
   useEffect(() => {
     reset(buildDefaults(defaultValues));
-  }, [reset, JSON.stringify(defaultValues)]);
+  }, [reset, defaultValues]);
 
   const timeString = watch('time');
 
