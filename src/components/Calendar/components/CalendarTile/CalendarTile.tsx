@@ -1,19 +1,11 @@
 import React from 'react';
-import {LeakageLevel} from '../../../../types/diary';
+import {CalendarDayData} from '../../../../types/diary';
 import * as S from './styles';
 import Label from '../../../Label/Label';
 import theme from '../../../../theme/theme';
 
-export interface DayItem {
-  dayTitle: string;
-  dayNumber: number;
-  date: Date;
-  isToday?: boolean;
-  level?: LeakageLevel;
-}
-
 export interface CalendarTileProps {
-  dayItem: DayItem;
+  dayItem: CalendarDayData;
   isSelected?: boolean;
   isDisabled?: boolean;
   onPress?: () => void;

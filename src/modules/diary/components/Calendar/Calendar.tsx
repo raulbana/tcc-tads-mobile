@@ -1,35 +1,33 @@
-import React, {useMemo} from 'react';
-import {useWindowDimensions, View} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import {CaretLeft, CaretRight} from 'phosphor-react-native';
-import CalendarTile, {
-  DayItem,
-} from '../../../../components/Calendar/components/CalendarTile/CalendarTile';
+import CalendarTile from '../../../../components/Calendar/components/CalendarTile/CalendarTile';
 import Label from '../../../../components/Label/Label';
 import theme from '../../../../theme/theme';
-import {horizontalScale} from '../../../../utils/scales';
 import {useCalendar} from './useCalendar';
 import * as S from './styles';
-import Loader from '../../../../components/Loader/Loader';
-
-const COLUMNS = 6;
-const CELL_GAP = horizontalScale(8);
-const PADDING_H = horizontalScale(16);
+import DayRegisterModal from '../DayRegisterModal/DayRegisterModal';
+import DayDataModal from '../DayDataModal/DayDataModal';
 
 const Calendar: React.FC = () => {
-  const {width: screenWidth} = useWindowDimensions();
-  const tileWidth = Math.floor(
-    (screenWidth - PADDING_H * 2 - CELL_GAP * (COLUMNS - 1)) / COLUMNS,
-  );
-
-  const {monthLabel, daysFlat, goPrevMonth, goNextMonth} = useCalendar();
-
-  const rows = useMemo(() => {
-    const out: DayItem[][] = [];
-    for (let i = 0; i < daysFlat.length; i += COLUMNS) {
-      out.push(daysFlat.slice(i, i + COLUMNS));
-    }
-    return out;
-  }, [daysFlat]);
+  const {
+    monthLabel,
+    goPrevMonth,
+    goNextMonth,
+    rows,
+    tileWidth,
+    COLUMNS,
+    isRegisterModalOpen,
+    setIsRegisterModalOpen,
+    onPressDay,
+    selectedDayItem,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    isEditingModalOpen,
+    setIsEditingModalOpen,
+    selectedRegisterItem,
+    onEditRegister,
+  } = useCalendar();
 
   return (
     <S.Container>
@@ -57,13 +55,51 @@ const Calendar: React.FC = () => {
                 <View
                   key={`${item.date.toISOString()}-${j}`}
                   style={{width: tileWidth}}>
-                  <CalendarTile dayItem={item} width={tileWidth} />
+                  <CalendarTile
+                    dayItem={item}
+                    width={tileWidth}
+                    onPress={() => onPressDay(item)}
+                  />
                 </View>
               ))}
             </S.Row>
           );
         })}
       </S.Grid>
+      {selectedDayItem && (
+        <DayRegisterModal
+          dayItem={selectedDayItem}
+          isOpen={isRegisterModalOpen}
+          onClose={() => setIsRegisterModalOpen(false)}
+          onAddRecord={() => {
+            setIsRegisterModalOpen(false);
+            setIsAddModalOpen(true);
+          }}
+          onEditRecord={onEditRegister}
+        />
+      )}
+      <DayDataModal
+        title="Novo Registro"
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={formData => {
+          console.log('Add: ', formData);
+        }}
+        baseDate={selectedDayItem?.date}
+      />
+
+      {selectedRegisterItem && (
+        <DayDataModal
+          title="Editar Registro"
+          isOpen={isEditingModalOpen}
+          onClose={() => setIsEditingModalOpen(false)}
+          onSubmit={formData => {
+            console.log('Edit: ', formData);
+          }}
+          selectedValues={selectedRegisterItem}
+          baseDate={selectedDayItem?.date}
+        />
+      )}
     </S.Container>
   );
 };

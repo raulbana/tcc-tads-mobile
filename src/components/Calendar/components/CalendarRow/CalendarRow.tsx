@@ -1,11 +1,11 @@
 import React from 'react';
 import * as S from './styles';
 import Animated from 'react-native-reanimated';
-import {DayItem} from '../CalendarTile/CalendarTile';
 import {useCalendarRow, ITEM_WIDTH, SPACING} from './useCalendarRow';
 import CalendarRowItem from './components/CalendarRowItem';
+import { CalendarDayData } from '../../../../types/diary';
 
-const days: DayItem[] = [
+const days: CalendarDayData[] = [
   {dayTitle: 'Dom', dayNumber: 11, level: 'LOW', date: new Date()},
   {dayTitle: 'Seg', dayNumber: 12, level: 'MEDIUM', date: new Date()},
   {dayTitle: 'Ter', dayNumber: 13, level: 'HIGH', date: new Date()},

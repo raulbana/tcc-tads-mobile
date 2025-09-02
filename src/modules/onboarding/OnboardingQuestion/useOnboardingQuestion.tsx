@@ -6,20 +6,27 @@ import {QuestionProps} from './components/QuestionSection/QuestionSection';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import useOnboardingQueries from '../services/onboardingQueryFactory';
+import {Question} from '../../../types/question';
 
 const useOnboardingQuestion = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isToastOpen, setIsToastOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const {getQuestions} = useOnboardingQueries(['onboarding', 'questions']);
-  const {data: questionList = [], isLoading, error} = getQuestions();
+  const onboardingQueries = useOnboardingQueries(['onboarding', 'questions']);
+  const {
+    data: questionList = [],
+    isLoading,
+    error,
+  } = onboardingQueries.getQuestions();
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
   useEffect(() => {
     if (error && !isToastOpen) {
-      setErrorMessage('Erro ao carregar perguntas. Tente novamente mais tarde.');
+      setErrorMessage(
+        'Erro ao carregar perguntas. Tente novamente mais tarde.',
+      );
       setIsToastOpen(true);
     }
   }, [error, isToastOpen]);
@@ -30,6 +37,7 @@ const useOnboardingQuestion = () => {
     getFieldState,
     getValues,
     trigger,
+    setValue,
     formState: {errors, isValid},
   } = useForm<ICIQAnswers>({
     resolver: zodResolver(iciqSchema),
@@ -44,6 +52,23 @@ const useOnboardingQuestion = () => {
     },
   });
 
+  const getDefaultValueForQuestion = (question: Question) => {
+    switch (question.type) {
+      case 'text':
+        return '';
+      case 'date':
+        return new Date().toISOString();
+      case 'slider':
+        return question.min || 0;
+      case 'radio':
+        return '';
+      case 'checkbox':
+        return [];
+      default:
+        return '';
+    }
+  };
+
   const onContinue = useCallback(
     async (field: keyof ICIQAnswers) => {
       const isFieldValid = await trigger(field);
@@ -52,19 +77,28 @@ const useOnboardingQuestion = () => {
         setCurrentQuestionIndex(prevIndex => {
           const nextIndex = prevIndex + 1;
           if (nextIndex < questionList.length) {
+            const nextQuestion = questionList[nextIndex];
+            const nextField = nextQuestion.id as keyof ICIQAnswers;
+            const defaultValue = getDefaultValueForQuestion(nextQuestion);
+            setValue(nextField, defaultValue);
             return nextIndex;
           } else {
             onSubmitAnswer();
             return prevIndex;
           }
         });
+
+        // Limpar erro ao avançar
+        if (errorMessage) {
+          setErrorMessage('');
+        }
       } else {
         const {error} = getFieldState(field);
         setErrorMessage(error?.message ?? 'Campo inválido');
         setIsToastOpen(true);
       }
     },
-    [getValues, trigger, questionList.length, getFieldState],
+    [getValues, trigger, questionList.length, getFieldState, setValue, errorMessage],
   );
 
   const onCloseToast = () => {
@@ -95,7 +129,13 @@ const useOnboardingQuestion = () => {
     control: control,
     onContinue: () => onContinue(question.id as keyof ICIQAnswers),
     selectedValue: getValues(question.id as keyof ICIQAnswers),
+    setValue: setValue, // Adicionar esta linha
   }));
+
+  const clearError = () => {
+    setErrorMessage('');
+    setIsToastOpen(false);
+  };
 
   return {
     currentQuestion: questionList[currentQuestionIndex],
@@ -112,6 +152,7 @@ const useOnboardingQuestion = () => {
     errorMessage,
     onCloseToast,
     navigateBack,
+    clearError, // Adicionar esta linha
   };
 };
 
