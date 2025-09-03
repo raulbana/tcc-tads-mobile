@@ -59,7 +59,7 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
     </S.StyledHeader>
   );
 
-  const resolvedHeader = header ?? (currentPage ? HeaderWithPageName : null);
+  const resolvedHeader = headerShown ? header ?? HeaderWithPageName : null;
 
   return (
     <Container style={containerStyle}>

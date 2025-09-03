@@ -27,7 +27,8 @@ const OnboardingQuestion = () => {
       headerShown
       goBack={navigateBack}
       goBackTo="Voltar"
-      currentPage="Questionário">
+      currentPage="Questionário"
+      >
       <Toast
         type={'ERROR'}
         message={errorMessage}

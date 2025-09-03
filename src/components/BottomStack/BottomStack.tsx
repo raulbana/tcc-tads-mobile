@@ -1,9 +1,10 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {MainTabParamList} from '../../navigation/routes';
-import {useBottomStack} from './useBottomStack';
+import {mainTabRoutes} from '../../navigation/MainTab/mainTabRoutes';
 import * as S from './styles';
 import BottomStackItem from './components/BottomStackItem/BottomStackItem';
+import {useBottomStack} from './useBottomStack';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -42,11 +43,11 @@ const BottomStack: React.FC = () => {
           })}
         </S.BarContainer>
       )}>
-      {items.map(item => (
+      {mainTabRoutes.map(route => (
         <Tab.Screen
-          key={item.name}
-          name={item.name}
-          component={item.component}
+          key={route.name}
+          name={route.name as keyof MainTabParamList}
+          component={route.component}
         />
       ))}
     </Tab.Navigator>
