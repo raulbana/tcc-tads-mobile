@@ -16,10 +16,16 @@ const Icon: React.FC<IconProps> = ({
   weight = 'regular',
   style,
 }) => {
-  const IconComponent = PhosphorIcons[name];
+  const IconComponent = PhosphorIcons[name] as React.ComponentType<IconProps>;
   if (!IconComponent) return null;
   return (
-    <IconComponent size={size} color={color} weight={weight} style={style} />
+    <IconComponent
+      size={size}
+      color={color}
+      weight={weight}
+      style={style}
+      name={name}
+    />
   );
 };
 
