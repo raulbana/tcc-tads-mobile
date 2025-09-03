@@ -3,41 +3,44 @@ import {
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
 import {ParamListBase, RouteProp, Theme} from '@react-navigation/native';
+
 import BottomStack from '../components/BottomStack/BottomStack';
-import OnboardingHome from '../modules/onboarding/OnboardingHome/OnboardingHome';
-import OnboardingQuestion from '../modules/onboarding/OnboardingQuestion/OnboardingQuestion';
+import AccessibilitySettings from '../modules/config/AccessibilitySettings/AccessibilitySettings';
+import OnboardingStack from './Onboarding/OnboardingStack';
 
 export type MainTabParamList = {
   Home: undefined;
   Diary: undefined;
   Exercises: undefined;
   Contents: undefined;
-  Account: undefined;
+  MyAccount: undefined;
 };
 
-export type ParamList = {
-  MainTabs: undefined;
+export type OnboardingParamList = {
   OnboardingHome: undefined;
   OnboardingQuestion: undefined;
 };
 
-export type RouteName = keyof ParamList;
-
-export interface Route<Name extends RouteName = RouteName> {
-  options:
-    | NativeStackNavigationOptions
-    | ((props: {
-        route: RouteProp<ParamListBase, RouteName>;
-        navigation: NativeStackNavigationProp<ParamListBase, string, undefined>;
-        theme: Theme;
-      }) => NativeStackNavigationOptions)
-    | undefined;
+export type RootParamList = {
+  MainTabs: {screen?: keyof MainTabParamList} | undefined;
+  Onboarding: {screen?: keyof OnboardingParamList} | undefined;
+  AccessibilitySettings: undefined;
+};
+export interface Route<
+  Name extends string = string,
+  ParamList extends ParamListBase = ParamListBase,
+> {
   name: Name;
   component: React.ComponentType<any>;
+  options?:
+    | NativeStackNavigationOptions
+    | ((props: {
+        route: RouteProp<ParamList, Name>;
+        navigation: NativeStackNavigationProp<ParamList, Name>;
+        theme: Theme;
+      }) => NativeStackNavigationOptions);
   params?: ParamList[Name];
 }
-
-export type NavigationStackProp = NativeStackNavigationProp<ParamList>;
 
 const routes: Route[] = [
   {
@@ -46,15 +49,17 @@ const routes: Route[] = [
     options: undefined,
   },
   {
-    name: 'OnboardingHome',
-    component: OnboardingHome,
+    name: 'Onboarding',
+    component: OnboardingStack,
     options: undefined,
   },
   {
-    name: 'OnboardingQuestion',
-    component: OnboardingQuestion,
+    name: 'AccessibilitySettings',
+    component: AccessibilitySettings,
     options: undefined,
   },
 ];
+
+export type NavigationStackProp = NativeStackNavigationProp<RootParamList>;
 
 export default routes;

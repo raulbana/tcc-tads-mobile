@@ -5,7 +5,7 @@ const useOnboardingHome = () => {
   const navigation = useNavigation<NavigationStackProp>();
 
   const navigateToQuestionnaire = () => {
-    navigation.navigate('OnboardingQuestion');
+    navigation.navigate('Onboarding', {screen: 'OnboardingQuestion'});
   };
   return {navigateToQuestionnaire};
 };

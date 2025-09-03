@@ -5,12 +5,13 @@ import {
   Book,
   UserCircle,
 } from 'phosphor-react-native';
-import {MainTabParamList} from '../../navigation/routes';
 import theme from '../../theme/theme';
 import {moderateScale} from '../../utils/scales';
 import {JSX} from 'react';
 import Home from '../../modules/core/Home/Home';
 import Diary from '../../modules/diary/Diary';
+import MyAccount from '../../modules/config/MyAccount/MyAccount';
+import { MainTabParamList } from '../../navigation/routes';
 
 export interface BottomStackItemConfig {
   name: keyof MainTabParamList;
@@ -57,12 +58,12 @@ export const useBottomStack = () => {
       component: Placeholder,
     },
     {
-      name: 'Account',
+      name: 'MyAccount',
       label: 'Conta',
       icon: (f, c, s = defaultSize) => (
         <UserCircle weight={f ? 'fill' : 'regular'} color={c} size={s} />
       ),
-      component: Placeholder,
+      component: MyAccount,
     },
   ];
   return {

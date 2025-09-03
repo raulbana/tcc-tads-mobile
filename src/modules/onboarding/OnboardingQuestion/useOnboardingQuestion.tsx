@@ -88,7 +88,6 @@ const useOnboardingQuestion = () => {
           }
         });
 
-        // Limpar erro ao avançar
         if (errorMessage) {
           setErrorMessage('');
         }
@@ -98,7 +97,14 @@ const useOnboardingQuestion = () => {
         setIsToastOpen(true);
       }
     },
-    [getValues, trigger, questionList.length, getFieldState, setValue, errorMessage],
+    [
+      getValues,
+      trigger,
+      questionList.length,
+      getFieldState,
+      setValue,
+      errorMessage,
+    ],
   );
 
   const onCloseToast = () => {
@@ -118,7 +124,7 @@ const useOnboardingQuestion = () => {
 
   const navigateBack = () => {
     if (currentQuestionIndex === 0) {
-      navigate('OnboardingHome');
+      navigate('Onboarding', {screen: 'OnboardingHome'});
     } else {
       setCurrentQuestionIndex(prev => prev - 1);
     }
