@@ -1,8 +1,16 @@
+import {useNavigation} from '@react-navigation/native';
 import theme from '../../../theme/theme';
 import {moderateScale} from '../../../utils/scales';
 import {OptionItem} from './components/OptionsList/OptionsList';
+import {NavigationStackProp} from '../../../navigation/routes';
 
 const useMyAccount = () => {
+  const {navigate} = useNavigation<NavigationStackProp>();
+
+  const navigateToAccessibilitySettings = () => {
+    navigate('AccessibilitySettings');
+  };
+
   const options: OptionItem[] = [
     {
       label: 'Acessibilidade',
@@ -11,6 +19,7 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
+      onPress: navigateToAccessibilitySettings,
     },
     {
       label: 'Notificações',
@@ -19,6 +28,7 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
+      onPress: () => {},
     },
     {
       label: 'Sobre o Aplicativo',
@@ -27,6 +37,7 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
+      onPress: () => {},
     },
     {
       label: 'Sair',
@@ -35,6 +46,7 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
+      onPress: () => {},
     },
   ];
 
