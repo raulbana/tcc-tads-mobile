@@ -26,6 +26,21 @@ export type RootParamList = {
   Onboarding: {screen?: keyof OnboardingParamList} | undefined;
   AccessibilitySettings: undefined;
 };
+export interface Route<
+  Name extends string = string,
+  ParamList extends ParamListBase = ParamListBase,
+> {
+  name: Name;
+  component: React.ComponentType<any>;
+  options?:
+    | NativeStackNavigationOptions
+    | ((props: {
+        route: RouteProp<ParamList, Name>;
+        navigation: NativeStackNavigationProp<ParamList, Name>;
+        theme: Theme;
+      }) => NativeStackNavigationOptions);
+  params?: ParamList[Name];
+}
 
 const routes: Route[] = [
   {
@@ -44,22 +59,6 @@ const routes: Route[] = [
     options: undefined,
   },
 ];
-
-export interface Route<
-  Name extends string = string,
-  ParamList extends ParamListBase = ParamListBase,
-> {
-  name: Name;
-  component: React.ComponentType<any>;
-  options?:
-    | NativeStackNavigationOptions
-    | ((props: {
-        route: RouteProp<ParamList, Name>;
-        navigation: NativeStackNavigationProp<ParamList, Name>;
-        theme: Theme;
-      }) => NativeStackNavigationOptions);
-  params?: ParamList[Name];
-}
 
 export type NavigationStackProp = NativeStackNavigationProp<RootParamList>;
 
