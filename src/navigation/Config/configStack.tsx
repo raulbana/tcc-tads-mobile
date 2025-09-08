@@ -1,5 +1,5 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {ConfigParamList, OnboardingParamList} from '../routes';
+import {ConfigParamList} from '../routes';
 import {configRoutes} from './configRoutes';
 
 const Stack = createNativeStackNavigator<ConfigParamList>();
