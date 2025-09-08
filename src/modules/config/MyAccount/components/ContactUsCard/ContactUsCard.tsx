@@ -5,7 +5,7 @@ import * as S from './styles';
 
 export interface ContactUsCardProps {
   onPress: () => void;
-}
+};
 
 const ContactUsCard: React.FC<ContactUsCardProps> = ({onPress}) => {
   return (
