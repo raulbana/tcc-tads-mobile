@@ -6,7 +6,6 @@ export const Wrapper = styled.View`
   gap: ${verticalScale(16)}px;
 `;
 
-//Button container for button on the end of the page
 export const ButtonContainer = styled.View`
   padding-horizontal: ${horizontalScale(16)}px;
   flex: 1;

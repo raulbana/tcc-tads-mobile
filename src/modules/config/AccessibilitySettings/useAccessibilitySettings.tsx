@@ -40,7 +40,10 @@ const useAccessibilitySettings = () => {
     onToggle: (value: boolean) => handleToggle(idx, value),
   }));
 
-  return {navigateToMyAccount, settingsList: itemsWithToggle};
+  return {
+    navigateToMyAccount,
+    settingsList: itemsWithToggle,
+  };
 };
 
 export default useAccessibilitySettings;

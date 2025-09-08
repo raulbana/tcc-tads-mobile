@@ -19,13 +19,13 @@ const useButton = () => {
   const getButtonTextSize = (size: ButtonSize): TypographyProps => {
     switch (size) {
       case 'SMALL':
-        return theme.typography.paragraph.sb3;
+        return theme.typography.paragraph.sb2;
       case 'MEDIUM':
-        return theme.typography.paragraph.sb5;
+        return theme.typography.paragraph.sb3;
       case 'LARGE':
-        return theme.typography.paragraph.sb5;
-      default:
         return theme.typography.paragraph.sb4;
+      default:
+        return theme.typography.paragraph.sb3;
     }
   };
 

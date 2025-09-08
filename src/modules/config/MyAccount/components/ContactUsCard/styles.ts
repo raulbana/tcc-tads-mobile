@@ -6,7 +6,7 @@ import {
 } from '../../../../../utils/scales';
 import theme from '../../../../../theme/theme';
 
-export const Outer = styled.View`
+export const Outer = styled.TouchableOpacity`
   width: 100%;
   position: relative;
 `;

@@ -8,7 +8,11 @@ const useMyAccount = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
 
   const navigateToAccessibilitySettings = () => {
-    navigate('AccessibilitySettings');
+    navigate('Config', {screen: 'AccessibilitySettings'});
+  };
+
+  const navigateToTalkToUs = () => {
+    navigate('Config', {screen: 'TalkToUs'});
   };
 
   const options: OptionItem[] = [
@@ -58,7 +62,7 @@ const useMyAccount = () => {
     'Relatórios detalhados',
   ];
 
-  return {options, advantages};
+  return {options, advantages, navigateToTalkToUs};
 };
 
 export default useMyAccount;

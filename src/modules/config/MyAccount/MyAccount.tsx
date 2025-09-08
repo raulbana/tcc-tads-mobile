@@ -9,7 +9,7 @@ import useMyAccount from './useMyAccount';
 import ContactUsCard from './components/ContactUsCard/ContactUsCard';
 
 const MyAccount = () => {
-  const {options, advantages} = useMyAccount();
+  const {options, advantages, navigateToTalkToUs} = useMyAccount();
 
   return (
     <ScreenContainer scrollable>
@@ -21,7 +21,7 @@ const MyAccount = () => {
         />
         <CreateAccountCard advantages={advantages} onCreateAccount={() => {}} />
         <OptionsList options={options} />
-        <ContactUsCard />
+        <ContactUsCard onPress={navigateToTalkToUs} />
       </S.Wrapper>
     </ScreenContainer>
   );

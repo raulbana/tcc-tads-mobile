@@ -7,6 +7,7 @@ import {ParamListBase, RouteProp, Theme} from '@react-navigation/native';
 import BottomStack from '../components/BottomStack/BottomStack';
 import AccessibilitySettings from '../modules/config/AccessibilitySettings/AccessibilitySettings';
 import OnboardingStack from './Onboarding/OnboardingStack';
+import ConfigStack from './Config/configStack';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -21,10 +22,16 @@ export type OnboardingParamList = {
   OnboardingQuestion: undefined;
 };
 
+export type ConfigParamList = {
+  MyAccount: undefined;
+  AccessibilitySettings: undefined;
+  TalkToUs: undefined;
+};
+
 export type RootParamList = {
   MainTabs: {screen?: keyof MainTabParamList} | undefined;
   Onboarding: {screen?: keyof OnboardingParamList} | undefined;
-  AccessibilitySettings: undefined;
+  Config: {screen?: keyof ConfigParamList} | undefined;
 };
 export interface Route<
   Name extends string = string,
@@ -54,8 +61,8 @@ const routes: Route[] = [
     options: undefined,
   },
   {
-    name: 'AccessibilitySettings',
-    component: AccessibilitySettings,
+    name: 'Config',
+    component: ConfigStack,
     options: undefined,
   },
 ];

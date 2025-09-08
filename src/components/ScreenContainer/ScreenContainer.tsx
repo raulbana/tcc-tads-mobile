@@ -26,7 +26,7 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
   children,
   scrollable = false,
   header,
-  headerShown = true,
+  headerShown = false,
   containerStyle,
   safeArea = true,
   loading = false,
