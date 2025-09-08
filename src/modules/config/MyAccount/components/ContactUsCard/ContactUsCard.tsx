@@ -3,9 +3,13 @@ import Label from '../../../../../components/Label/Label';
 import theme from '../../../../../theme/theme';
 import * as S from './styles';
 
-const ContactUsCard = () => {
+export interface ContactUsCardProps {
+  onPress: () => void;
+};
+
+const ContactUsCard: React.FC<ContactUsCardProps> = ({onPress}) => {
   return (
-    <S.Outer>
+    <S.Outer onPress={onPress} activeOpacity={0.8}>
       <S.Container>
         <S.ContentRow>
           <S.TextSection>
@@ -25,7 +29,7 @@ const ContactUsCard = () => {
             <Label
               typography={theme.typography.paragraph.r3}
               color={theme.colors.gray_06}
-              text="Lorem ipsum dolor sit amet consectetur. Quis a neque"
+              text="Em caso de dúvidas, críticas ou sugestões, entre em contato com a nossa equipe de suporte."
               textAlign="left"
             />
           </S.TextSection>
