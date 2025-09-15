@@ -58,7 +58,7 @@ const Comment: React.FC<CommentProps> = ({
             text={authorName}
           />
           <Label
-            typography={theme.typography.paragraph.sm2}
+            typography={theme.typography.paragraph.sm1}
             color={theme.colors.gray_06}
             text={moment(createdAt).fromNow()}
           />

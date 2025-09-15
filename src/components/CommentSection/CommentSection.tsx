@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Comment as CommentType} from '../../types/content';
 import Label from '../Label/Label';
 import theme from '../../theme/theme';
@@ -8,7 +8,7 @@ import CommentInput from '../CommentInput/CommentInput';
 
 export interface CommentSectionProps {
   comments: CommentType[];
-  onCommentSend: () => void;
+  onCommentSend: (text: string, parentId?: string) => void;
   loading?: boolean;
   disabled?: boolean;
   commentText?: string;
@@ -16,6 +16,10 @@ export interface CommentSectionProps {
   onPressLike?: (commentId: string, liked: boolean) => void;
   onPressMore?: (commentId: string) => void;
   onPressReply?: (commentId: string) => void;
+  replyTo?: string | null;
+  replyText?: string;
+  setReplyText?: (text: string) => void;
+  setReplyTo?: (id: string | null) => void;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
@@ -28,6 +32,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onPressLike,
   onPressMore,
   onPressReply,
+  replyTo,
+  replyText,
+  setReplyText,
+  setReplyTo,
 }) => {
   return (
     <S.Container>
@@ -38,17 +46,44 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           text={`Comentários`}
         />
       </S.HeaderRow>
-      <CommentInput
-        value={commentText || ''}
-        onChange={onCommentTextChange}
-        onSend={onCommentSend}
-      />
+      {!replyTo && (
+        <CommentInput
+          value={commentText || ''}
+          onChange={onCommentTextChange}
+          onSend={() => onCommentSend(commentText || '')}
+          disabled={disabled}
+          loading={loading}
+        />
+      )}
+      {replyTo && (
+        <S.ReplyInputWrapper>
+          <Label
+            text="Respondendo..."
+            typography={theme.typography.paragraph.sm2}
+            color={theme.colors.purple_03}
+          />
+          <CommentInput
+            value={replyText || ''}
+            onChange={setReplyText ?? (() => {})}
+            onSend={() => onCommentSend(replyText || '', replyTo)}
+            disabled={disabled}
+            loading={loading}
+          />
+          <S.CancelReplyButton onPress={() => setReplyTo && setReplyTo(null)}>
+            <Label
+              text="Cancelar"
+              typography={theme.typography.paragraph.sm2}
+              color={theme.colors.gray_06}
+            />
+          </S.CancelReplyButton>
+        </S.ReplyInputWrapper>
+      )}
       {comments.length > 0 ? (
         comments.map(comment => (
           <Comment
             onPressLike={onPressLike}
             onPressMore={onPressMore}
-            onPressReply={onPressReply}
+            onPressReply={id => setReplyTo && setReplyTo(id)}
             key={comment.id}
             comment={comment}
           />

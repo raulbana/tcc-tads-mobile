@@ -69,13 +69,20 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   const resolvedHeader = headerShown ? header ?? HeaderWithPageName : null;
 
+  const shouldScrollHeader =
+    fullBleed && scrollable && headerShown && !!resolvedHeader;
+
   return (
     <Container style={containerStyle}>
-      {headerShown && resolvedHeader}
+      {/* Regular header (not fullBleed or not scrollable) */}
+      {headerShown && !shouldScrollHeader && resolvedHeader}
       {loading && LoadingComponent}
       {!loading &&
         (scrollable ? (
-          <S.StyledScrollContent contentContainerStyle={contentContainerStyle}>
+          <S.StyledScrollContent
+            contentContainerStyle={contentContainerStyle}
+            showsVerticalScrollIndicator={false}>
+            {shouldScrollHeader && resolvedHeader}
             {children}
           </S.StyledScrollContent>
         ) : (

@@ -23,10 +23,14 @@ const ContentDetails = () => {
     comments,
     commentText,
     onChangeCommentText,
-    onSendComment,
     content,
     onReplyComment,
     onLikeCommentOrReply,
+    handleSend,
+    replyTo,
+    replyText,
+    setReplyText,
+    setReplyTo,
   } = useContentDetails();
 
   return isLoading || !content ? (
@@ -112,11 +116,17 @@ const ContentDetails = () => {
         />
         <CommentSection
           comments={comments}
-          onCommentSend={onSendComment}
+          onCommentSend={handleSend}
           onCommentTextChange={onChangeCommentText}
           commentText={commentText}
           onPressLike={onLikeCommentOrReply}
           onPressReply={onReplyComment}
+          disabled={false}
+          loading={false}
+          replyTo={replyTo}
+          replyText={replyText}
+          setReplyText={setReplyText}
+          setReplyTo={setReplyTo}
         />
       </S.Wrapper>
     </ScreenContainer>

@@ -14,3 +14,13 @@ export const HeaderRow = styled.View`
   align-items: center;
   justify-content: space-between;
 `;
+
+export const ReplyInputWrapper = styled.View`
+  margin-bottom: ${verticalScale(12)}px;
+  gap: ${verticalScale(4)}px;
+`;
+
+export const CancelReplyButton = styled.TouchableOpacity`
+  align-self: flex-end;
+  margin-top: ${verticalScale(2)}px;
+`;

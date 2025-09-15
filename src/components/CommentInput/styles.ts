@@ -43,3 +43,4 @@ export const SendButton = styled.TouchableOpacity<{
   justify-content: center;
   opacity: ${({disabled}) => (disabled ? 0.7 : 1)};
 `;
+

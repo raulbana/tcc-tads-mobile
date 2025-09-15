@@ -18,7 +18,6 @@ export const StyledSafeArea = styled(SafeAreaView)`
   padding-horizontal: ${horizontalScale(16)}px;
 `;
 
-// Full-bleed variantes (sem paddings) para telas que precisam de imagem de borda a borda
 export const StyledContainerFullBleed = styled.View`
   flex: 1;
   background-color: ${theme.colors.white};
