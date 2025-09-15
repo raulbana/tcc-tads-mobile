@@ -1,19 +1,13 @@
 import {SafeAreaView} from 'react-native';
 import styled from 'styled-components/native';
-import {
-  horizontalScale,
-  verticalScale,
-} from '../../utils/scales';
+import {horizontalScale, verticalScale} from '../../utils/scales';
 import theme from '../../theme/theme';
-
-
 
 export const StyledContainer = styled.View`
   flex: 1;
   background-color: ${theme.colors.white};
   padding-top: ${verticalScale(48)}px;
   padding-bottom: ${verticalScale(16)}px;
-  padding-horizontal: ${horizontalScale(16)}px;
 `;
 
 export const StyledSafeArea = styled(SafeAreaView)`
@@ -22,6 +16,17 @@ export const StyledSafeArea = styled(SafeAreaView)`
   padding-bottom: ${verticalScale(16)}px;
   padding-top: ${verticalScale(48)}px;
   padding-horizontal: ${horizontalScale(16)}px;
+`;
+
+// Full-bleed variantes (sem paddings) para telas que precisam de imagem de borda a borda
+export const StyledContainerFullBleed = styled.View`
+  flex: 1;
+  background-color: ${theme.colors.white};
+`;
+
+export const StyledSafeAreaFullBleed = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${theme.colors.white};
 `;
 
 export const StyledContent = styled.View`
@@ -37,8 +42,7 @@ export const StyledScrollContent = styled.ScrollView.attrs({
 export const StyledHeader = styled.View`
   padding-vertical: ${verticalScale(8)}px;
   width: 100%;
-  display: flex;
-  flex-direction: row;
+  align-items: flex-start;
 `;
 
 export const GoBackContainer = styled.TouchableOpacity.attrs({
@@ -50,4 +54,4 @@ export const GoBackContainer = styled.TouchableOpacity.attrs({
   gap: ${horizontalScale(8)}px;
   align-items: center;
   justify-content: center;
-`
+`;

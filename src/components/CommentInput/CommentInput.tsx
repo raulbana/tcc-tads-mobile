@@ -1,0 +1,50 @@
+import React from 'react';
+import * as S from './styles';
+import theme from '../../theme/theme';
+import Label from '../Label/Label';
+
+interface CommentInputProps {
+  value: string;
+  onChange: (text: string) => void;
+  onSend: () => void;
+  placeholder?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  row?: boolean;
+}
+
+const CommentInput: React.FC<CommentInputProps> = ({
+  value,
+  onChange,
+  onSend,
+  placeholder = 'Escreva seu comentário aqui',
+  disabled = false,
+  loading = false,
+  row,
+}) => {
+  return (
+    <S.Container row={row}>
+      <S.TextInput
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        placeholderTextColor={theme.colors.gray_06}
+        editable={!disabled && !loading}
+        multiline
+        numberOfLines={2}
+      />
+      <S.SendButton
+        onPress={onSend}
+        disabled={disabled || loading || value.trim().length === 0}
+        activeOpacity={0.8}>
+        <Label
+          text="Enviar"
+          typography={theme.typography.paragraph.sb2}
+          color={theme.colors.white}
+        />
+      </S.SendButton>
+    </S.Container>
+  );
+};
+
+export default CommentInput;

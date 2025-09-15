@@ -20,6 +20,7 @@ type ScreenContainerProps = {
   currentPage?: string;
   goBack?: () => void;
   goBackTo?: string;
+  fullBleed?: boolean;
 };
 
 const ScreenContainer: React.FC<ScreenContainerProps> = ({
@@ -35,8 +36,15 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
   currentPage,
   goBack,
   goBackTo,
+  fullBleed = false,
 }) => {
-  const Container = safeArea ? S.StyledSafeArea : S.StyledContainer;
+  const Container = fullBleed
+    ? safeArea
+      ? S.StyledSafeAreaFullBleed
+      : S.StyledContainerFullBleed
+    : safeArea
+    ? S.StyledSafeArea
+    : S.StyledContainer;
 
   const HeaderWithPageName = (
     <S.StyledHeader>
