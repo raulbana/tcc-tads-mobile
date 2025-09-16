@@ -19,9 +19,11 @@ const ContentDetailsHeader: React.FC<ContentDetailsHeaderProps> = ({image}) => {
         resizeMode="cover"
         style={{width: '100%', aspectRatio: 1.9}}
         imageStyle={{width: screenWidth, height: undefined}}>
+        <S.GradientOverlay />
+
         <S.BackButtonContainer>
           <S.BackButton onPress={goBack}>
-            <Icon name="ArrowLeft" size={36} color='white' />
+            <Icon name="ArrowLeft" size={36} color="white" />
           </S.BackButton>
         </S.BackButtonContainer>
       </S.ImageBackground>

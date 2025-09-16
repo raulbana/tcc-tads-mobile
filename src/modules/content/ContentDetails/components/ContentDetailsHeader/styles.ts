@@ -2,8 +2,8 @@ import styled from 'styled-components/native';
 import {
   verticalScale,
   horizontalScale,
-  moderateScale,
 } from '../../../../../utils/scales';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const Container = styled.View`
   width: 100%;
@@ -26,4 +26,17 @@ export const BackButtonContainer = styled.View`
 export const BackButton = styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
+`;
+
+export const GradientOverlay = styled(LinearGradient).attrs({
+  colors: ['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)'],
+  locations: [0, 0.6, 1],
+  end: {x: 0.5, y: 1},
+  start: {x: 0.5, y: 0},
+})`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
 `;

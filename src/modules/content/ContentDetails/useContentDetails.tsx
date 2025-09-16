@@ -76,6 +76,9 @@ const useContentDetails = () => {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
+  const [imageCarouselVisible, setImageCarouselVisible] = useState(false);
+  const [imageCarouselIndex, setImageCarouselIndex] = useState(0);
+
   useEffect(() => {
     if (contentData) {
       setContent(contentData);
@@ -204,6 +207,10 @@ const useContentDetails = () => {
     replyText,
     setReplyText,
     setReplyTo,
+    imageCarouselVisible,
+    setImageCarouselVisible,
+    imageCarouselIndex,
+    setImageCarouselIndex,
   };
 };
 

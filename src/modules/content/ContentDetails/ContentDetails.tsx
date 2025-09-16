@@ -12,6 +12,7 @@ import * as S from './styles';
 import useContentDetails from './useContentDetails';
 import ImageCard from '../../../components/ImageCard/ImageCard';
 import CommentSection from '../../../components/CommentSection/CommentSection';
+import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselModal';
 
 const ContentDetails = () => {
   const {
@@ -31,6 +32,10 @@ const ContentDetails = () => {
     replyText,
     setReplyText,
     setReplyTo,
+    imageCarouselVisible,
+    setImageCarouselVisible,
+    imageCarouselIndex,
+    setImageCarouselIndex,
   } = useContentDetails();
 
   return isLoading || !content ? (
@@ -53,10 +58,25 @@ const ContentDetails = () => {
             data: content.images,
             itemWidth: 140,
             renderItem: ({item}) => (
-              <ImageCard image={item} onClick={() => {}} />
+              <ImageCard
+                image={item}
+                onClick={() => {
+                  setImageCarouselVisible(true);
+                  setImageCarouselIndex(content.images.indexOf(item));
+                }}
+              />
             ),
           }}
           sectionTitle={''}
+        />
+        <ImageCarouselModal
+          images={content.images}
+          isVisible={imageCarouselVisible}
+          onClose={() => {
+            setImageCarouselVisible(false);
+          }}
+          currentIndex={imageCarouselIndex}
+          onChangeIndex={setImageCarouselIndex}
         />
         <Label
           typography={theme.typography.title.b3}
