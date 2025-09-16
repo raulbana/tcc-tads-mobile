@@ -25,6 +25,9 @@ const ContentCard: React.FC<ContentCardProps> = ({
         source={image}
         imageStyle={{width: '100%', height: '100%', borderRadius: 16}}
         resizeMode="cover">
+        <S.Overlay>
+          <S.OverlayGradient />
+        </S.Overlay>
         <S.BadgeContainer>
           <Badge content={badgeLabel} />
         </S.BadgeContainer>

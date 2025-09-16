@@ -9,8 +9,6 @@ export const Button = styled.TouchableOpacity<RepostButtonProps>`
   gap: ${horizontalScale(4)}px;
   align-items: center;
   justify-content: space-between;
-  border: 2px solid ${({theme}) => theme.colors.purple_04};
-  background-color: ${({isReposted, theme}) =>
-    isReposted ? theme.colors.purple_04 : 'transparent'};
+  background-color: 'transparent';
   border-radius: ${horizontalScale(8)}px;
 `;

@@ -48,12 +48,15 @@ const ContentDetails = () => {
         />
       }>
       <S.Wrapper>
-        <ActionsRow
-          isLiked={isLiked}
-          onLikePress={toggleLike}
-          isReposted={isReposted}
-          onRepostPress={toggleRepost}
-          category={content.category}
+        <CarouselSection
+          carouselData={{
+            data: content.images,
+            itemWidth: 140,
+            renderItem: ({item}) => (
+              <ImageCard image={item} onClick={() => {}} />
+            ),
+          }}
+          sectionTitle={''}
         />
         <Label
           typography={theme.typography.title.b3}
@@ -84,7 +87,7 @@ const ContentDetails = () => {
           />
         )}
 
-        {content.videos.length > 0 && (
+        {/*   {content.videos.length > 0 && (
           <Button
             text={
               <S.Row>
@@ -103,16 +106,13 @@ const ContentDetails = () => {
             }
             onPress={() => {}}
           />
-        )}
-        <CarouselSection
-          carouselData={{
-            data: content.images,
-            itemWidth: 160,
-            renderItem: ({item}) => (
-              <ImageCard image={item} onClick={() => {}} />
-            ),
-          }}
-          sectionTitle={'Imagens'}
+        )} */}
+        <ActionsRow
+          isLiked={isLiked}
+          onLikePress={toggleLike}
+          isReposted={isReposted}
+          onRepostPress={toggleRepost}
+          category={content.category}
         />
         <CommentSection
           comments={comments}

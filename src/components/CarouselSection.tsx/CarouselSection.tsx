@@ -5,7 +5,7 @@ import * as S from './styles';
 
 export interface CarouselSectionProps<T> {
   carouselData: CarouselProps<T>;
-  sectionTitle: string;
+  sectionTitle?: string;
 }
 
 const CarouselSection = <T,>({
@@ -14,11 +14,13 @@ const CarouselSection = <T,>({
 }: CarouselSectionProps<T>) => {
   return (
     <S.Section>
-      <Label
-        typography={theme.typography.paragraph.sb3}
-        color={theme.colors.gray_08}
-        text={sectionTitle}
-      />
+      {sectionTitle && (
+        <Label
+          typography={theme.typography.paragraph.sb3}
+          color={theme.colors.gray_08}
+          text={sectionTitle}
+        />
+      )}
       <Carousel {...carouselData} />
     </S.Section>
   );

@@ -12,11 +12,11 @@ export interface RepostButtonProps {
 const RepostButton: React.FC<RepostButtonProps> = ({onPress, isReposted}) => {
   return (
     <S.Button onPress={onPress} isReposted={isReposted}>
-      <Label
+      {/* <Label
         typography={theme.typography.paragraph.m2}
         color={isReposted ? theme.colors.white : theme.colors.purple_04}
         text={isReposted ? 'Desfazer' : 'Repostar'}
-      />
+      /> */}
       {!isReposted ? (
         <Icon
           name={'ArrowBendDoubleUpRight'}
@@ -29,7 +29,7 @@ const RepostButton: React.FC<RepostButtonProps> = ({onPress, isReposted}) => {
           name={'X'}
           size={moderateScale(24)}
           weight={'bold'}
-          color={theme.colors.white}
+          color={theme.colors.purple_04}
         />
       )}
     </S.Button>

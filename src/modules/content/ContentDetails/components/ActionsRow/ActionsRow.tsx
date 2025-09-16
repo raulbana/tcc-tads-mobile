@@ -27,10 +27,10 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
         textColor={theme.colors.purple_04}
       />
       <S.RightActions>
+        <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
         <S.RepostButtonContainer>
           <RepostButton onPress={onRepostPress} isReposted={isReposted} />
         </S.RepostButtonContainer>
-        <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
       </S.RightActions>
     </S.ActionsRowContainer>
   );
