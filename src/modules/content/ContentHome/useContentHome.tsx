@@ -88,7 +88,7 @@ const useContentHome = () => {
       onClick: () => handleCardClick((index + 1).toString()),
     }));
     setContentCardList(updatedContentCards);
-  }, []);
+  }, [contentCardList, handleCardClick]);
 
   useEffect(() => {
     setCardClickHandlers();
