@@ -1,16 +1,12 @@
 export interface ContentCategory {
   id: string;
   name: string;
-  description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  auditable: boolean;
 }
 
 export interface ContentTag {
   id: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface Comment {
@@ -38,10 +34,9 @@ export interface Content {
   createdAt: Date;
   updatedAt: Date;
   coverUrl: string;
-  images: string[];
-  videos: string[];
+  images?: string[];
+  video?: string;
   category: string;
-  isFavorite: boolean;
   isReposted?: boolean;
   isLiked?: boolean;
   likesCount?: number;

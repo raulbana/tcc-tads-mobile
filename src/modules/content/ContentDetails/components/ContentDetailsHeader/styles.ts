@@ -1,8 +1,5 @@
 import styled from 'styled-components/native';
-import {
-  verticalScale,
-  horizontalScale,
-} from '../../../../../utils/scales';
+import {verticalScale, horizontalScale} from '../../../../../utils/scales';
 import LinearGradient from 'react-native-linear-gradient';
 
 export const Container = styled.View`

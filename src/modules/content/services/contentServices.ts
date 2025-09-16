@@ -18,13 +18,7 @@ const mockContents: Content[] = [
       'https://picsum.photos/300/300',
       'https://picsum.photos/300/300',
     ],
-    videos: [
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-      'https://www.w3schools.com/html/movie.mp4',
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-    ],
     category: 'Tecnologia',
-    isFavorite: false,
     authorId: '123',
     commentsCount: 1,
     comments: [
@@ -58,9 +52,7 @@ const mockContents: Content[] = [
       'https://picsum.photos/300/300',
       'https://picsum.photos/300/300',
     ],
-    videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
     category: 'Saúde',
-    isFavorite: true,
     authorId: '456',
     commentsCount: 1,
     comments: [

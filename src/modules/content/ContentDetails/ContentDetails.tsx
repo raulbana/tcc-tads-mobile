@@ -1,7 +1,5 @@
 import React from 'react';
-import Button from '../../../components/Button/Button';
 import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSection';
-import Icon from '../../../components/Icon/Icon';
 import Label from '../../../components/Label/Label';
 import Loader from '../../../components/Loader/Loader';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
@@ -47,37 +45,11 @@ const ContentDetails = () => {
       scrollable
       header={
         <ContentDetailsHeader
-          image={{
-            uri: content.coverUrl,
-          }}
+          image={content.video ?? content.coverUrl}
+          type={content.video ? 'video' : 'image'}
         />
       }>
       <S.Wrapper>
-        <CarouselSection
-          carouselData={{
-            data: content.images,
-            itemWidth: 140,
-            renderItem: ({item}) => (
-              <ImageCard
-                image={item}
-                onClick={() => {
-                  setImageCarouselVisible(true);
-                  setImageCarouselIndex(content.images.indexOf(item));
-                }}
-              />
-            ),
-          }}
-          sectionTitle={''}
-        />
-        <ImageCarouselModal
-          images={content.images}
-          isVisible={imageCarouselVisible}
-          onClose={() => {
-            setImageCarouselVisible(false);
-          }}
-          currentIndex={imageCarouselIndex}
-          onChangeIndex={setImageCarouselIndex}
-        />
         <Label
           typography={theme.typography.title.b3}
           color={theme.colors.gray_08}
@@ -91,6 +63,28 @@ const ContentDetails = () => {
             textAlign="justify"
           />
         )}
+
+        <CarouselSection
+          carouselData={{
+            data: content?.images ?? [],
+            itemWidth: 140,
+            renderItem: ({item}) => (
+              <ImageCard
+                image={item}
+                onClick={() => {
+                  setImageCarouselVisible(true);
+                  setImageCarouselIndex(
+                    typeof content?.images?.indexOf(item) === 'number' &&
+                      content?.images?.indexOf(item) !== -1
+                      ? content.images.indexOf(item)
+                      : 0,
+                  );
+                }}
+              />
+            ),
+          }}
+          sectionTitle={''}
+        />
         {content.subtitle && (
           <Label
             typography={theme.typography.paragraph.sb3}
@@ -106,27 +100,6 @@ const ContentDetails = () => {
             textAlign="justify"
           />
         )}
-
-        {/*   {content.videos.length > 0 && (
-          <Button
-            text={
-              <S.Row>
-                <Label
-                  typography={theme.typography.paragraph.sb3}
-                  color={theme.colors.white}
-                  text={'Vídeos'}
-                />
-                <Icon
-                  name="Play"
-                  weight="fill"
-                  size={16}
-                  color={theme.colors.white}
-                />
-              </S.Row>
-            }
-            onPress={() => {}}
-          />
-        )} */}
         <ActionsRow
           isLiked={isLiked}
           onLikePress={toggleLike}
@@ -149,6 +122,15 @@ const ContentDetails = () => {
           setReplyTo={setReplyTo}
         />
       </S.Wrapper>
+      <ImageCarouselModal
+        images={content.images ?? []}
+        isVisible={imageCarouselVisible}
+        onClose={() => {
+          setImageCarouselVisible(false);
+        }}
+        currentIndex={imageCarouselIndex}
+        onChangeIndex={setImageCarouselIndex}
+      />
     </ScreenContainer>
   );
 };
