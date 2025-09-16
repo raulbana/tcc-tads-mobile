@@ -25,7 +25,6 @@ const mockContents: Content[] = [
       {
         id: 'c1',
         contentId: '1',
-        userId: 'u1',
         text: 'Great content!',
         authorId: 'u1',
         authorName: 'User 1',
@@ -59,7 +58,6 @@ const mockContents: Content[] = [
       {
         id: 'c1',
         contentId: '1',
-        userId: 'u1',
         text: 'Great content!',
         authorId: 'u1',
         authorName: 'User 1',
@@ -70,7 +68,6 @@ const mockContents: Content[] = [
       {
         id: 'c2',
         contentId: '1',
-        userId: 'u2',
         text: 'Thanks for sharing!',
         authorId: 'u2',
         authorName: 'User 2',
@@ -82,7 +79,6 @@ const mockContents: Content[] = [
           {
             id: 'c3',
             contentId: '1',
-            userId: 'u1',
             text: 'You are welcome!',
             authorId: 'u1',
             authorName: 'User 1',
@@ -93,7 +89,6 @@ const mockContents: Content[] = [
           {
             id: 'c4',
             contentId: '2',
-            userId: 'u1',
             text: 'You are welcome!',
             authorId: 'u1',
             authorName: 'User 1',
@@ -104,7 +99,6 @@ const mockContents: Content[] = [
           {
             id: 'c5',
             contentId: '3',
-            userId: 'u1',
             text: 'You are welcome!',
             authorId: 'u1',
             authorName: 'User 1',

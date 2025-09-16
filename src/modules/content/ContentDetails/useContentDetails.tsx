@@ -93,7 +93,6 @@ const useContentDetails = () => {
     const newComment: Comment = {
       id: Math.random().toString(36).substring(7),
       contentId: contentId,
-      userId: 'currentUser',
       authorId: 'currentUser',
       authorName: 'Current User',
       text: commentText,
@@ -147,7 +146,6 @@ const useContentDetails = () => {
       const newReply: Comment = {
         id: Math.random().toString(36).substring(7),
         contentId: contentId,
-        userId: 'currentUser',
         authorId: 'currentUser',
         authorName: 'Current User',
         text: replyText,
@@ -170,7 +168,6 @@ const useContentDetails = () => {
     const newComment: Comment = {
       id: Math.random().toString(36).substring(7),
       contentId: contentId,
-      userId: 'currentUser',
       authorId: 'currentUser',
       authorName: 'Current User',
       text: commentText,

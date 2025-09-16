@@ -1,23 +1,24 @@
 import React, {useState} from 'react';
 import * as S from './styles';
+import useVideoPlayer from './useVideoPlayer';
 
 interface VideoPlayerProps {
   url: string;
 }
 
 export const VideoPlayer: React.FC<VideoPlayerProps> = ({url}) => {
-  const [paused, setPaused] = useState(true);
+  const {isPaused, togglePlayPause} = useVideoPlayer();
 
   return (
-    <S.Container onPress={() => setPaused(!paused)}>
+    <S.Container onPress={togglePlayPause}>
       <S.Overlay>
         <S.VideoPlayer
           source={{uri: url}}
           resizeMode="contain"
-          paused={paused}
-          controls={!paused}
+          paused={isPaused}
+          controls={!isPaused}
         />
-        {paused && <S.PlayButton>▶</S.PlayButton>}
+        {isPaused && <S.PlayButton>▶</S.PlayButton>}
       </S.Overlay>
     </S.Container>
   );

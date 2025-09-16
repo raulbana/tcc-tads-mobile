@@ -12,7 +12,6 @@ export interface ContentTag {
 export interface Comment {
   id: string;
   contentId: string;
-  userId: string;
   text: string;
   authorId: string;
   authorName: string;

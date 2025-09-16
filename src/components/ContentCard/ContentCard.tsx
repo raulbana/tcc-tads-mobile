@@ -25,7 +25,9 @@ const ContentCard: React.FC<ContentCardProps> = ({
         source={image}
         imageStyle={{width: '100%', height: '100%', borderRadius: 16}}
         resizeMode="cover">
-        <S.GradientOverlay />
+        <S.GradientOverlay
+          colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']}
+        />
         <S.BadgeContainer>
           <Badge content={badgeLabel} />
         </S.BadgeContainer>
