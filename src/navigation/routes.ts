@@ -2,12 +2,11 @@ import {
   NativeStackNavigationOptions,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import {ParamListBase, RouteProp, Theme} from '@react-navigation/native';
-
+import {ParamListBase, RouteProp, Theme, NavigatorScreenParams} from '@react-navigation/native';
 import BottomStack from '../components/BottomStack/BottomStack';
-import AccessibilitySettings from '../modules/config/AccessibilitySettings/AccessibilitySettings';
 import OnboardingStack from './Onboarding/OnboardingStack';
 import ConfigStack from './Config/configStack';
+import ContentStack from './Content/contentStack';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -28,11 +27,18 @@ export type ConfigParamList = {
   TalkToUs: undefined;
 };
 
-export type RootParamList = {
-  MainTabs: {screen?: keyof MainTabParamList} | undefined;
-  Onboarding: {screen?: keyof OnboardingParamList} | undefined;
-  Config: {screen?: keyof ConfigParamList} | undefined;
+export type ContentParamList = {
+  ContentHome: undefined;
+  ContentDetails: {contentId: string};
 };
+
+export type RootParamList = {
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
+  Onboarding: NavigatorScreenParams<OnboardingParamList> | undefined;
+  Config: NavigatorScreenParams<ConfigParamList> | undefined;
+  Content: NavigatorScreenParams<ContentParamList> | undefined;
+};
+
 export interface Route<
   Name extends string = string,
   ParamList extends ParamListBase = ParamListBase,
@@ -63,6 +69,11 @@ const routes: Route[] = [
   {
     name: 'Config',
     component: ConfigStack,
+    options: undefined,
+  },
+  {
+    name: 'Content',
+    component: ContentStack,
     options: undefined,
   },
 ];

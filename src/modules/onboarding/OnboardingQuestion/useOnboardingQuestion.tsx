@@ -135,7 +135,7 @@ const useOnboardingQuestion = () => {
     control: control,
     onContinue: () => onContinue(question.id as keyof ICIQAnswers),
     selectedValue: getValues(question.id as keyof ICIQAnswers),
-    setValue: setValue, // Adicionar esta linha
+    setValue: setValue,
   }));
 
   const clearError = () => {
@@ -158,7 +158,7 @@ const useOnboardingQuestion = () => {
     errorMessage,
     onCloseToast,
     navigateBack,
-    clearError, // Adicionar esta linha
+    clearError,
   };
 };
 

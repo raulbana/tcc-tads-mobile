@@ -20,6 +20,7 @@ type ScreenContainerProps = {
   currentPage?: string;
   goBack?: () => void;
   goBackTo?: string;
+  fullBleed?: boolean;
 };
 
 const ScreenContainer: React.FC<ScreenContainerProps> = ({
@@ -35,8 +36,15 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
   currentPage,
   goBack,
   goBackTo,
+  fullBleed = false,
 }) => {
-  const Container = safeArea ? S.StyledSafeArea : S.StyledContainer;
+  const Container = fullBleed
+    ? safeArea
+      ? S.StyledSafeAreaFullBleed
+      : S.StyledContainerFullBleed
+    : safeArea
+    ? S.StyledSafeArea
+    : S.StyledContainer;
 
   const HeaderWithPageName = (
     <S.StyledHeader>
@@ -61,13 +69,20 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   const resolvedHeader = headerShown ? header ?? HeaderWithPageName : null;
 
+  const shouldScrollHeader =
+    fullBleed && scrollable && headerShown && !!resolvedHeader;
+
   return (
     <Container style={containerStyle}>
-      {headerShown && resolvedHeader}
+      {/* Regular header (not fullBleed or not scrollable) */}
+      {headerShown && !shouldScrollHeader && resolvedHeader}
       {loading && LoadingComponent}
       {!loading &&
         (scrollable ? (
-          <S.StyledScrollContent contentContainerStyle={contentContainerStyle}>
+          <S.StyledScrollContent
+            contentContainerStyle={contentContainerStyle}
+            showsVerticalScrollIndicator={false}>
+            {shouldScrollHeader && resolvedHeader}
             {children}
           </S.StyledScrollContent>
         ) : (
