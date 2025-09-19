@@ -1,0 +1,55 @@
+import React from 'react';
+import {TouchableOpacity} from 'react-native';
+import ScreenContainer from '../../../../components/ScreenContainer/ScreenContainer';
+import Label from '../../../../components/Label/Label';
+import LoginForm from './components/LoginForm/LoginForm';
+import DailyIULogo from '../../../../assets/illustrations/daily-iu-logo.svg';
+import {useNavigation} from '@react-navigation/native';
+import {NavigationStackProp} from '../../../../navigation/routes';
+import * as S from './styles';
+import theme from '../../../../theme/theme';
+import useLogin from './useLogin';
+
+const Login: React.FC = () => {
+  const {handleGoToRegister} = useLogin();
+
+  return (
+    <ScreenContainer>
+      <S.Outer>
+        <S.LogoWrapper>
+          <DailyIULogo width={48} height={48} />
+          <Label
+            typography={theme.typography.title.b2}
+            text="DailyIU"
+            color={theme.colors.gray_08}
+          />
+        </S.LogoWrapper>
+
+        <Label
+          text="Entrar na sua conta"
+          typography={theme.typography.title.b3}
+          color={theme.colors.gray_08}
+          style={{marginHorizontal: 'auto'}}
+        />
+
+        <LoginForm />
+        <S.FooterRow>
+          <Label
+            text="Ainda não tem conta?"
+            color={theme.colors.gray_06}
+            typography={theme.typography.paragraph.sm3}
+          />
+          <TouchableOpacity onPress={handleGoToRegister}>
+            <Label
+              text=" Criar Conta"
+              color={theme.colors.purple_04}
+              typography={theme.typography.paragraph.sm3}
+            />
+          </TouchableOpacity>
+        </S.FooterRow>
+      </S.Outer>
+    </ScreenContainer>
+  );
+};
+
+export default Login;

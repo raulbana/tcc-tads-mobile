@@ -6,6 +6,7 @@ import Navigator from './src/navigation';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import moment from 'moment';
 import 'moment/locale/pt-br';
+import {AuthProvider} from './src/contexts/AuthContext';
 if (__DEV__) {
   require('./ReactotronConfig');
 }
@@ -14,13 +15,15 @@ function App(): React.ReactElement {
   moment.locale('pt-br');
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
-        <NavigationContainer>
-          <Navigator />
-        </NavigationContainer>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <NavigationContainer>
+            <Navigator />
+          </NavigationContainer>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   );
 }
 

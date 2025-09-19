@@ -2,11 +2,17 @@ import {
   NativeStackNavigationOptions,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import {ParamListBase, RouteProp, Theme, NavigatorScreenParams} from '@react-navigation/native';
+import {
+  ParamListBase,
+  RouteProp,
+  Theme,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
 import BottomStack from '../components/BottomStack/BottomStack';
 import OnboardingStack from './Onboarding/OnboardingStack';
 import ConfigStack from './Config/configStack';
 import ContentStack from './Content/contentStack';
+import AuthStack from './Auth/authStack';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -32,11 +38,18 @@ export type ContentParamList = {
   ContentDetails: {contentId: string};
 };
 
+export type AuthParamList = {
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+};
+
 export type RootParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   Onboarding: NavigatorScreenParams<OnboardingParamList> | undefined;
   Config: NavigatorScreenParams<ConfigParamList> | undefined;
   Content: NavigatorScreenParams<ContentParamList> | undefined;
+  Auth: NavigatorScreenParams<AuthParamList> | undefined;
 };
 
 export interface Route<
@@ -74,6 +87,11 @@ const routes: Route[] = [
   {
     name: 'Content',
     component: ContentStack,
+    options: undefined,
+  },
+  {
+    name: 'Auth',
+    component: AuthStack,
     options: undefined,
   },
 ];

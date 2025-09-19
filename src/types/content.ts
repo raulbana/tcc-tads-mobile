@@ -4,11 +4,6 @@ export interface ContentCategory {
   auditable: boolean;
 }
 
-export interface ContentTag {
-  id: string;
-  name: string;
-}
-
 export interface Comment {
   id: string;
   contentId: string;
@@ -35,7 +30,7 @@ export interface Content {
   coverUrl: string;
   images?: string[];
   video?: string;
-  category: string;
+  category: ContentCategory;
   isReposted?: boolean;
   isLiked?: boolean;
   likesCount?: number;
@@ -45,5 +40,4 @@ export interface Content {
   repostedByUserId?: string;
   commentsCount: number;
   comments: Comment[];
-  tags?: string[];
 }
