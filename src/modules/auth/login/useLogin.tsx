@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import {NavigationStackProp} from '../../../../navigation/routes';
+import { NavigationStackProp } from '../../../navigation/routes';
 
 const useLogin = () => {
   const {navigate} = useNavigation<NavigationStackProp>();

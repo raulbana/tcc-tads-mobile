@@ -1,12 +1,12 @@
 import React from 'react';
 import {Controller} from 'react-hook-form';
 import * as S from './styles';
-import Input from '../../../../../../components/Input/Input';
-import Button from '../../../../../../components/Button/Button';
-import Label from '../../../../../../components/Label/Label';
-import theme from '../../../../../../theme/theme';
 import useRegisterForm from './useRegisterForm';
-import SwitchToggle from '../../../../../../components/SwitchToggle/SwitchToggle';
+import Input from '../../../../../components/Input/Input';
+import Label from '../../../../../components/Label/Label';
+import Button from '../../../../../components/Button/Button';
+import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
+import theme from '../../../../../theme/theme';
 
 const RegisterForm: React.FC = () => {
   const {register, handleSubmit, errors, control, setValue, onSubmit, watch} =

@@ -92,7 +92,7 @@ const useContentHome = () => {
 
   useEffect(() => {
     setCardClickHandlers();
-  }, [setCardClickHandlers]);
+  }, []);
 
   return {
     badgeList,

@@ -1,17 +1,17 @@
 import React from 'react';
-import ScreenContainer from '../../../../components/ScreenContainer/ScreenContainer';
-import Label from '../../../../components/Label/Label';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import * as S from './styles';
-import DailyIULogo from '../../../../assets/illustrations/daily-iu-logo.svg';
-import theme from '../../../../theme/theme';
+import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
 import useRegister from './useRegister';
+import Label from '../../../components/Label/Label';
+import theme from '../../../theme/theme';
+import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 
 const Register: React.FC = () => {
   const {handleGoToLogin} = useRegister();
 
   return (
-    <ScreenContainer safeArea>
+    <ScreenContainer>
       <S.Outer>
         <S.LogoWrapper>
           <DailyIULogo width={48} height={48} />

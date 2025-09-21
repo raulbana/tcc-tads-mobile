@@ -1,6 +1,6 @@
 import styled from 'styled-components/native';
-import {verticalScale, horizontalScale, moderateScale} from '../../../../utils/scales';
-import theme from '../../../../theme/theme';
+import theme from '../../../theme/theme';
+import { horizontalScale, verticalScale } from '../../../utils/scales';
 
 export const Outer = styled.View`
   flex: 1;

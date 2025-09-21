@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import {verticalScale, horizontalScale} from '../../../../../../utils/scales';
+import { verticalScale, horizontalScale } from '../../../../../utils/scales';
 
 export const Container = styled.View`
   gap: ${verticalScale(16)}px;

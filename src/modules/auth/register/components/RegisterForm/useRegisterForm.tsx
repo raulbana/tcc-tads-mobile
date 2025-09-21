@@ -15,6 +15,7 @@ const useRegisterForm = () => {
     setValue,
     watch,
     reset,
+    register,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -72,6 +73,7 @@ const useRegisterForm = () => {
     watch,
     onSubmit,
     isRegistering,
+    register,
   };
 };
 

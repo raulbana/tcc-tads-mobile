@@ -1,14 +1,12 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
-import ScreenContainer from '../../../../components/ScreenContainer/ScreenContainer';
-import Label from '../../../../components/Label/Label';
 import LoginForm from './components/LoginForm/LoginForm';
-import DailyIULogo from '../../../../assets/illustrations/daily-iu-logo.svg';
-import {useNavigation} from '@react-navigation/native';
-import {NavigationStackProp} from '../../../../navigation/routes';
+import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
 import * as S from './styles';
-import theme from '../../../../theme/theme';
 import useLogin from './useLogin';
+import Label from '../../../components/Label/Label';
+import theme from '../../../theme/theme';
+import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 
 const Login: React.FC = () => {
   const {handleGoToRegister} = useLogin();
