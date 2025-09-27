@@ -1,5 +1,9 @@
 import {QueryKey, useMutation} from '@tanstack/react-query';
 import {
+  forgotPasswordRequestRequest,
+  forgotPasswordRequestResponse,
+  forgotPasswordValidateRequest,
+  forgotPasswordValidateResponse,
   loginRequest,
   loginResponse,
   registerRequest,
@@ -17,6 +21,16 @@ export const authQueryFactory = (queryKey: QueryKey) => {
     useRegister: () =>
       useMutation<registerResponse, Error, registerRequest>({
         mutationFn: (data: registerRequest) => authServices.register(data),
+      }),
+
+    useForgotPasswordRequest: () =>
+      useMutation<forgotPasswordRequestResponse, Error, forgotPasswordRequestRequest>({
+        mutationFn: (data: forgotPasswordRequestRequest) => authServices.forgotPasswordRequest(data),
+      }),
+
+    useForgotPasswordValidate: () =>
+      useMutation<forgotPasswordValidateResponse, Error, forgotPasswordValidateRequest>({
+        mutationFn: (data: forgotPasswordValidateRequest) => authServices.forgotPasswordValidate(data),
       }),
   };
 };

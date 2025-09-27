@@ -51,3 +51,23 @@ export interface registerResponse {
   message: string;
   status: string;
 }
+
+export interface forgotPasswordRequestRequest {
+  email: string;
+}
+
+export interface forgotPasswordRequestResponse {
+  message: string;
+  status: string;
+}
+
+export interface forgotPasswordValidateRequest {
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface forgotPasswordValidateResponse {
+  message: string;
+  status: string;
+}

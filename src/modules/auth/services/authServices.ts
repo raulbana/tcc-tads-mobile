@@ -1,6 +1,10 @@
 import {BASE_URL} from '@env';
 import apiFactory from '../../../services/apiFactory';
 import {
+  forgotPasswordRequestRequest,
+  forgotPasswordRequestResponse,
+  forgotPasswordValidateRequest,
+  forgotPasswordValidateResponse,
   loginRequest,
   loginResponse,
   registerRequest,
@@ -22,6 +26,22 @@ const authServices = {
   register: async (data: registerRequest): Promise<registerResponse> => {
     const response = await apiInstance.post(
       apiRoutes.authentication.register,
+      data,
+    );
+    return response.data;
+  },
+
+  forgotPasswordRequest: async (data: forgotPasswordRequestRequest): Promise<forgotPasswordRequestResponse> => {
+    const response = await apiInstance.post(
+      apiRoutes.authentication.forgotPasswordRequest,
+      data,
+    );
+    return response.data;
+  },
+
+  forgotPasswordValidate: async (data: forgotPasswordValidateRequest): Promise<forgotPasswordValidateResponse> => {
+    const response = await apiInstance.post(
+      apiRoutes.authentication.forgotPasswordValidate,
       data,
     );
     return response.data;
