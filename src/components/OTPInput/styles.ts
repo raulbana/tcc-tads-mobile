@@ -17,15 +17,15 @@ export const Container = styled.View`
   align-items: center;
   justify-content: center;
   width: 100%;
-  gap: ${horizontalScale(16)}px;
+  gap: ${horizontalScale(12)}px;
 `;
 
 export const Input = styled(TextInput)<{
   $isFocused: boolean;
   $hasError: boolean;
 }>`
-  width: ${horizontalScale(48)}px;
-  height: ${verticalScale(48)}px;
+  width: ${horizontalScale(36)}px;
+  height: ${verticalScale(36)}px;
   border-radius: ${moderateScale(10)}px;
   border: 2px solid ${theme.colors.gray_04};
   border-color: ${({$isFocused, $hasError}) =>
@@ -37,5 +37,5 @@ export const Input = styled(TextInput)<{
   text-align: center;
   justify-content: center;
   align-items: center;
-  font-size: ${moderateScale(18)}px;
+  font-size: ${moderateScale(12)}px;
 `;

@@ -25,7 +25,7 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
         name="otp"
         render={({field}) => (
           <OTPInput
-            length={4}
+            length={6}
             hasError={!!errors.otp}
             value={field.value}
             onChange={field.onChange}
