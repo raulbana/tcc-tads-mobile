@@ -70,22 +70,6 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
         )}
       />
 
-      <Controller
-        control={control}
-        name="confirmPassword"
-        render={({field}) => (
-          <Input
-            {...register('confirmPassword')}
-            label="Confirmar senha"
-            value={field.value}
-            onChangeText={field.onChange}
-            placeholder="Confirme sua senha"
-            error={errors.confirmPassword?.message as string | undefined}
-            secureTextEntry
-            onChange={field.onChange}
-          />
-        )}
-      />
       <S.ButtonContainer>
         <S.ButtonsSection>
           <Button
