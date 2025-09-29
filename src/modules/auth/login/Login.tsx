@@ -9,7 +9,7 @@ import theme from '../../../theme/theme';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 
 const Login: React.FC = () => {
-  const {handleGoToRegister} = useLogin();
+  const {handleGoToRegister, handleGoToForgotPassword} = useLogin();
 
   return (
     <ScreenContainer>
@@ -40,6 +40,15 @@ const Login: React.FC = () => {
           <TouchableOpacity onPress={handleGoToRegister}>
             <Label
               text=" Criar Conta"
+              color={theme.colors.purple_04}
+              typography={theme.typography.paragraph.sm3}
+            />
+          </TouchableOpacity>
+        </S.FooterRow>
+        <S.FooterRow>
+          <TouchableOpacity onPress={handleGoToForgotPassword}>
+            <Label
+              text="Esqueceu a senha?"
               color={theme.colors.purple_04}
               typography={theme.typography.paragraph.sm3}
             />

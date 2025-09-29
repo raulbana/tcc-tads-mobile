@@ -45,7 +45,8 @@ const useRegisterForm = (onSuccess: () => void) => {
 
   const onSubmit = useCallback(
     async (values: ForgotPasswordRequestFormData) => {
-      try {
+      onSuccess();
+ /*      try {
         const payload: forgotPasswordRequestRequest = {
           email: values.email,
         };
@@ -62,7 +63,7 @@ const useRegisterForm = (onSuccess: () => void) => {
         return res;
       } catch (error) {
         throw error;
-      }
+      } */
     },
     [forgotPasswordRequestMutate, setSession, reset, onSuccess],
   );

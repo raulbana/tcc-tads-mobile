@@ -4,6 +4,9 @@ import * as S from './styles';
 import Input from '../../../../../components/Input/Input';
 import Button from '../../../../../components/Button/Button';
 import useForgotPasswordRequestForm from './useForgotPasswordRequestForm';
+import { TouchableOpacity } from 'react-native';
+import Label from '../../../../../components/Label/Label';
+import theme from '../../../../../theme/theme';
 
 interface ForgotPasswordRequestFormProps {
   onSuccess: () => void;
@@ -12,14 +15,8 @@ interface ForgotPasswordRequestFormProps {
 const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
   onSuccess,
 }) => {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    control,
-    onSubmit,
-    navigateToLogin,
-  } = useForgotPasswordRequestForm(onSuccess);
+  const {register, handleSubmit, errors, control, onSubmit, navigateToLogin} =
+    useForgotPasswordRequestForm(onSuccess);
 
   return (
     <S.Container>
@@ -48,7 +45,13 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
               handleSubmit(onSubmit)();
             }}
           />
-          <Button type="SECONDARY" text="Voltar" onPress={navigateToLogin} />
+          <S.GoToLoginButton onPress={navigateToLogin}>
+            <Label
+              text="Voltar para login"
+              color={theme.colors.purple_04}
+              typography={theme.typography.paragraph.sm3}
+            />
+          </S.GoToLoginButton>
         </S.ButtonsSection>
       </S.ButtonContainer>
     </S.Container>

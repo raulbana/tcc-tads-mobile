@@ -18,3 +18,7 @@ export const ButtonsSection = styled.View`
   width: 100%;
   gap: ${verticalScale(8)}px;
 `;
+export const GoToLoginButton = styled.TouchableOpacity`
+  align-items: center;
+  margin-top: ${verticalScale(8)}px;
+`;
