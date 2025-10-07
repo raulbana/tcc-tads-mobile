@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "make:icon": "npx @bam.tech/react-native-make icon --path ./src/assets/logo/daily-iu-app-icon.png"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

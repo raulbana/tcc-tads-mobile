@@ -1,4 +1,4 @@
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 import {horizontalScale, verticalScale} from '../../utils/scales';
 import theme from '../../theme/theme';
@@ -6,15 +6,15 @@ import theme from '../../theme/theme';
 export const StyledContainer = styled.View`
   flex: 1;
   background-color: ${theme.colors.white};
-  padding-top: ${verticalScale(48)}px;
-  padding-bottom: ${verticalScale(16)}px;
+  padding-top: ${verticalScale(16)}px;
+  padding-bottom: ${verticalScale(0)}px;
 `;
 
 export const StyledSafeArea = styled(SafeAreaView)`
   flex: 1;
   background-color: ${theme.colors.white};
-  padding-bottom: ${verticalScale(16)}px;
-  padding-top: ${verticalScale(48)}px;
+  padding-bottom: ${verticalScale(0)}px;
+  padding-top: ${verticalScale(16)}px;
   padding-horizontal: ${horizontalScale(16)}px;
 `;
 

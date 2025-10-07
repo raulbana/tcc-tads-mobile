@@ -34,7 +34,7 @@ export const TextSection = styled.View`
   flex: 1;
   flex-direction: column;
   gap: ${verticalScale(10)}px;
-  padding-right: ${horizontalScale(8)}px;
+  padding-right: ${horizontalScale(95)}px;
   justify-content: center;
 `;
 

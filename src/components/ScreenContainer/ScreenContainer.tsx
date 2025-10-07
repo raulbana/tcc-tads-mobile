@@ -74,7 +74,6 @@ const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   return (
     <Container style={containerStyle}>
-      {/* Regular header (not fullBleed or not scrollable) */}
       {headerShown && !shouldScrollHeader && resolvedHeader}
       {loading && LoadingComponent}
       {!loading &&
