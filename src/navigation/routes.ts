@@ -36,6 +36,7 @@ export type ConfigParamList = {
 export type ContentParamList = {
   ContentHome: undefined;
   ContentDetails: {contentId: string};
+  CreateContent: undefined;
 };
 
 export type AuthParamList = {

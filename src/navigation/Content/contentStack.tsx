@@ -5,7 +5,9 @@ import {contentRoutes} from './contentRoute';
 const Stack = createNativeStackNavigator<ContentParamList>();
 
 const ContentStack: React.FC = () => (
-  <Stack.Navigator screenOptions={{headerShown: false}}>
+  <Stack.Navigator
+    screenOptions={{headerShown: false}}
+    initialRouteName="CreateContent">
     {contentRoutes.map(route => (
       <Stack.Screen
         key={route.name}

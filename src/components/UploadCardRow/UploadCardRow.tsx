@@ -22,9 +22,9 @@ const UploadCardRow: React.FC<UploadCardRowProps> = ({
       <S.IconWrapper>
         <Icon
           name="ImageSquare"
-          size={24}
+          size={28}
           color={theme.colors.purple_04}
-          weight="fill"
+          weight="bold"
         />
       </S.IconWrapper>
 
@@ -44,7 +44,7 @@ const UploadCardRow: React.FC<UploadCardRowProps> = ({
 
       {onRemove && (
         <S.RemoveButton onPress={onRemove} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-          <Icon name="XCircle" size={20} color={theme.colors.error} weight="fill" />
+          <Icon name="X" size={20} color={theme.colors.error} weight="bold" />
         </S.RemoveButton>
       )}
     </S.Container>

@@ -7,18 +7,24 @@ import Badge from '../../../components/Badge/Badge';
 import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSection';
 import ContentCard from '../../../components/ContentCard/ContentCard';
 import useContentHome from './useContentHome';
+import Icon from '../../../components/Icon/Icon';
 
 const ContentHome = () => {
-  const {badgeList, contentCardList, navigateToDetails} = useContentHome();
+  const {badgeList, contentCardList, navigateToDetails, navigateToCreateContent} = useContentHome();
 
   return (
     <ScreenContainer scrollable>
       <S.Wrapper>
-        <Label
-          typography={theme.typography.title.b3}
-          color={theme.colors.gray_08}
-          text="Conteúdos"
-        />
+        <S.Header>
+          <Label
+            typography={theme.typography.title.b3}
+            color={theme.colors.gray_08}
+            text="Conteúdos"
+          />
+          <S.CreatePostButton onPress={navigateToCreateContent}>
+            <Icon name="Plus" size={24} color={theme.colors.gray_08} />
+          </S.CreatePostButton>
+        </S.Header>
         <CarouselSection
           carouselData={{
             data: badgeList,

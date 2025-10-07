@@ -7,7 +7,7 @@ const Stack = createNativeStackNavigator<AuthParamList>();
 const AuthStack: React.FC = () => (
   <Stack.Navigator
     screenOptions={{headerShown: false}}
-    initialRouteName="ForgotPassword">
+    initialRouteName="Login">
     {authRoutes.map(route => (
       <Stack.Screen
         key={route.name}

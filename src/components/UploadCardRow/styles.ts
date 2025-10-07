@@ -7,13 +7,15 @@ import {
 import theme from '../../theme/theme';
 
 export const Container = styled.TouchableOpacity`
+  display: flex;
   width: 100%;
   flex-direction: row;
   align-items: center;
   gap: ${horizontalScale(12)}px;
-  padding: ${verticalScale(12)}px ${horizontalScale(16)}px;
+  padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
   border-radius: ${moderateScale(12)}px;
   background-color: ${theme.colors.gray_02};
+  border: 1px solid ${theme.colors.gray_04};
 `;
 
 export const IconWrapper = styled.View`

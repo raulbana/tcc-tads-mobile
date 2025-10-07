@@ -82,6 +82,10 @@ const useContentHome = () => {
     navigate('Content', {screen: 'ContentDetails', params: {contentId}});
   };
 
+  const navigateToCreateContent = () => {
+    navigate('Content', {screen: 'CreateContent'});
+  }
+
   const setCardClickHandlers = useCallback(() => {
     const updatedContentCards = contentCardList.map((card, index) => ({
       ...card,
@@ -99,6 +103,7 @@ const useContentHome = () => {
     contentCardList,
     navigateToDetails,
     handleCardClick,
+    navigateToCreateContent,
   };
 };
 
