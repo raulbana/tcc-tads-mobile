@@ -121,9 +121,8 @@ const api = apiFactory(BASE_URL);
 
 const contentServices = {
   getById: async (contentId: string): Promise<Content> => {
-    /*     const response = await api.get(`/contents/${contentId}`);
-     */ /* return response.data; */
-    return mockContents[1];
+    const response = await api.get(`/contents/${contentId}`);
+    return response.data; 
   },
 
   getAll: async (): Promise<Content[]> => {
