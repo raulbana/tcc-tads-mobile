@@ -24,6 +24,7 @@ interface UploadBoxProps {
   title: string;
   description: string;
   parentScrollRef?: any;
+  externalError?: string;
 }
 
 const UploadBox: React.FC<UploadBoxProps> = ({
@@ -35,49 +36,71 @@ const UploadBox: React.FC<UploadBoxProps> = ({
   title,
   description,
   parentScrollRef,
+  externalError,
 }) => {
-  const {files, pickFile, removeFile, reorderFiles, listRef} =
+  const {files, pickFile, removeFile, reorderFiles, listRef, error} =
     useUpload(allowedTypes);
 
+  const displayError = externalError || error;
+
+  React.useEffect(() => {
+    onUpdateFiles(files);
+  }, [files]);
+
   const renderUpload = useCallback(
-    ({item, drag, isActive}: RenderItemParams<UploadFile>) => (
-      <S.DraggableItem
-        isActive={isActive}
-        onLongPress={drag}
-        delayLongPress={200}>
-        <S.CardContainer>
-          <S.IconWrapper>
-            <Icon
-              name="ImageSquare"
-              size={28}
-              color={theme.colors.purple_04}
-              weight="bold"
-            />
-          </S.IconWrapper>
+    ({item, drag, isActive}: RenderItemParams<UploadFile>) => {
+      const isVideo = item.type.startsWith('video');
+      const isDraggable = !isVideo;
 
-          <S.InfoWrapper>
-            <Label
-              text={item.fileName}
-              typography={theme.typography.paragraph.sb2}
-              color={theme.colors.gray_08}
-              numberOfLines={1}
-            />
-            <Label
-              text={`${(item.fileSize / 1024 / 1024).toFixed(2)} MB`}
-              typography={theme.typography.paragraph.sm2}
-              color={theme.colors.gray_06}
-            />
-          </S.InfoWrapper>
+      return (
+        <S.DraggableItem
+          isActive={isActive}
+          isDraggable={isDraggable}
+          onLongPress={isDraggable ? drag : undefined}
+          delayLongPress={200}
+          disabled={!isDraggable}>
+          <S.CardContainer>
+            <S.IconWrapper>
+              <Icon
+                name={isVideo ? 'VideoCamera' : 'ImageSquare'}
+                size={28}
+                color={theme.colors.purple_04}
+                weight="bold"
+              />
+            </S.IconWrapper>
 
-          <S.RemoveButton
-            onPress={() => removeFile(item.id)}
-            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-            <Icon name="X" size={20} color={theme.colors.error} weight="bold" />
-          </S.RemoveButton>
-        </S.CardContainer>
-      </S.DraggableItem>
-    ),
-    [removeFile],
+            <S.InfoWrapper>
+              <Label
+                text={item.fileName}
+                typography={theme.typography.paragraph.sb2}
+                color={theme.colors.gray_08}
+                numberOfLines={1}
+              />
+              <Label
+                text={`${(item.fileSize / 1024 / 1024).toFixed(2)} MB`}
+                typography={theme.typography.paragraph.sm2}
+                color={theme.colors.gray_06}
+              />
+            </S.InfoWrapper>
+
+            <S.RemoveButton
+              onPress={() => {
+                removeFile(item.id);
+                onRemoveFile(item);
+              }}
+              hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+              <Icon
+                name="X"
+                size={20}
+                color={theme.colors.error}
+                weight="bold"
+              />
+            </S.RemoveButton>
+          </S.CardContainer>
+        </S.DraggableItem>
+      );
+    },
+    [removeFile, onRemoveFile],
   );
 
   const hasThumbnail = useMemo(
@@ -94,13 +117,23 @@ const UploadBox: React.FC<UploadBoxProps> = ({
     <S.Wrapper>
       {hasThumbnail && (
         <S.ThumbnailContainer>
-          <S.ThumbnailPreviewText></S.ThumbnailPreviewText>
-          <S.ThumbnailGradient colors={['rgba(0,0,0,0.6)', 'transparent']} />
-          <S.ThumbnailPreview source={{uri: files[0].uri}} resizeMode="cover" />
+          <S.ThumbnailPreview source={{uri: files[0].uri}} resizeMode="cover">
+            <S.ThumbnailGradient
+              colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']}
+            />
+            <S.ThumbnailPreviewText>
+              <Label
+                text={title}
+                typography={theme.typography.paragraph.sb3}
+                color={theme.colors.white}
+                numberOfLines={1}
+              />
+            </S.ThumbnailPreviewText>
+          </S.ThumbnailPreview>
         </S.ThumbnailContainer>
       )}
 
-      <S.Container onPress={pickFile}>
+      <S.Container onPress={pickFile} hasError={!!displayError}>
         <Icon name="UploadSimple" size={32} color={theme.colors.purple_04} />
         <Label
           typography={theme.typography.paragraph.r2}
@@ -114,27 +147,54 @@ const UploadBox: React.FC<UploadBoxProps> = ({
         />
       </S.Container>
 
+      {displayError && (
+        <Label
+          typography={theme.typography.paragraph.sm1}
+          color={theme.colors.error}
+          text={displayError}
+        />
+      )}
+
       {files.length > 0 && (
-        <S.ListContainer>
-          <GestureHandlerRootView style={{width: '100%', overflow: 'visible'}}>
-            <DraggableFlatList
-              ref={listRef}
-              data={files}
-              keyExtractor={keyExtractor}
-              contentContainerStyle={{paddingVertical: verticalScale(8)}}
-              renderItem={renderUpload}
-              onDragEnd={({data}) => reorderFiles(data)}
-              dragItemOverflow={true}
-              activationDistance={10}
-              scrollEnabled={false}
-              style={{overflow: 'visible'}}
-              nestedScrollEnabled={true}
-              simultaneousHandlers={
-                parentScrollRef ? [parentScrollRef] : undefined
-              }
-            />
-          </GestureHandlerRootView>
-        </S.ListContainer>
+        <>
+          {files.length > 1 && (
+            <S.HintContainer>
+              <Icon
+                name="Lightbulb"
+                size={20}
+                color={theme.colors.purple_04}
+                weight="bold"
+              />
+              <Label
+                text="Dica: Arraste a imagem que você quer como capa para o primeiro lugar da lista! 👆"
+                typography={theme.typography.paragraph.sm2}
+                color={theme.colors.gray_07}
+                style={{flex: 1}}
+              />
+            </S.HintContainer>
+          )}
+          <S.ListContainer>
+            <GestureHandlerRootView
+              style={{width: '100%', overflow: 'visible'}}>
+              <DraggableFlatList
+                ref={listRef}
+                data={files}
+                keyExtractor={keyExtractor}
+                contentContainerStyle={{paddingVertical: verticalScale(8)}}
+                renderItem={renderUpload}
+                onDragEnd={({data}) => reorderFiles(data)}
+                dragItemOverflow={true}
+                activationDistance={10}
+                scrollEnabled={false}
+                style={{overflow: 'visible'}}
+                nestedScrollEnabled={true}
+                simultaneousHandlers={
+                  parentScrollRef ? [parentScrollRef] : undefined
+                }
+              />
+            </GestureHandlerRootView>
+          </S.ListContainer>
+        </>
       )}
     </S.Wrapper>
   );

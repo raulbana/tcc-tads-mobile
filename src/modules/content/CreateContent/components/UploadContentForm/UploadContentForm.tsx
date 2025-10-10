@@ -8,6 +8,7 @@ import Badge from '../../../../../components/Badge/Badge';
 import CarouselSection from '../../../../../components/CarouselSection.tsx/CarouselSection';
 import UploadBox from '../UploadBox/UploadBox';
 import {UploadFile} from '../UploadBox/useUpload';
+import Button from '../../../../../components/Button/Button';
 
 interface UploadContentFormProps {
   parentScrollRef?: any;
@@ -23,24 +24,35 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
     onSubmit,
     register,
     onSelectCategory,
-    title,
-    description,
     onSubmitFiles,
     onRemoveFile,
     onUpdateFiles,
+    titleText,
+    descriptionText,
+    categoriesList,
+    isLoading,
+    uploadError,
   } = useUploadContentForm();
   return (
     <S.Container>
-      <UploadBox
-        allowedTypes={['image', 'video']}
-        onSubmitFiles={onSubmitFiles}
-        onRemoveFile={onRemoveFile}
-        onReorderFiles={onUpdateFiles}
-        onUpdateFiles={onUpdateFiles}
-        title={title}
-        description={description}
-        parentScrollRef={parentScrollRef}
-      />
+      <S.FieldGroup>
+        <Label
+          text="Mídia"
+          typography={theme.typography.paragraph.r3}
+          color={theme.colors.gray_08}
+        />
+        <UploadBox
+          allowedTypes={['image', 'video']}
+          onSubmitFiles={onSubmitFiles}
+          onRemoveFile={onRemoveFile}
+          onReorderFiles={onUpdateFiles}
+          onUpdateFiles={onUpdateFiles}
+          title={titleText}
+          description={descriptionText}
+          parentScrollRef={parentScrollRef}
+          externalError={uploadError}
+        />
+      </S.FieldGroup>
       <S.FormContainer>
         <S.FieldGroup>
           <Controller
@@ -75,14 +87,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
         <S.FieldGroup>
           <CarouselSection
             carouselData={{
-              data: [
-                {
-                  content: 'Categoria 1',
-                  textColor: theme.colors.gray_08,
-                  backgroundColor: theme.colors.gray_03,
-                },
-              ],
-              itemWidth: 100,
+              data: categoriesList,
               renderItem: ({item}) => (
                 <Badge
                   {...item}
@@ -94,6 +99,13 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
           />
         </S.FieldGroup>
       </S.FormContainer>
+      <S.ButtonContainer>
+        <Button
+          text={isLoading ? 'Publicando...' : 'Publicar Conteúdo'}
+          onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
+        />
+      </S.ButtonContainer>
     </S.Container>
   );
 };

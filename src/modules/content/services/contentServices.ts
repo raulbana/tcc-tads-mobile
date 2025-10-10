@@ -135,6 +135,49 @@ const contentServices = {
     const response = await api.get('/contents/categories');
     return response.data;
   },
+
+  createContent: async (contentData: {
+    title: string;
+    description: string;
+    images: string[];
+    video?: string;
+    categories: string[];
+  }): Promise<Content> => {
+    const formData = new FormData();
+    
+    formData.append('title', contentData.title);
+    formData.append('description', contentData.description);
+    formData.append('categories', JSON.stringify(contentData.categories));
+
+    contentData.images.forEach((imageUri, index) => {
+      const filename = imageUri.split('/').pop() || `image_${index}.jpg`;
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('images', {
+        uri: imageUri,
+        name: filename,
+        type: type,
+      } as any);
+    });
+
+    if (contentData.video) {
+      const filename = contentData.video.split('/').pop() || 'video.mp4';
+      formData.append('video', {
+        uri: contentData.video,
+        name: filename,
+        type: 'video/mp4',
+      } as any);
+    }
+
+    const response = await api.post('/contents', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  },
 };
 
 export default contentServices;

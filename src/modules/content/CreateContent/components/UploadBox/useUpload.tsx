@@ -14,10 +14,13 @@ export function useUpload(
   allowedTypes: ('image' | 'video')[] = ['image', 'video'],
 ) {
   const [files, setFiles] = useState<UploadFile[]>([]);
+  const [error, setError] = useState<string>('');
   const listRef = useRef<any>(null);
 
   const pickFile = useCallback(async () => {
     try {
+      setError(''); // Clear previous errors
+
       const result = await launchImageLibrary({
         mediaType: allowedTypes.includes('video') ? 'mixed' : 'photo',
         selectionLimit: 1,
@@ -28,6 +31,27 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
+      const MAX_FILE_SIZE = 10 * 1024 * 1024;
+      if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+        const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
+        const errorMsg = `Arquivo muito grande (${fileSizeMB}MB). Máximo: 10MB`;
+        setError(errorMsg);
+        Alert.alert('Arquivo muito grande', errorMsg);
+        return;
+      }
+
+      const isVideo = asset.type?.startsWith('video');
+
+      if (isVideo) {
+        const hasVideo = files.some(file => file.type.startsWith('video'));
+        if (hasVideo) {
+          const errorMsg = 'Apenas 1 vídeo é permitido por post';
+          setError(errorMsg);
+          Alert.alert('Limite de vídeos atingido', errorMsg);
+          return;
+        }
+      }
+
       const newFile: UploadFile = {
         id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         uri: asset.uri!,
@@ -36,19 +60,27 @@ export function useUpload(
         fileSize: asset.fileSize!,
       };
 
-      setFiles(prevFiles => [...prevFiles, newFile]);
+      if (isVideo) {
+        setFiles(prevFiles => [...prevFiles, newFile]);
+      } else {
+        setFiles(prevFiles => [newFile, ...prevFiles]);
+      }
+      setError('');
     } catch (err) {
-      Alert.alert('Erro', 'Não foi possível carregar o arquivo.');
+      const errorMsg = 'Não foi possível carregar o arquivo';
+      setError(errorMsg);
+      Alert.alert('Erro', errorMsg);
     }
-  }, [allowedTypes]);
+  }, [allowedTypes, files]);
 
   const removeFile = useCallback((id: string) => {
     setFiles(prevFiles => prevFiles.filter(file => file.id !== id));
+    setError('');
   }, []);
 
   const reorderFiles = useCallback((ordered: UploadFile[]) => {
     setFiles(ordered);
   }, []);
 
-  return {files, pickFile, removeFile, reorderFiles, listRef};
+  return {files, pickFile, removeFile, reorderFiles, listRef, error, setError};
 }

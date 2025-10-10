@@ -13,28 +13,31 @@ export const Wrapper = styled.View`
   overflow: visible;
 `;
 
-export const Container = styled.TouchableOpacity`
-  border: 1px dashed #cbd5e1;
+export const Container = styled.TouchableOpacity<{hasError?: boolean}>`
+  border: 1px dashed ${({hasError}) => (hasError ? theme.colors.error : '#cbd5e1')};
   border-radius: ${moderateScale(12)}px;
   padding: ${verticalScale(20)}px;
   align-items: center;
   justify-content: center;
-  background-color: #f9fafb;
+  background-color: ${({hasError}) => (hasError ? '#fff5f5' : '#f9fafb')};
   gap: ${verticalScale(8)}px;
   overflow: visible;
 `;
 
-//gradient from bottom to half top to show the title
-export const ThumbnailPreview = styled.Image`
+export const ThumbnailPreview = styled.ImageBackground`
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: ${moderateScale(16)}px;
 `;
 
-export const DraggableItem = styled.TouchableOpacity<{isActive: boolean}>`
+export const DraggableItem = styled.TouchableOpacity<{
+  isActive: boolean;
+  isDraggable?: boolean;
+}>`
   width: 100%;
   margin-bottom: ${verticalScale(8)}px;
-  opacity: ${({isActive}) => (isActive ? 0.9 : 1)};
+  opacity: ${({isActive, isDraggable = true}) =>
+    isActive ? 0.9 : isDraggable ? 1 : 0.7};
   transform: ${({isActive}) => (isActive ? 'scale(1.02)' : 'scale(1)')};
   elevation: ${({isActive}) => (isActive ? 5 : 0)};
   shadow-color: ${({isActive}) => (isActive ? '#000' : 'transparent')};
@@ -87,19 +90,36 @@ export const ThumbnailPreviewText = styled.View`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: ${verticalScale(8)}px;
+  padding: ${verticalScale(24)}px;
+  z-index: 10;
 `;
 
 export const ThumbnailGradient = styled(LinearGradient).attrs({
-  locations: [0, 0.6, 1],
-  end: { x: 0.5, y: 1 },
-  start: { x: 0.5, y: 0 },
+  colors: ['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)'],
+  locations: [0, 0.8, 1],
+  start: {x: 0.5, y: 1},
+  end: {x: 0.5, y: 0},
 })`
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   top: 0;
+  z-index: 1;
+`;
+export const ThumbnailContainer = styled.View`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: ${moderateScale(16)}px;
+  overflow: hidden;
 `;
 
-export const ThumbnailContainer = styled.View``
+export const HintContainer = styled.View`
+  background-color: ${theme.colors.purple_01};
+  border-radius: ${moderateScale(8)}px;
+  padding: ${verticalScale(12)}px ${horizontalScale(12)}px;
+  flex-direction: row;
+  align-items: center;
+  gap: ${horizontalScale(8)}px;
+`;

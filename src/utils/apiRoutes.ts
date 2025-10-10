@@ -14,6 +14,7 @@ const apiRoutes = {
     all: '/contents',
     category: '/contents/category',
     byId: (contentId: string) => `/contents/${contentId}`,
+    create: '/contents',
   },
 };
 

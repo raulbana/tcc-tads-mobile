@@ -23,13 +23,12 @@ const Badge: React.FC<BadgeProps> = props => {
       {...props}
       disabled={disabled}
       isActive={isActive}
-      backgroundColor={isActive ? theme.colors.gray_08 : undefined}>
+      backgroundColor={isActive ? theme.colors.purple_02 : undefined}>
       {typeof content === 'string' ? (
         <Label
           color={textColor || theme.colors.gray_08}
           typography={theme.typography.paragraph.m2}
           text={content}
-          numberOfLines={numberOfLines}
           ellipsizeMode={ellipsizeMode}
         />
       ) : (

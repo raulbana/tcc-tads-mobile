@@ -4,12 +4,13 @@ import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer
 import theme from '../../../theme/theme';
 import UploadContentForm from './components/UploadContentForm/UploadContentForm';
 import * as S from './styles';
+import useCreateContent from './useCreateContent';
 
 const CreateContent = () => {
   const scrollRef = useRef<any>(null);
-
+  const {goBack} = useCreateContent();
   return (
-    <ScreenContainer scrollable={true} ref={scrollRef}>
+    <ScreenContainer scrollable={true} ref={scrollRef} goBackTo="Conteúdos" goBack={goBack} headerShown>
       <S.Wrapper>
         <S.Header>
           <Label
