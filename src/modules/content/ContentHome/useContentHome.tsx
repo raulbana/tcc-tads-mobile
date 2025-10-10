@@ -74,29 +74,28 @@ const useContentHome = () => {
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  const navigateToDetails = () => {
+  const navigateToDetails = useCallback(() => {
     navigate('Content', {screen: 'ContentDetails', params: {contentId: '1'}});
-  };
+  }, [navigate]);
 
-  const handleCardClick = (contentId: string) => {
-    navigate('Content', {screen: 'ContentDetails', params: {contentId}});
-  };
+  const handleCardClick = useCallback(
+    (contentId: string) => {
+      navigate('Content', {screen: 'ContentDetails', params: {contentId}});
+    },
+    [navigate],
+  );
 
-  const navigateToCreateContent = () => {
+  const navigateToCreateContent = useCallback(() => {
     navigate('Content', {screen: 'CreateContent'});
-  }
+  }, [navigate]);
 
-  const setCardClickHandlers = useCallback(() => {
-    const updatedContentCards = contentCardList.map((card, index) => ({
+  useEffect(() => {
+    const updatedContentCards = contentCardListMock.map((card, index) => ({
       ...card,
       onClick: () => handleCardClick((index + 1).toString()),
     }));
     setContentCardList(updatedContentCards);
-  }, [contentCardList, handleCardClick]);
-
-  useEffect(() => {
-    setCardClickHandlers();
-  }, [setCardClickHandlers]);
+  }, [handleCardClick]);
 
   return {
     badgeList,
