@@ -62,7 +62,7 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
             label="Confirmar senha"
             value={field.value}
             onChangeText={field.onChange}
-            placeholder="Digite sua senha"
+            placeholder="Confirme sua nova senha"
             error={errors.confirmPassword?.message as string | undefined}
             secureTextEntry
             onChange={field.onChange}
