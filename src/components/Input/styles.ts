@@ -30,4 +30,5 @@ export const Wrapper = styled.View`
   width: 100%;
   display: flex;
   flex-direction: column;
+  gap: ${verticalScale(4)}px;
 `;

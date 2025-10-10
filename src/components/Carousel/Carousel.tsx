@@ -5,7 +5,7 @@ import * as S from './styles';
 export interface CarouselProps<T> {
   data: T[];
   renderItem: ({item, index}: {item: T; index: number}) => React.ReactElement;
-  itemWidth: number;
+  itemWidth?: number;
   gap?: number;
   onIndexChange?: (index: number) => void;
   initialIndex?: number;
@@ -41,17 +41,20 @@ function Carousel<T>({
         )}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={itemWidth + gap}
+        snapToInterval={(itemWidth ?? 0) + gap}
         decelerationRate="fast"
         contentContainerStyle={{paddingHorizontal: gap}}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={{itemVisiblePercentThreshold: 60}}
         initialScrollIndex={initialIndex}
-        getItemLayout={(_, index) => ({
-          length: itemWidth + gap,
-          offset: (itemWidth + gap) * index,
-          index,
-        })}
+        getItemLayout={(_, index) => {
+          const length = (itemWidth ?? 0) + gap;
+          return {
+            length,
+            offset: length * index,
+            index,
+          };
+        }}
       />
     </S.Container>
   );

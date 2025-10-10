@@ -7,6 +7,9 @@ import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import useOnboardingQueries from '../services/onboardingQueryFactory';
 import {Question} from '../../../types/question';
+import {useAuth} from '../../../contexts/AuthContext';
+import {Gender, PatientProfile} from '../../../types/auth';
+import {v7 as uuidv7} from 'uuid';
 
 const useOnboardingQuestion = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
@@ -51,6 +54,8 @@ const useOnboardingQuestion = () => {
       q6_when: [],
     },
   });
+
+  const {savePatientProfile} = useAuth();
 
   const getDefaultValueForQuestion = (question: Question) => {
     switch (question.type) {
@@ -113,12 +118,25 @@ const useOnboardingQuestion = () => {
   };
 
   const onSubmitAnswer = useCallback(() => {
-    console.log(getValues());
     handleSubmit(() => {
       console.log({
         ...getValues(),
         isValid,
       });
+
+      const answers = getValues();
+      
+      const profileData: PatientProfile = {
+        id: uuidv7(),
+        birthDate: answers.birthdate,
+        gender: answers.gender as Gender,
+        q1Score: answers.q3_frequency,
+        q2Score: answers.q4_amount,
+        q3Score: answers.q5_interference,
+        q4Score: answers.q6_when.length as number,
+      };
+
+      savePatientProfile(profileData);
     });
   }, [getValues, handleSubmit, isValid]);
 

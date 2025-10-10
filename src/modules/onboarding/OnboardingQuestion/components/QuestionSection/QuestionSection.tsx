@@ -11,6 +11,7 @@ import SliderInput from '../../../../../components/Slider/SliderInput';
 import {Control, useFormState} from 'react-hook-form';
 import {ICIQAnswers} from '../../schema/questionnaire';
 import {useQuestionSection} from './useQuestionSection';
+import DatePickerInput from '../../../../../components/DatePicker/DatePicker';
 
 export interface QuestionProps {
   question: Question;
@@ -57,7 +58,7 @@ const QuestionSection: React.FC<QuestionProps> = ({
 
       case 'date':
         return (
-          <DatePicker
+          <DatePickerInput
             value={validDate(localValue) ?? new Date()}
             onChange={(date: Date) => {
               handleDateChange(date.toISOString());
@@ -66,6 +67,7 @@ const QuestionSection: React.FC<QuestionProps> = ({
             modal={false}
             maximumDate={new Date()}
             mode="date"
+            
           />
         );
 

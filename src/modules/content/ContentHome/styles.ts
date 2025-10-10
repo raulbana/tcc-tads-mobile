@@ -1,7 +1,20 @@
 import styled from 'styled-components/native';
-import {verticalScale} from '../../../utils/scales';
+import {moderateScale, verticalScale} from '../../../utils/scales';
 
 export const Wrapper = styled.View`
   flex: 1;
-  gap: ${verticalScale(24)}px;
+  gap: ${verticalScale(16)}px;
+`;
+
+export const Header = styled.View`
+  width: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+export const CreatePostButton = styled.TouchableOpacity`
+  border: 2px solid ${({theme}) => theme.colors.gray_08};
+  border-radius: ${moderateScale(8)}px;
 `;

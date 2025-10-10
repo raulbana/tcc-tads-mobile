@@ -32,7 +32,7 @@ const TrainingSection: React.FC<TrainingSectionProps> = ({
         typeCard={'default'}
         exercise={{
           id: '1',
-          title: 'Treino de Peito',
+          title: 'Treino de Assoalho Pélvico',
           description:
             'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
           status: 'PENDING',

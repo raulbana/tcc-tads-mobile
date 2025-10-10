@@ -1,0 +1,74 @@
+import React from 'react';
+import {Controller} from 'react-hook-form';
+import useLoginForm from './useLoginForm';
+import * as S from './styles';
+import Input from '../../../../../components/Input/Input';
+import Label from '../../../../../components/Label/Label';
+import Button from '../../../../../components/Button/Button';
+import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
+import theme from '../../../../../theme/theme';
+
+const LoginForm: React.FC = () => {
+  const {
+    control,
+    handleSubmit,
+    errors,
+    setValue,
+    register,
+    onSubmit,
+    remember,
+  } = useLoginForm();
+
+  return (
+    <S.Container>
+      <Controller
+        control={control}
+        name="email"
+        render={({field}) => (
+          <Input
+            {...register('email')}
+            label="E-mail"
+            value={field.value}
+            onChangeText={field.onChange}
+            placeholder="Digite seu e-mail"
+            error={errors.email?.message}
+            keyboardType="email-address"
+            autoCorrect={false}
+            onChange={field.onChange}
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="password"
+        render={({field}) => (
+          <Input
+            {...register('password')}
+            label="Senha"
+            value={field.value}
+            onChangeText={field.onChange}
+            placeholder="Digite sua senha"
+            error={errors.password?.message}
+            secureTextEntry
+            required
+            onChange={field.onChange}
+          />
+        )}
+      />
+      <S.CheckboxRow>
+        <SwitchToggle
+          value={remember as boolean}
+          onValueChange={value => setValue('remember', value)}
+        />
+        <Label
+          text="Lembrar de mim"
+          typography={theme.typography.paragraph.r2}
+          color={theme.colors.gray_07}
+        />
+      </S.CheckboxRow>
+      <Button type="PRIMARY" text="Entrar" onPress={handleSubmit(onSubmit)} />
+    </S.Container>
+  );
+};
+
+export default LoginForm;

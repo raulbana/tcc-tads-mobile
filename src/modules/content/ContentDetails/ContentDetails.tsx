@@ -105,7 +105,7 @@ const ContentDetails = () => {
           onLikePress={toggleLike}
           isReposted={isReposted}
           onRepostPress={toggleRepost}
-          category={content.category}
+          category={content.category.name}
         />
         <CommentSection
           comments={comments}

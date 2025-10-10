@@ -9,17 +9,27 @@ export interface BadgeProps {
   borderColor?: string;
   textColor?: string;
   onPress?: () => void;
+  disabled?: boolean;
+  isActive?: boolean;
+  numberOfLines?: number;
+  ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
 }
 
 const Badge: React.FC<BadgeProps> = props => {
-  const {content, textColor} = props;
+  const {content, textColor, disabled, isActive, numberOfLines, ellipsizeMode} =
+    props;
   return (
-    <S.BadgeContainer {...props}>
+    <S.BadgeContainer
+      {...props}
+      disabled={disabled}
+      isActive={isActive}
+      backgroundColor={isActive ? theme.colors.purple_02 : undefined}>
       {typeof content === 'string' ? (
         <Label
           color={textColor || theme.colors.gray_08}
           typography={theme.typography.paragraph.m2}
           text={content}
+          ellipsizeMode={ellipsizeMode}
         />
       ) : (
         React.createElement(content)

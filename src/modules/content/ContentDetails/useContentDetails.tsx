@@ -86,7 +86,7 @@ const useContentDetails = () => {
       setIsReposted(contentData.isReposted);
       setComments(contentData.comments || []);
     }
-  }, [contentData]);
+  }, [isLoading, contentData, refetch]);
 
   const onSendComment = () => {
     if (commentText.trim() === '') return;
