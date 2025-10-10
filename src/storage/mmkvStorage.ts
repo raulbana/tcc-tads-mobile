@@ -1,6 +1,4 @@
 import {MMKV} from 'react-native-mmkv';
-import {BASE_MMKV_STORAGE_KEY} from '@env';
-
 export const MMKVStorage = new MMKV({
   id: 'daily_iu_app_storage',
 });
