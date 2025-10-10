@@ -1,0 +1,61 @@
+import styled from 'styled-components/native';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../../utils/scales';
+import theme from '../../theme/theme';
+
+export const Container = styled.View`
+  background-color: ${theme.colors.gray_03};
+  border-radius: ${moderateScale(16)}px;
+  padding: ${verticalScale(20)}px ${horizontalScale(16)}px;
+  margin-bottom: ${verticalScale(16)}px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+export const Header = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: ${verticalScale(12)}px;
+`;
+
+export const TitleContainer = styled.View`
+  flex: 1;
+  margin-right: ${horizontalScale(12)}px;
+`;
+
+export const BadgeContainer = styled.View`
+  align-items: flex-end;
+`;
+
+export const Badge = styled.View`
+  background-color: ${theme.colors.purple_02};
+  border-radius: ${moderateScale(12)}px;
+  padding: ${verticalScale(4)}px ${horizontalScale(8)}px;
+`;
+
+export const MetadataRow = styled.View`
+  flex-direction: row;
+  gap: ${horizontalScale(16)}px;
+  margin-bottom: ${verticalScale(12)}px;
+`;
+
+export const MetadataItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${horizontalScale(4)}px;
+`;
+
+export const DescriptionContainer = styled.View`
+  margin-bottom: ${verticalScale(16)}px;
+`;
+
+export const ButtonContainer = styled.View`
+  width: 100%;
+`;

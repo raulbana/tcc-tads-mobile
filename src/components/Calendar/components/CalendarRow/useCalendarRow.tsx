@@ -42,15 +42,16 @@ export const useCalendarRow = () => {
     }
 
     return generatedDays;
-  }, [days]);
-
-  useEffect(() => {
-    const newDays = initializeDays();
-    setDays(newDays);
   }, []);
 
   useEffect(() => {
-    console.log(`days:`, days);
+    const newDays = initializeDays();
+    console.log('Initializing days:', newDays);
+    setDays(newDays);
+  }, [initializeDays]);
+
+  useEffect(() => {
+    console.log('Days updated:', days.length, days);
   }, [days]);
 
   return {scrollX, scrollHandler, days};
