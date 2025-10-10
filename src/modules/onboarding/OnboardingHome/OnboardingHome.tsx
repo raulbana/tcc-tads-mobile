@@ -16,8 +16,7 @@ const OnboardingHome = () => {
           typography={theme.typography.title.h3}
           text={'Seja bem-vindo(a) ao DailyIU! Seu app para acompanhamento de '}
           color={theme.colors.gray_08}
-          numberOfLines={5}
-          textAlign="justify"
+          numberOfLines={4}
           textBreakStrategy="balanced">
           <Label
             typography={theme.typography.title.b3}

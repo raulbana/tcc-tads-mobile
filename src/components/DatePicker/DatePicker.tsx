@@ -75,46 +75,31 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
           />
         </S.InputPressable>
       ) : (
-        <Input
-          type="date"
-          value={displayValue}
-          placeholder={
-            placeholder ??
-            (mode === 'time' ? 'Selecione o horário' : 'Selecione a data')
-          }
-          disabled={disabled}
-          onChange={str => {
-            if (!str) return;
-            const dt = new Date(str);
-            if (!isNaN(dt.getTime())) onChange(dt);
+        <DatePicker
+          modal={modal}
+          open={modal ? isOpen : true}
+          date={value || new Date()}
+          mode={mode}
+          minimumDate={minimumDate}
+          maximumDate={maximumDate}
+          is24hourSource="locale"
+          locale="pt-BR"
+          theme="light"
+          dividerColor={theme.colors.gray_04}
+          onConfirm={date => {
+            onChange(date);
+            closeModal();
+          }}
+          onCancel={() => {
+            onCancel();
+            closeModal();
+          }}
+          onDateChange={date => {
+            if (modal) return;
+            onChange(date);
           }}
         />
       )}
-
-      <DatePicker
-        modal={modal}
-        open={modal ? isOpen : true}
-        date={value || new Date()}
-        mode={mode}
-        minimumDate={minimumDate}
-        maximumDate={maximumDate}
-        is24hourSource="locale"
-        locale="pt-BR"
-        theme="light"
-        dividerColor={theme.colors.gray_04}
-        onConfirm={date => {
-          onChange(date);
-          closeModal();
-        }}
-        onCancel={() => {
-          onCancel();
-          closeModal();
-        }}
-        onDateChange={date => {
-          if (modal) return;
-          onChange(date);
-        }}
-      />
     </S.Container>
   );
 };

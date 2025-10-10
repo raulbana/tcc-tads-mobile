@@ -7,7 +7,7 @@ export type StackScreenProps = React.ComponentProps<typeof Stack.Screen>;
 const Navigator: React.FC = () => {
   return (
     <Stack.Navigator
-      initialRouteName="MainTabs"
+      initialRouteName="Onboarding"
       screenOptions={{headerShown: false}}>
       {routes.map(route => (
         <Stack.Screen

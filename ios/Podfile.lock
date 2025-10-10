@@ -1334,7 +1334,7 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
-  - react-native-date-picker (5.0.13):
+  - react-native-date-picker (5.0.12):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1901,6 +1901,30 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNDateTimePicker (8.4.5):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNGestureHandler (2.28.0):
     - DoubleConversion
     - glog
@@ -2258,6 +2282,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -2423,6 +2448,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNReanimated:
@@ -2476,7 +2503,7 @@ SPEC CHECKSUMS:
   React-logger: 44e070aefe084568c02b544b9d7d436703be1a47
   React-Mapbuffer: b25dedf7fe8923898c44b217ee2ef75c837d0e6a
   React-microtasksnativemodule: 22bd119cb27aa28ff15a4e9311e1a53034c14eab
-  react-native-date-picker: 3f997d3f1313adc1cd2bd8bc21d872cf012a2322
+  react-native-date-picker: ffb59a0dd7d3a1e78795c738c8dea68b90b18389
   react-native-image-picker: c73e6edfdbc2bbc1c12b3fe9c2149441fa08f149
   react-native-mmkv: a5f4c22acb1d2f8d1008c07a986186d5fce147ac
   react-native-safe-area-context: 6863f9e225b541b481514b0f6d51be0867184c2c
@@ -2513,6 +2540,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 1807bcf4715beaa540417d139032b54e57cdd005
   ReactCommon: b7062f81f6ea61ec29e03aab1d439fb56c49372c
   RNCAsyncStorage: 2cf7d05f5b1bc38680b6c83971e535a6ae9c5bc7
+  RNDateTimePicker: 57a160d5283b8a966076b8769713110a6882417b
   RNGestureHandler: f8d0f8c032ba1209eb370bcc29e1138788208673
   RNReanimated: 1909c549d12e6403209f0749d74d2089ac6426b7
   RNScreens: fd709d812885ccf4fac5cb35389147c399c0f164
