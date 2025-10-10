@@ -5,10 +5,12 @@ import {
   verticalScale,
 } from '../../../../../utils/scales';
 import theme from '../../../../../theme/theme';
+import LinearGradient from 'react-native-linear-gradient';
 
 export const Wrapper = styled.View`
   width: 100%;
   gap: ${verticalScale(16)}px;
+  overflow: visible;
 `;
 
 export const Container = styled.TouchableOpacity`
@@ -19,20 +21,85 @@ export const Container = styled.TouchableOpacity`
   justify-content: center;
   background-color: #f9fafb;
   gap: ${verticalScale(8)}px;
+  overflow: visible;
 `;
 
+//gradient from bottom to half top to show the title
 export const ThumbnailPreview = styled.Image`
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: ${moderateScale(12)}px;
+  border-radius: ${moderateScale(16)}px;
 `;
 
-export const DraggableWrapper = styled.TouchableOpacity`
+export const DraggableItem = styled.TouchableOpacity<{isActive: boolean}>`
   width: 100%;
+  margin-bottom: ${verticalScale(8)}px;
+  opacity: ${({isActive}) => (isActive ? 0.9 : 1)};
+  transform: ${({isActive}) => (isActive ? 'scale(1.02)' : 'scale(1)')};
+  elevation: ${({isActive}) => (isActive ? 5 : 0)};
+  shadow-color: ${({isActive}) => (isActive ? '#000' : 'transparent')};
+  shadow-offset: ${({isActive}) => (isActive ? '0px 2px' : '0px 0px')};
+  shadow-opacity: ${({isActive}) => (isActive ? 0.5 : 0)};
+  shadow-radius: ${({isActive}) => (isActive ? '4px' : '0px')};
+  z-index: 1000;
+`;
+
+export const CardContainer = styled.View`
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: ${horizontalScale(12)}px;
+  padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
+  border-radius: ${moderateScale(12)}px;
+  background-color: ${theme.colors.gray_02};
+  border: 1px solid ${theme.colors.gray_04};
+  overflow: visible;
+`;
+
+export const IconWrapper = styled.View`
+  width: ${horizontalScale(40)}px;
+  height: ${horizontalScale(40)}px;
+  border-radius: ${moderateScale(12)}px;
+  align-items: center;
+  justify-content: center;
+  background-color: ${theme.colors.purple_01};
+`;
+
+export const InfoWrapper = styled.View`
+  flex: 1;
+  gap: ${verticalScale(4)}px;
+`;
+
+export const RemoveButton = styled.TouchableOpacity`
+  padding: ${verticalScale(4)}px;
 `;
 
 export const ListContainer = styled.View`
   width: 100%;
   gap: ${verticalScale(8)}px;
   padding-horizontal: ${horizontalScale(4)}px;
+  overflow: visible;
 `;
+
+export const ThumbnailPreviewText = styled.View`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: ${verticalScale(8)}px;
+`;
+
+export const ThumbnailGradient = styled(LinearGradient).attrs({
+  locations: [0, 0.6, 1],
+  end: { x: 0.5, y: 1 },
+  start: { x: 0.5, y: 0 },
+})`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+`;
+
+export const ThumbnailContainer = styled.View``

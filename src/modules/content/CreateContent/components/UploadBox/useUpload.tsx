@@ -1,8 +1,9 @@
-import {useState} from 'react';
+import {useState, useRef, useCallback} from 'react';
 import {Alert} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 export type UploadFile = {
+  id: string;
   uri: string;
   type: string;
   fileName: string;
@@ -12,11 +13,10 @@ export type UploadFile = {
 export function useUpload(
   allowedTypes: ('image' | 'video')[] = ['image', 'video'],
 ) {
-  const [files, setFiles] = useState<UploadFile[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState<number >()
+  const [files, setFiles] = useState<UploadFile[]>([]);
+  const listRef = useRef<any>(null);
 
-  const pickFile = async () => {
+  const pickFile = useCallback(async () => {
     try {
       const result = await launchImageLibrary({
         mediaType: allowedTypes.includes('video') ? 'mixed' : 'photo',
@@ -28,28 +28,27 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
-      setFiles([
-        ...(files ?? []),
-        {
-          uri: asset.uri!,
-          type: asset.type!,
-          fileName: asset.fileName!,
-          fileSize: asset.fileSize!,
-        },
-      ]);
+      const newFile: UploadFile = {
+        id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        uri: asset.uri!,
+        type: asset.type!,
+        fileName: asset.fileName!,
+        fileSize: asset.fileSize!,
+      };
+
+      setFiles(prevFiles => [...prevFiles, newFile]);
     } catch (err) {
       Alert.alert('Erro', 'Não foi possível carregar o arquivo.');
     }
-  };
+  }, [allowedTypes]);
 
-  const removeFile = (index: number) => {
-    if (!files) return;
-    setFiles(files.filter((_, i) => i !== index));
-  };
+  const removeFile = useCallback((id: string) => {
+    setFiles(prevFiles => prevFiles.filter(file => file.id !== id));
+  }, []);
 
-   const reorderFiles = (ordered: UploadFile[]) => {
+  const reorderFiles = useCallback((ordered: UploadFile[]) => {
     setFiles(ordered);
-  };
+  }, []);
 
-  return {files, pickFile, removeFile, reorderFiles};
+  return {files, pickFile, removeFile, reorderFiles, listRef};
 }

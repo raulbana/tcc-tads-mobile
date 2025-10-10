@@ -1,12 +1,15 @@
+import React, {useRef} from 'react';
 import Label from '../../../components/Label/Label';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import theme from '../../../theme/theme';
-import UploadBox from './components/UploadBox/UploadBox';
+import UploadContentForm from './components/UploadContentForm/UploadContentForm';
 import * as S from './styles';
 
 const CreateContent = () => {
+  const scrollRef = useRef<any>(null);
+
   return (
-    <ScreenContainer>
+    <ScreenContainer scrollable={true} ref={scrollRef}>
       <S.Wrapper>
         <S.Header>
           <Label
@@ -15,7 +18,7 @@ const CreateContent = () => {
             color={theme.colors.gray_08}
           />
         </S.Header>
-        <UploadBox />
+        <UploadContentForm parentScrollRef={scrollRef} />
       </S.Wrapper>
     </ScreenContainer>
   );

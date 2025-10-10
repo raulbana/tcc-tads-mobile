@@ -3,7 +3,7 @@ import {
   useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import {CalendarDayData} from '../../../../types/diary';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 export const ITEM_WIDTH = 64;
 export const SPACING = 8;
@@ -19,7 +19,7 @@ export const useCalendarRow = () => {
     },
   });
 
-  const initializeDays = () => {
+  const initializeDays = useCallback(() => {
     const today = new Date();
     const generatedDays: CalendarDayData[] = [];
 
@@ -41,12 +41,17 @@ export const useCalendarRow = () => {
       });
     }
 
-    setDays(generatedDays); 
-  };
+    return generatedDays;
+  }, [days]);
 
   useEffect(() => {
-    initializeDays();
+    const newDays = initializeDays();
+    setDays(newDays);
   }, []);
+
+  useEffect(() => {
+    console.log(`days:`, days);
+  }, [days]);
 
   return {scrollX, scrollHandler, days};
 };
