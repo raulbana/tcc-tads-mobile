@@ -1,7 +1,13 @@
-import {useState} from 'react';
+import {useState, useCallback} from 'react';
 import {Exercise} from '../../../types/exercise';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {ExercisesParamList} from '../../../navigation/routes';
 
 const useExerciseHome = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
+
   const [workouts] = useState<Exercise[]>([
     {
       id: '1',
@@ -61,9 +67,13 @@ const useExerciseHome = () => {
     },
   ]);
 
-  const handleWorkoutPress = (workoutId: string) => {
-    console.log('Workout pressed:', workoutId);
-  };
+  const handleWorkoutPress = useCallback(
+    (workoutId: string) => {
+      console.log('Workout pressed:', workoutId);
+      navigation.navigate('ExerciseDetails', {exerciseId: workoutId});
+    },
+    [navigation],
+  );
 
   return {
     workouts,

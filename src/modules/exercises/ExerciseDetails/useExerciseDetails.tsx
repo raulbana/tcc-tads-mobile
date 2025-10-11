@@ -1,12 +1,25 @@
-import {useState} from 'react';
+import {useState, useCallback, useEffect} from 'react';
+import {useRoute, RouteProp} from '@react-navigation/native';
+import {ExercisesParamList} from '../../../navigation/routes';
 import {Workout} from '../../../types/exercise';
 
+type ExerciseDetailsRouteProp = RouteProp<
+  ExercisesParamList,
+  'ExerciseDetails'
+>;
+
 export const useExerciseDetails = () => {
+  const route = useRoute<ExerciseDetailsRouteProp>();
+  const {exerciseId} = route.params;
+
   const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'images'>(
     'videos',
   );
 
-  // Mock data para demonstração usando estrutura Workout
+  useEffect(() => {
+    console.log('ExerciseDetails montado com ID:', exerciseId);
+  }, [exerciseId]);
+
   const mockWorkout: Workout = {
     id: '1',
     name: 'Treino XYZ',
@@ -18,8 +31,7 @@ export const useExerciseDetails = () => {
       {
         id: '1',
         title: 'Exercício 1',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         status: 'PENDING',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -47,8 +59,7 @@ export const useExerciseDetails = () => {
       {
         id: '2',
         title: 'Exercício 2',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         status: 'PENDING',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -74,20 +85,23 @@ export const useExerciseDetails = () => {
         },
       },
     ],
+    duration: '',
+    description: '',
+    category: ''
   };
 
-  const handleVideosPress = () => {
+  const handleVideosPress = useCallback(() => {
     setActiveMediaTab('videos');
-  };
+  }, []);
 
-  const handleImagesPress = () => {
+  const handleImagesPress = useCallback(() => {
     setActiveMediaTab('images');
-  };
+  }, []);
 
-  const handleStartWorkout = () => {
+  const handleStartWorkout = useCallback(() => {
     // TODO: Implementar navegação para iniciar treino
-    console.log('Iniciar treino:', mockWorkout.name);
-  };
+    console.log('Iniciar treino:', mockWorkout.name, 'ID:', exerciseId);
+  }, [mockWorkout.name, exerciseId]);
 
   const getWorkoutCategory = () => {
     return mockWorkout.exercises[0]?.category || 'Lorem';

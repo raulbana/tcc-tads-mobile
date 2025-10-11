@@ -1,5 +1,5 @@
 export type ExerciseStatus = 'COMPLETED' | 'PENDING' | 'IN_PROGRESS';
-export type WorkoutStatus = 'PAUSED' | 'COMPLETED' | 'MISSED';
+export type WorkoutStatus = 'PAUSED' | 'COMPLETED' | 'MISSED' | 'IN_PROGRESS';
 export type WorkoutDifficulty = 'EASY' | 'MODERATE' | 'HARD';
 export type WorkoutEvaluation = 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 
@@ -12,6 +12,7 @@ export const ExerciseStatusLabels: Record<ExerciseStatus, string> = {
 export const WorkoutStatusLabels: Record<WorkoutStatus, string> = {
     PAUSED: 'Pausado',
     COMPLETED: 'Completo',
+    IN_PROGRESS: 'Em Progresso',
     MISSED: 'Perdido'
 };
 
@@ -72,4 +73,7 @@ export interface Workout {
         difficultyFeedback: string;
         comments?: string;
     };
+    duration: string;
+    description: string;
+    category: string;
 }

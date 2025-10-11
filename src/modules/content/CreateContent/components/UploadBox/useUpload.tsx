@@ -15,11 +15,12 @@ export function useUpload(
 ) {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [error, setError] = useState<string>('');
+  const [totalFileSize, setTotalFileSize] = useState<number>(0);
   const listRef = useRef<any>(null);
 
   const pickFile = useCallback(async () => {
     try {
-      setError(''); // Clear previous errors
+      setError('');
 
       const result = await launchImageLibrary({
         mediaType: allowedTypes.includes('video') ? 'mixed' : 'photo',
@@ -31,17 +32,19 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
+      
       const MAX_FILE_SIZE = 10 * 1024 * 1024;
-      if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+      if (asset.fileSize && asset.fileSize + totalFileSize > MAX_FILE_SIZE) {
+        const totalFileSizeMB = (totalFileSize / 1024 / 1024).toFixed(2);
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
-        const errorMsg = `Arquivo muito grande (${fileSizeMB}MB). Máximo: 10MB`;
+        const errorMsg = `Limite de excedido (${fileSizeMB}MB). Máximo: 10MB total por post (${totalFileSizeMB}MB)`;
         setError(errorMsg);
         Alert.alert('Arquivo muito grande', errorMsg);
         return;
       }
-
+      
       const isVideo = asset.type?.startsWith('video');
-
+      
       if (isVideo) {
         const hasVideo = files.some(file => file.type.startsWith('video'));
         if (hasVideo) {
@@ -51,7 +54,7 @@ export function useUpload(
           return;
         }
       }
-
+      
       const newFile: UploadFile = {
         id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         uri: asset.uri!,
@@ -59,12 +62,13 @@ export function useUpload(
         fileName: asset.fileName!,
         fileSize: asset.fileSize!,
       };
-
+      
       if (isVideo) {
         setFiles(prevFiles => [...prevFiles, newFile]);
       } else {
         setFiles(prevFiles => [newFile, ...prevFiles]);
       }
+      setTotalFileSize(prevTotalFileSize => prevTotalFileSize + asset.fileSize!);
       setError('');
     } catch (err) {
       const errorMsg = 'Não foi possível carregar o arquivo';

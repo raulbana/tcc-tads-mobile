@@ -20,6 +20,6 @@ export const Title = styled.View`
 `;
 
 export const StartWorkoutButton = styled.View`
-  margin-top: ${verticalScale(32)}px;
-  padding-bottom: ${verticalScale(20)}px;
+  align-items: center;
+  justify-content: center;
 `;

@@ -51,16 +51,14 @@ const ExerciseDetails = () => {
             activeMediaTab={activeMediaTab}
           />
         ))}
-
-        <S.StartWorkoutButton>
-          <Button
-            type="PRIMARY"
-            size="LARGE"
-            text="Iniciar Treino"
-            onPress={handleStartWorkout}
-          />
-        </S.StartWorkoutButton>
       </S.Container>
+      <S.StartWorkoutButton>
+        <Button
+          type="PRIMARY"
+          text="Iniciar Treino"
+          onPress={handleStartWorkout}
+        />
+      </S.StartWorkoutButton>
     </ScreenContainer>
   );
 };

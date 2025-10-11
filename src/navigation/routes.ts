@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   NativeStackNavigationOptions,
   NativeStackNavigationProp,
@@ -50,6 +51,7 @@ export type ExercisesParamList = {
   ExercisesHome: undefined;
   ExerciseDetails: {exerciseId: string};
   EvaluateExercise: {exerciseId: string};
+  ExerciseWorkout: {exerciseId: string};
 }
 
 export type RootParamList = {

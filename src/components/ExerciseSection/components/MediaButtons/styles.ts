@@ -1,6 +1,6 @@
 import styled from "styled-components/native";
-import { verticalScale, horizontalScale } from "../../utils/scales";
-import theme from "../../theme/theme";
+import theme from "../../../../theme/theme";
+import { horizontalScale, verticalScale } from "../../../../utils/scales";
 
 export const Container = styled.View`
   flex-direction: row;
@@ -16,7 +16,7 @@ export const Button = styled.TouchableOpacity<{ isActive: boolean }>`
   gap: ${horizontalScale(8)}px;
   padding: ${verticalScale(12)}px ${horizontalScale(16)}px;
   background-color: ${({ isActive }) => 
-    isActive ? theme.colors.purple_01 : theme.colors.purple_02
+    isActive ? theme.colors.purple_04 : theme.colors.purple_02
   };
   border-radius: ${horizontalScale(8)}px;
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};

@@ -1,8 +1,10 @@
+import ExerciseDetails from "../../modules/exercises/ExerciseDetails/ExerciseDetails";
 import ExerciseHome from "../../modules/exercises/ExerciseHome/ExerciseHome";
 import { Route } from "../routes";
 
 export const exercisesRoutes: Route[] = [
   {name: 'ExercisesHome', component: ExerciseHome},
-  {name: 'ExerciseDetails', component: (/* ExerciseDetails */) => null},
+  {name: 'ExerciseDetails', component: ExerciseDetails},
+  {name: 'ExerciseWorkout', component: ()=> null},
   {name: 'EvaluateExercise', component: (/* EvaluateExercise */) => null},
 ];

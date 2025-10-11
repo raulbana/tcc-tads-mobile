@@ -30,7 +30,7 @@ const MediaButtons: React.FC<MediaButtonsProps> = ({
           name="PlayCircle"
           size={20}
           color={
-            activeTab === 'videos' ? theme.colors.gray_08 : theme.colors.gray_07
+            activeTab === 'videos' ? theme.colors.white : theme.colors.gray_08
           }
           weight="regular"
         />
@@ -38,7 +38,7 @@ const MediaButtons: React.FC<MediaButtonsProps> = ({
           text="Vídeos"
           typography={theme.typography.paragraph.m3}
           color={
-            activeTab === 'videos' ? theme.colors.gray_08 : theme.colors.gray_07
+            activeTab === 'videos' ? theme.colors.white : theme.colors.gray_08
           }
         />
       </S.Button>
@@ -51,7 +51,7 @@ const MediaButtons: React.FC<MediaButtonsProps> = ({
           name="Image"
           size={20}
           color={
-            activeTab === 'images' ? theme.colors.gray_08 : theme.colors.gray_07
+            activeTab === 'images' ? theme.colors.white : theme.colors.gray_08
           }
           weight="regular"
         />
@@ -59,7 +59,7 @@ const MediaButtons: React.FC<MediaButtonsProps> = ({
           text="Imagens"
           typography={theme.typography.paragraph.m3}
           color={
-            activeTab === 'images' ? theme.colors.gray_08 : theme.colors.gray_07
+            activeTab === 'images' ? theme.colors.white : theme.colors.gray_08
           }
         />
       </S.Button>
