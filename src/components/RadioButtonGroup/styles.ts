@@ -13,7 +13,7 @@ export const OptionButton = styled.TouchableOpacity<{selected: boolean}>`
   border-color: ${({selected, theme}) =>
     selected ? theme.colors.purple_03 : theme.colors.gray_05};
   border-radius: ${moderateScale(16)}px;
-  padding-vertical: ${moderateScale(16)}px;
+  padding-vertical: ${moderateScale(12)}px;
   padding-horizontal: ${moderateScale(8)}px;
   align-items: center;
   justify-content: center;

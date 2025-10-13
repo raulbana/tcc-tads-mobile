@@ -16,14 +16,14 @@ export interface BadgeProps {
 }
 
 const Badge: React.FC<BadgeProps> = props => {
-  const {content, textColor, disabled, isActive, numberOfLines, ellipsizeMode} =
+  const {content, textColor, disabled, isActive, numberOfLines, ellipsizeMode, backgroundColor} =
     props;
   return (
     <S.BadgeContainer
       {...props}
       disabled={disabled}
       isActive={isActive}
-      backgroundColor={isActive ? theme.colors.purple_02 : undefined}>
+      backgroundColor={isActive ? theme.colors.purple_02 : backgroundColor}>
       {typeof content === 'string' ? (
         <Label
           color={textColor || theme.colors.gray_08}

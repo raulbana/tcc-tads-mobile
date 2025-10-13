@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import * as S from './styles';
 import Animated from 'react-native-reanimated';
 import {useCalendarRow, ITEM_WIDTH, SPACING} from './useCalendarRow';
@@ -7,11 +7,21 @@ import CalendarRowItem from './components/CalendarRowItem';
 const CalendarRow = () => {
   const {scrollX, scrollHandler, days} = useCalendarRow();
 
+  const getItemLayout = (_: any, index: number) => ({
+    length: ITEM_WIDTH + SPACING,
+    offset: (ITEM_WIDTH + SPACING) * index,
+    index,
+  });
+
+  if (days.length === 0) {
+    return null;
+  }
+
   return (
     <S.Container>
       <Animated.FlatList
         data={days}
-        keyExtractor={item => item.dayTitle}
+        keyExtractor={(item, index) => `day-${index}-${item.dayNumber}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         snapToInterval={ITEM_WIDTH + SPACING}
@@ -19,10 +29,16 @@ const CalendarRow = () => {
         contentContainerStyle={{paddingHorizontal: 16}}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
-        initialScrollIndex={3}
-        renderItem={({item, index}) => (
-          <CalendarRowItem dayItem={item} index={index} scrollX={scrollX} />
-        )}
+        initialScrollIndex={2}
+        getItemLayout={getItemLayout}
+        renderItem={({item, index}) => {
+          return (
+            <CalendarRowItem dayItem={item} index={index} scrollX={scrollX} />
+          );
+        }}
+        ListEmptyComponent={() => {
+          return null;
+        }}
       />
     </S.Container>
   );

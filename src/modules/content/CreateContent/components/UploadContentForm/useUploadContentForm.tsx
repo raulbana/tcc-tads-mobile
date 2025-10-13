@@ -88,7 +88,6 @@ const useUploadContentForm = () => {
         video: data.video,
         categories: data.categories,
       });*/
-      console.log(data);
 
       Alert.alert('Sucesso!', 'Seu conteúdo foi publicado com sucesso.', [
         {

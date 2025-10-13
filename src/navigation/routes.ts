@@ -13,6 +13,7 @@ import OnboardingStack from './Onboarding/OnboardingStack';
 import ConfigStack from './Config/configStack';
 import ContentStack from './Content/contentStack';
 import AuthStack from './Auth/authStack';
+import ExercisesStack from './Exercises/exercisesStack';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -45,12 +46,20 @@ export type AuthParamList = {
   ForgotPassword: undefined;
 };
 
+export type ExercisesParamList = {
+  ExercisesHome: undefined;
+  ExerciseDetails: {exerciseId: string};
+  EvaluateExercise: {exerciseId: string};
+  ExerciseWorkout: {exerciseId: string};
+}
+
 export type RootParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
   Onboarding: NavigatorScreenParams<OnboardingParamList> | undefined;
   Config: NavigatorScreenParams<ConfigParamList> | undefined;
   Content: NavigatorScreenParams<ContentParamList> | undefined;
   Auth: NavigatorScreenParams<AuthParamList> | undefined;
+  Exercises: NavigatorScreenParams<ExercisesParamList> | undefined;
 };
 
 export interface Route<
@@ -93,6 +102,11 @@ const routes: Route[] = [
   {
     name: 'Auth',
     component: AuthStack,
+    options: undefined,
+  },
+  {
+    name: 'Exercises',
+    component: ExercisesStack,
     options: undefined,
   },
 ];
