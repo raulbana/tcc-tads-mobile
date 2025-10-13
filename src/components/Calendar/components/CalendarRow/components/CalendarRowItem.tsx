@@ -37,11 +37,6 @@ const CalendarRowItem: React.FC<CalendarRowItemProps> = ({
     };
   });
 
-  useEffect(() => {
-    console.log('CalendarRowItem mounted:', index, dayItem.dayTitle);
-  }, [dayItem, index]);
-
-  console.log('CalendarRowItem rendering:', index, dayItem.dayTitle);
 
   return (
     <Animated.View

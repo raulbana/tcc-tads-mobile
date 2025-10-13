@@ -119,10 +119,6 @@ const useOnboardingQuestion = () => {
 
   const onSubmitAnswer = useCallback(() => {
     handleSubmit(() => {
-      console.log({
-        ...getValues(),
-        isValid,
-      });
 
       const answers = getValues();
       

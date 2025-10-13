@@ -139,13 +139,6 @@ const useMultiStepEvaluation = ({
       const updatedEvaluations = [...exercisesEvaluations, newEvaluation];
       setExercisesEvaluations(updatedEvaluations);
 
-      console.log('Exercise evaluation saved:', {
-        exerciseId: currentExercise.id,
-        exerciseIndex: currentExerciseEvaluationIndex + 1,
-        totalExercises: totalExercises,
-        evaluation: data,
-      });
-
       if (!isLastExercise) {
         setCurrentExerciseEvaluationIndex(currentExerciseEvaluationIndex + 1);
       } else {

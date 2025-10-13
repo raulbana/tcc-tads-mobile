@@ -83,7 +83,6 @@ const Calendar: React.FC = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSubmit={formData => {
-          console.log('Add: ', formData);
         }}
         baseDate={selectedDayItem?.date}
       />
@@ -94,7 +93,6 @@ const Calendar: React.FC = () => {
           isOpen={isEditingModalOpen}
           onClose={() => setIsEditingModalOpen(false)}
           onSubmit={formData => {
-            console.log('Edit: ', formData);
           }}
           selectedValues={selectedRegisterItem}
           baseDate={selectedDayItem?.date}

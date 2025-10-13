@@ -46,13 +46,10 @@ export const useCalendarRow = () => {
 
   useEffect(() => {
     const newDays = initializeDays();
-    console.log('Initializing days:', newDays);
     setDays(newDays);
   }, [initializeDays]);
 
-  useEffect(() => {
-    console.log('Days updated:', days.length, days);
-  }, [days]);
+
 
   return {scrollX, scrollHandler, days};
 };

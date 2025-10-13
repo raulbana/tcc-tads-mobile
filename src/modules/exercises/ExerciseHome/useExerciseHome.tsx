@@ -69,7 +69,6 @@ const useExerciseHome = () => {
 
   const handleWorkoutPress = useCallback(
     (workoutId: string) => {
-      console.log('Workout pressed:', workoutId);
       navigation.navigate('ExerciseDetails', {exerciseId: workoutId});
     },
     [navigation],

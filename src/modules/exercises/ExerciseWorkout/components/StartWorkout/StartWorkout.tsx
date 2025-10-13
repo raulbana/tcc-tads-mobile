@@ -10,8 +10,6 @@ interface StartWorkoutProps {
 }
 
 const StartWorkout = ({workout, onStartWorkout}: StartWorkoutProps) => {
-
-  console.log('workout', workout);
   const {name, duration, category, difficulty, description} = workout;
   return (
     <S.Container>

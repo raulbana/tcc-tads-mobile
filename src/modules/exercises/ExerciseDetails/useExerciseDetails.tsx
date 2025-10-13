@@ -16,10 +16,6 @@ export const useExerciseDetails = () => {
     'videos',
   );
 
-  useEffect(() => {
-    console.log('ExerciseDetails montado com ID:', exerciseId);
-  }, [exerciseId]);
-
   const mockWorkout: Workout = {
     id: '1',
     name: 'Treino XYZ',
