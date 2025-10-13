@@ -4,8 +4,10 @@ import Label from '../Label/Label';
 import Icon from '../Icon/Icon';
 import Button from '../Button/Button';
 import theme from '../../theme/theme';
+import { WorkoutDifficulty, WorkoutDifficultyLabels } from '../../types/exercise';
 
 export interface ExerciseInfoCardProps {
+  name: string;
   description: string;
   duration: string;
   category: string;
@@ -14,6 +16,7 @@ export interface ExerciseInfoCardProps {
 }
 
 const ExerciseInfoCard: React.FC<ExerciseInfoCardProps> = ({
+  name,
   description,
   duration,
   category,
@@ -23,14 +26,30 @@ const ExerciseInfoCard: React.FC<ExerciseInfoCardProps> = ({
   return (
     <S.Container>
       <S.InfoIconContainer>
-        <Icon name="Info" size={16} color={theme.colors.white} weight="fill" />
+        <Icon
+          name="Info"
+          size={24}
+          color={theme.colors.purple_04}
+          weight="fill"
+        />
+        <Label
+          text={`Informações do treino:`}
+          typography={theme.typography.paragraph.r3}
+          color={theme.colors.purple_04}
+        />
       </S.InfoIconContainer>
-
+      <S.CenterContainer>
+        <Label
+          text={`${name}`}
+          typography={theme.typography.paragraph.r4}
+          color={theme.colors.gray_08}
+        />
+      </S.CenterContainer>
       <S.Description>
         <Label
           text={description}
           typography={theme.typography.paragraph.r3}
-          color={theme.colors.gray_08}
+          color={theme.colors.gray_07}
         />
       </S.Description>
 
@@ -71,7 +90,7 @@ const ExerciseInfoCard: React.FC<ExerciseInfoCardProps> = ({
             weight="regular"
           />
           <Label
-            text={difficulty}
+            text={WorkoutDifficultyLabels[difficulty as WorkoutDifficulty]}
             typography={theme.typography.paragraph.r3}
             color={theme.colors.gray_07}
           />
@@ -79,12 +98,7 @@ const ExerciseInfoCard: React.FC<ExerciseInfoCardProps> = ({
       </S.MetricsContainer>
 
       <S.StartButton>
-        <Button
-          type="PRIMARY"
-          size="LARGE"
-          text="Iniciar Treino"
-          onPress={onStartWorkout}
-        />
+        <Button type="PRIMARY" text="Iniciar Treino" onPress={onStartWorkout} />
       </S.StartButton>
     </S.Container>
   );

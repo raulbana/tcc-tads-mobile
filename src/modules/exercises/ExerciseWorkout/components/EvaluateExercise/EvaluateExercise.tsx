@@ -1,0 +1,90 @@
+import React from 'react';
+import {Exercise, Workout} from '../../../../../types/exercise';
+import * as S from './styles';
+import useMultiStepEvaluation from './useMultiStepEvaluation';
+import WorkoutEvaluationStep from './components/WorkoutEvaluationStep';
+import ExerciseSpecificEvaluationStep from './components/ExerciseSpecificEvaluationStep';
+import EvaluationProgress from './components/EvaluationProgress';
+import {ExerciseEvaluationAnswers} from './schema/exerciseEvaluation';
+
+interface EvaluateExerciseProps {
+  workout: Workout;
+  currentExercise: Exercise;
+  onContinue: () => void;
+}
+
+const EvaluateExercise: React.FC<EvaluateExerciseProps> = ({
+  workout,
+  currentExercise,
+  onContinue,
+}) => {
+  const {
+    currentStep,
+    currentStepIndex,
+    totalSteps,
+    isLastStep,
+    workoutForm,
+    exerciseForm,
+    handleWorkoutContinue,
+    handleExerciseContinue,
+    handlePreviousStep,
+    difficultyOptions,
+    completionOptions,
+    confidenceOptions,
+    currentExercise: evaluationExercise,
+    currentExerciseIndex,
+    totalExercises,
+    isLastExercise,
+  } = useMultiStepEvaluation({
+    workout,
+    currentExercise,
+    onComplete: data => {
+      onContinue();
+    },
+  });
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 'WORKOUT_EVALUATION':
+        return (
+          <WorkoutEvaluationStep
+            control={workoutForm.control}
+            errors={workoutForm.formState.errors}
+            difficultyOptions={difficultyOptions}
+            onContinue={handleWorkoutContinue}
+            isValid={workoutForm.formState.isValid}
+          />
+        );
+      case 'EXERCISE_EVALUATION':
+        return (
+          <ExerciseSpecificEvaluationStep
+            control={exerciseForm.control}
+            errors={exerciseForm.formState.errors}
+            completionOptions={completionOptions}
+            confidenceOptions={confidenceOptions}
+            currentExercise={evaluationExercise}
+            currentExerciseIndex={currentExerciseIndex}
+            totalExercises={totalExercises}
+            onContinue={handleExerciseContinue}
+            onPrevious={handlePreviousStep}
+            isValid={exerciseForm.formState.isValid}
+            isLastExercise={isLastExercise}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <S.Container>
+      <EvaluationProgress
+        currentStep={currentStepIndex}
+        totalSteps={totalSteps}
+      />
+      {renderCurrentStep()}
+    </S.Container>
+  );
+};
+
+export default EvaluateExercise;

@@ -10,26 +10,25 @@ interface StartWorkoutProps {
 }
 
 const StartWorkout = ({workout, onStartWorkout}: StartWorkoutProps) => {
+
+  console.log('workout', workout);
+  const {name, duration, category, difficulty, description} = workout;
   return (
     <S.Container>
       <S.Header>
         <Label
-          text="Treino: "
-          typography={theme.typography.title.m3}
-          color={theme.colors.gray_08}
-        />
-        <Label
-          text={workout.name}
-          typography={theme.typography.title.b4}
+          text={name}
+          typography={theme.typography.title.b3}
           color={theme.colors.gray_08}
         />
       </S.Header>
       <S.Illustration />
       <ExerciseInfoCard
-        description={workout.name}
-        duration={workout.duration}
-        category={workout.category} 
-        difficulty={workout.difficulty}
+        name={name}
+        description={description}
+        duration={duration}
+        category={category} 
+        difficulty={difficulty}
         onStartWorkout={onStartWorkout}
       />
     </S.Container>

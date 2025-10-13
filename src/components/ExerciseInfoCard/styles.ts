@@ -11,23 +11,23 @@ export const Container = styled.View`
 `;
 
 export const InfoIconContainer = styled.View`
-  align-self: center;
-  width: ${horizontalScale(24)}px;
-  height: ${horizontalScale(24)}px;
-  border-radius: ${horizontalScale(12)}px;
-  background-color: ${theme.colors.purple_04};
   align-items: center;
   justify-content: center;
+  width: 100%;
+  flex-direction: row;
+  gap: ${horizontalScale(8)}px;
 `;
 
 export const Description = styled.View`
-  align-items: center;
+width: 100%;  
+align-items: center;
 `;
 
 export const MetricsContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding-horizontal: ${horizontalScale(16)}px;
 `;
 
 export const MetricItem = styled.View`
@@ -38,4 +38,8 @@ export const MetricItem = styled.View`
 
 export const StartButton = styled.View`
   margin-top: ${verticalScale(8)}px;
+`;
+
+export const CenterContainer = styled.View`
+  align-items: center;
 `;

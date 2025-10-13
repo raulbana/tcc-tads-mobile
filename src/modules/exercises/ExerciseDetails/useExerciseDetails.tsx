@@ -1,8 +1,8 @@
 import {useState, useCallback, useEffect} from 'react';
-import {useRoute, RouteProp} from '@react-navigation/native';
+import {useRoute, RouteProp, useNavigation} from '@react-navigation/native';
 import {ExercisesParamList} from '../../../navigation/routes';
 import {Workout} from '../../../types/exercise';
-
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type ExerciseDetailsRouteProp = RouteProp<
   ExercisesParamList,
   'ExerciseDetails'
@@ -11,7 +11,7 @@ type ExerciseDetailsRouteProp = RouteProp<
 export const useExerciseDetails = () => {
   const route = useRoute<ExerciseDetailsRouteProp>();
   const {exerciseId} = route.params;
-
+  const navigation = useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
   const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'images'>(
     'videos',
   );
@@ -99,12 +99,11 @@ export const useExerciseDetails = () => {
   }, []);
 
   const handleStartWorkout = useCallback(() => {
-    // TODO: Implementar navegação para iniciar treino
-    console.log('Iniciar treino:', mockWorkout.name, 'ID:', exerciseId);
+    navigation.navigate('ExerciseWorkout', {exerciseId});
   }, [mockWorkout.name, exerciseId]);
 
   const getWorkoutCategory = () => {
-    return mockWorkout.exercises[0]?.category || 'Lorem';
+    return mockWorkout.exercises[0]?.category;
   };
 
   const getWorkoutName = () => {
@@ -116,14 +115,11 @@ export const useExerciseDetails = () => {
   };
 
   return {
-    // Data
     workout: mockWorkout,
     exercises: getExercises(),
     workoutName: getWorkoutName(),
     workoutCategory: getWorkoutCategory(),
     activeMediaTab,
-
-    // Actions
     handleVideosPress,
     handleImagesPress,
     handleStartWorkout,
