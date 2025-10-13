@@ -37,7 +37,7 @@ export function useUpload(
       if (asset.fileSize && asset.fileSize + totalFileSize > MAX_FILE_SIZE) {
         const totalFileSizeMB = (totalFileSize / 1024 / 1024).toFixed(2);
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
-        const errorMsg = `Limite de excedido (${fileSizeMB}MB). Máximo: 10MB total por post (${totalFileSizeMB}MB)`;
+        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 10MB total por post (${totalFileSizeMB}MB)`;
         setError(errorMsg);
         Alert.alert('Arquivo muito grande', errorMsg);
         return;
