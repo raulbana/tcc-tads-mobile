@@ -47,11 +47,7 @@ const useRegisterForm = () => {
           password: values.password,
         };
 
-        // Usar diretamente o register do AuthContext que já integra com a API
         await authRegister(payload);
-
-        // O AuthContext já faz login automático após registro bem-sucedido
-        // Navegar para a tela principal
         navigate('MainTabs');
 
         reset();

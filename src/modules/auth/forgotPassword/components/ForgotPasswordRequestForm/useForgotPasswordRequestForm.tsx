@@ -37,7 +37,7 @@ const useRegisterForm = (onSuccess: () => void) => {
     isPending: isForgotPasswordRequesting,
   } = forgotPasswordRequestMutation;
 
-  const {} = useAuth(); // Não precisa mais do setSession
+  const {} = useAuth();
 
   const navigateToLogin = () => {
     navigate('Auth', {screen: 'Login'});

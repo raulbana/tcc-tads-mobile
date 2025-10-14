@@ -37,7 +37,7 @@ const authServices = {
   forgotPasswordRequest: async (data: forgotPasswordRequestRequest): Promise<forgotPasswordRequestResponse> => {
     const response = await apiInstance.post(
       apiRoutes.authentication.forgotPasswordRequest,
-      {}, // Body vazio pois o email vai no header
+      {},
       {
         headers: {
           'x-user-email': data.email,

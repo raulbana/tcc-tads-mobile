@@ -49,7 +49,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     isPending: isForgotPasswordValidating,
   } = forgotPasswordRequestMutation;
 
-  const {} = useAuth(); // Não precisa mais do setSession
+  const {} = useAuth();
 
   const onSubmit = useCallback(
     async (values: ForgotPasswordValidationFormData) => {

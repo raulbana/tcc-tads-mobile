@@ -15,44 +15,30 @@ import {
 } from '../types/auth';
 import {MMKVStorage} from '../storage/mmkvStorage';
 import authServices from '../modules/auth/services/authServices';
-import { useNavigation } from '@react-navigation/native';
-import { NavigationStackProp } from '../navigation/routes';
+import {useNavigation} from '@react-navigation/native';
+import {NavigationStackProp} from '../navigation/routes';
 
-// Storage keys - usando apenas MMKV
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
-const TEMP_USER_KEY = 'temp_user_v1'; // Para usuários não cadastrados
+const TEMP_USER_KEY = 'temp_user_v1';
 
 interface AuthContextType {
-  // Estados principais
   user: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   isInitializing: boolean;
   error: string | null;
-
-  // Ações de autenticação
   login: (credentials: loginRequest) => Promise<void>;
   register: (userData: registerRequest) => Promise<void>;
   logout: () => Promise<void>;
-
-  // Gerenciamento de dados temporários (usuários não cadastrados)
   saveTempUser: (userData: User) => Promise<void>;
   clearTempUser: () => Promise<void>;
-
-  // Atualização de dados
   updateUser: (updatedUser: User) => Promise<void>;
-
-  // Getters de dados do usuário
   getPatientProfile: () => PatientProfile | null;
   getPreferences: () => Preferences | null;
   getProfilePictureUrl: () => string;
-
-  // Salvar dados específicos
   savePatientProfile: (profile: PatientProfile) => Promise<void>;
   savePreferences: (preferences: Preferences) => Promise<void>;
-
-  // Utilitários
   clearError: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -67,7 +53,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const [error, setError] = useState<string | null>(null);
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  // Função para limpar todos os dados de autenticação (declarada primeiro)
   const clearAuthData = useCallback(async () => {
     try {
       MMKVStorage.delete(LOGGED_USER_KEY);
@@ -77,21 +62,13 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
-  // Função de logout
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-
-      // Limpar dados de autenticação
       await clearAuthData();
-
-      // Limpar estado
       setUser(null);
       setIsLoggedIn(false);
-
-      // Não carregar usuário temporário automaticamente no logout
-      // O usuário deve escolher se quer continuar como temporário
     } catch (error) {
       console.error('Logout error:', error);
       setError('Erro ao fazer logout');
@@ -100,7 +77,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, [clearAuthData]);
 
-  // Inicialização do contexto
   useEffect(() => {
     let mounted = true;
 
@@ -108,8 +84,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       try {
         setIsInitializing(true);
         setError(null);
-
-        // 1. Verificar se há usuário logado (com token)
         const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
         const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
 
@@ -117,25 +91,21 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           const parsedUser = JSON.parse(loggedUser) as User;
           if (!mounted) return;
 
-          // Validar token com a API
           try {
             await authServices.getUserById(parsedUser.id);
             setUser(parsedUser);
             setIsLoggedIn(true);
           } catch (error) {
-            // Token inválido, limpar dados
             await clearAuthData();
-            // Verificar se há usuário temporário
             await loadTempUser();
           }
         } else {
-          // Não há usuário logado, verificar usuário temporário
           await loadTempUser();
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         setError('Erro ao inicializar autenticação');
-        await loadTempUser(); // Fallback para usuário temporário
+        await loadTempUser();
       } finally {
         if (mounted) {
           setIsInitializing(false);
@@ -163,7 +133,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     };
   }, []);
 
-  // Funções de persistência simplificadas (apenas MMKV)
   const saveLoggedUser = useCallback(async (userObj: User, token: string) => {
     try {
       const userJson = JSON.stringify(userObj);
@@ -197,19 +166,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     setError(null);
   }, []);
 
-  // Login com integração à API
   const login = useCallback(
     async (credentials: loginRequest) => {
       try {
         setIsLoading(true);
         setError(null);
-
         const response = await authServices.login(credentials);
-
         setUser(response.user);
         setIsLoggedIn(true);
         await saveLoggedUser(response.user, response.token);
-        await clearTempUser(); // Limpar dados temporários ao fazer login
+        await clearTempUser();
         navigate('MainTabs');
       } catch (error) {
         const errorMessage =
@@ -223,21 +189,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [saveLoggedUser, clearTempUser, navigate],
   );
 
-  // Registro com integração à API
   const register = useCallback(
     async (userData: registerRequest) => {
       try {
         setIsLoading(true);
         setError(null);
-
         const response = await authServices.register(userData);
-
-        // Após registro bem-sucedido, fazer login automaticamente
         const loginCredentials = {
           email: userData.email,
           password: userData.password,
         };
-
         await login(loginCredentials);
       } catch (error) {
         const errorMessage =
@@ -251,7 +212,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [login],
   );
 
-  // Salvar usuário temporário (não cadastrado)
   const saveTempUserData = useCallback(
     async (userData: User) => {
       try {
@@ -271,14 +231,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [saveTempUser],
   );
 
-  // Refresh dos dados do usuário
   const refreshUser = useCallback(async () => {
     if (!user || !isLoggedIn) return;
 
     try {
       setIsLoading(true);
       setError(null);
-
       const updatedUser = await authServices.getUserById(user.id);
       setUser(updatedUser);
       await saveLoggedUser(
@@ -288,7 +246,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     } catch (error) {
       console.error('Refresh user error:', error);
       setError('Erro ao atualizar dados do usuário');
-      // Se o erro for 401, fazer logout
       if (error instanceof Error && error.message.includes('401')) {
         await logout();
       }
@@ -297,7 +254,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, [user, isLoggedIn, saveLoggedUser, logout]);
 
-  // Atualizar dados do usuário
   const updateUser = useCallback(
     async (updatedUser: User) => {
       try {
@@ -305,11 +261,9 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setUser(updatedUser);
 
         if (isLoggedIn) {
-          // Se logado, atualizar via API e salvar no storage de usuário logado
           const token = MMKVStorage.getString(AUTH_TOKEN_KEY) || '';
           await saveLoggedUser(updatedUser, token);
         } else {
-          // Se não logado, salvar como usuário temporário
           await saveTempUser(updatedUser);
         }
       } catch (error) {
@@ -378,35 +332,22 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   return (
     <AuthContext.Provider
       value={{
-        // Estados principais
         user,
         isLoggedIn,
         isLoading,
         isInitializing,
         error,
-
-        // Ações de autenticação
         login,
         register,
         logout,
-
-        // Gerenciamento de dados temporários
         saveTempUser: saveTempUserData,
         clearTempUser,
-
-        // Atualização de dados
         updateUser,
-
-        // Getters de dados do usuário
         getPatientProfile,
         getPreferences,
         getProfilePictureUrl,
-
-        // Salvar dados específicos
         savePatientProfile,
         savePreferences,
-
-        // Utilitários
         clearError,
         refreshUser,
       }}>
