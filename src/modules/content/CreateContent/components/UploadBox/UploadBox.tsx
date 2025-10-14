@@ -194,9 +194,7 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                 dragHitSlop={
                   Platform.OS === 'android' ? {top: 10, bottom: 10} : undefined
                 }
-                // Removed dragScale prop, as it's not supported by DraggableFlatList
                 onDragBegin={() => {
-                  // Disable parent scroll during drag on Android
                   if (Platform.OS === 'android' && parentScrollRef?.current) {
                     parentScrollRef.current.setNativeProps({
                       scrollEnabled: false,
@@ -204,7 +202,6 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                   }
                 }}
                 onDragEnd={({data}) => {
-                  // Re-enable parent scroll after drag on Android
                   if (Platform.OS === 'android' && parentScrollRef?.current) {
                     parentScrollRef.current.setNativeProps({
                       scrollEnabled: true,
