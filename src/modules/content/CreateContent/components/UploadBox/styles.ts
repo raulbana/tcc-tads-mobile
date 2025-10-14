@@ -47,7 +47,7 @@ export const DraggableItem = styled.TouchableOpacity<{
   z-index: ${({isActive}) => (isActive ? 1000 : 1)};
   background-color: ${({isActive}) => (isActive ? 'rgba(255, 255, 255, 0.95)' : 'transparent')};
   border-radius: ${({isActive}) => (isActive ? '8px' : '0px')};
-  overflow: visible;
+  overflow: ${({isActive}) => (isActive ? 'visible' : 'hidden')};
 `;
 
 export const CardContainer = styled.View`
