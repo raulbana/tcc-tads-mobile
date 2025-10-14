@@ -36,7 +36,7 @@ const useRegisterForm = () => {
   const {mutateAsync: registerMutate, isPending: isRegistering} =
     registerMutation;
 
-  const {setSession} = useAuth();
+  const {register: authRegister, isLoading: authLoading} = useAuth();
 
   const onSubmit = useCallback(
     async (values: RegisterFormData) => {
@@ -47,21 +47,19 @@ const useRegisterForm = () => {
           password: values.password,
         };
 
-        const res = await registerMutate(payload);
+        // Usar diretamente o register do AuthContext que já integra com a API
+        await authRegister(payload);
 
-        if (res.status === 'success') {
-          navigate('Auth', {screen: 'Login'});
-        } else {
-          throw new Error('Registration failed');
-        }
+        // O AuthContext já faz login automático após registro bem-sucedido
+        // Navegar para a tela principal
+        navigate('MainTabs');
 
         reset();
-        return res;
       } catch (error) {
         throw error;
       }
     },
-    [registerMutate, setSession, reset],
+    [authRegister, navigate, reset],
   );
 
   return {
@@ -74,6 +72,7 @@ const useRegisterForm = () => {
     onSubmit,
     isRegistering,
     register,
+    isLoading: authLoading,
   };
 };
 

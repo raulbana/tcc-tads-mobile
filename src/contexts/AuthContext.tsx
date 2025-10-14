@@ -6,31 +6,55 @@ import React, {
   useEffect,
   useCallback,
 } from 'react';
-import {User, PatientProfile, Preferences} from '../types/auth';
 import {
-  MMKVStorage,
-  ANON_USER_KEY,
-  MMKV_CACHE_USER_KEY,
-} from '../storage/mmkvStorage';
-import {asyncSet, asyncGet, asyncRemove} from '../storage/asyncStorage';
+  User,
+  PatientProfile,
+  Preferences,
+  loginRequest,
+  registerRequest,
+} from '../types/auth';
+import {MMKVStorage} from '../storage/mmkvStorage';
+import authServices from '../modules/auth/services/authServices';
+import { useNavigation } from '@react-navigation/native';
+import { NavigationStackProp } from '../navigation/routes';
 
+// Storage keys - usando apenas MMKV
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
+const TEMP_USER_KEY = 'temp_user_v1'; // Para usuários não cadastrados
 
 interface AuthContextType {
+  // Estados principais
   user: User | null;
   isLoggedIn: boolean;
-  registerLocal: (userBasic: User) => Promise<void>;
-  login: (userData: User) => Promise<void>;
-  setSession: (payload: {user: User; token?: string}) => Promise<void>;
+  isLoading: boolean;
+  isInitializing: boolean;
+  error: string | null;
+
+  // Ações de autenticação
+  login: (credentials: loginRequest) => Promise<void>;
+  register: (userData: registerRequest) => Promise<void>;
   logout: () => Promise<void>;
-  clearLocalRegistration: () => Promise<void>;
+
+  // Gerenciamento de dados temporários (usuários não cadastrados)
+  saveTempUser: (userData: User) => Promise<void>;
+  clearTempUser: () => Promise<void>;
+
+  // Atualização de dados
   updateUser: (updatedUser: User) => Promise<void>;
+
+  // Getters de dados do usuário
   getPatientProfile: () => PatientProfile | null;
   getPreferences: () => Preferences | null;
   getProfilePictureUrl: () => string;
+
+  // Salvar dados específicos
   savePatientProfile: (profile: PatientProfile) => Promise<void>;
   savePreferences: (preferences: Preferences) => Promise<void>;
+
+  // Utilitários
+  clearError: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,180 +62,263 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({children}: {children: ReactNode}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const {navigate} = useNavigation<NavigationStackProp>();
 
+  // Função para limpar todos os dados de autenticação (declarada primeiro)
+  const clearAuthData = useCallback(async () => {
+    try {
+      MMKVStorage.delete(LOGGED_USER_KEY);
+      MMKVStorage.delete(AUTH_TOKEN_KEY);
+    } catch (error) {
+      console.error('Error clearing auth data:', error);
+    }
+  }, []);
+
+  // Função de logout
+  const logout = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Limpar dados de autenticação
+      await clearAuthData();
+
+      // Limpar estado
+      setUser(null);
+      setIsLoggedIn(false);
+
+      // Não carregar usuário temporário automaticamente no logout
+      // O usuário deve escolher se quer continuar como temporário
+    } catch (error) {
+      console.error('Logout error:', error);
+      setError('Erro ao fazer logout');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [clearAuthData]);
+
+  // Inicialização do contexto
   useEffect(() => {
     let mounted = true;
 
-    const hydrate = async () => {
+    const initializeAuth = async () => {
       try {
-        const asyncUser = await asyncGet(LOGGED_USER_KEY);
-        if (asyncUser) {
-          const parsed = JSON.parse(asyncUser) as User;
-          if (!mounted) return;
-          setUser(parsed);
-          setIsLoggedIn(true);
-          MMKVStorage.set(MMKV_CACHE_USER_KEY, asyncUser);
-          return;
-        }
+        setIsInitializing(true);
+        setError(null);
 
-        const mmUser = MMKVStorage.getString(ANON_USER_KEY);
-        if (mmUser) {
-          const parsed = JSON.parse(mmUser) as User;
-          if (!mounted) return;
-          setUser(parsed);
-          setIsLoggedIn(false);
-          return;
-        }
+        // 1. Verificar se há usuário logado (com token)
+        const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
+        const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
 
-        const cached = MMKVStorage.getString(MMKV_CACHE_USER_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached) as User;
+        if (loggedUser && token) {
+          const parsedUser = JSON.parse(loggedUser) as User;
           if (!mounted) return;
-          setUser(parsed);
-          setIsLoggedIn(false);
+
+          // Validar token com a API
+          try {
+            await authServices.getUserById(parsedUser.id);
+            setUser(parsedUser);
+            setIsLoggedIn(true);
+          } catch (error) {
+            // Token inválido, limpar dados
+            await clearAuthData();
+            // Verificar se há usuário temporário
+            await loadTempUser();
+          }
+        } else {
+          // Não há usuário logado, verificar usuário temporário
+          await loadTempUser();
         }
-      } catch (e) {
-        console.warn('Auth hydrate error', e);
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setError('Erro ao inicializar autenticação');
+        await loadTempUser(); // Fallback para usuário temporário
+      } finally {
+        if (mounted) {
+          setIsInitializing(false);
+        }
       }
     };
 
-    hydrate();
+    const loadTempUser = async () => {
+      try {
+        const tempUser = MMKVStorage.getString(TEMP_USER_KEY);
+        if (tempUser) {
+          const parsedUser = JSON.parse(tempUser) as User;
+          if (!mounted) return;
+          setUser(parsedUser);
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error loading temp user:', error);
+      }
+    };
+
+    initializeAuth();
     return () => {
       mounted = false;
     };
   }, []);
 
-  const persistAnon = useCallback(async (userObj: User | null) => {
+  // Funções de persistência simplificadas (apenas MMKV)
+  const saveLoggedUser = useCallback(async (userObj: User, token: string) => {
     try {
-      if (userObj) {
-        const json = JSON.stringify(userObj);
-        MMKVStorage.set(ANON_USER_KEY, json);
-      } else {
-        MMKVStorage.delete(ANON_USER_KEY);
-      }
-    } catch (e) {
-      console.warn('persistAnon error', e);
+      const userJson = JSON.stringify(userObj);
+      MMKVStorage.set(LOGGED_USER_KEY, userJson);
+      MMKVStorage.set(AUTH_TOKEN_KEY, token);
+    } catch (error) {
+      console.error('Error saving logged user:', error);
+      throw new Error('Erro ao salvar dados do usuário');
     }
   }, []);
 
-  const persistLogged = useCallback(async (userObj: User | null) => {
+  const saveTempUser = useCallback(async (userObj: User) => {
     try {
-      if (userObj) {
-        const json = JSON.stringify(userObj);
-        await asyncSet(LOGGED_USER_KEY, json);
-        MMKVStorage.set(MMKV_CACHE_USER_KEY, json);
-      } else {
-        await asyncRemove(LOGGED_USER_KEY);
-        MMKVStorage.delete(MMKV_CACHE_USER_KEY);
-      }
-    } catch (e) {
-      console.warn('persistLogged error', e);
+      const userJson = JSON.stringify(userObj);
+      MMKVStorage.set(TEMP_USER_KEY, userJson);
+    } catch (error) {
+      console.error('Error saving temp user:', error);
+      throw new Error('Erro ao salvar dados temporários');
     }
   }, []);
 
-  const persistToken = useCallback(async (token?: string | null) => {
+  const clearTempUser = useCallback(async () => {
     try {
-      if (token) {
-        await asyncSet(AUTH_TOKEN_KEY, token);
-        MMKVStorage.set(AUTH_TOKEN_KEY, token);
-      } else {
-        await asyncRemove(AUTH_TOKEN_KEY);
-        MMKVStorage.delete(AUTH_TOKEN_KEY);
-      }
-    } catch (e) {
-      console.warn('persistToken error', e);
+      MMKVStorage.delete(TEMP_USER_KEY);
+    } catch (error) {
+      console.error('Error clearing temp user:', error);
     }
   }, []);
 
-  const registerLocal = useCallback(
-    async (userBasic: User) => {
-      setUser(userBasic);
-      setIsLoggedIn(false);
-      await persistAnon(userBasic);
-    },
-    [persistAnon],
-  );
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
+  // Login com integração à API
   const login = useCallback(
+    async (credentials: loginRequest) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await authServices.login(credentials);
+
+        setUser(response.user);
+        setIsLoggedIn(true);
+        await saveLoggedUser(response.user, response.token);
+        await clearTempUser(); // Limpar dados temporários ao fazer login
+        navigate('MainTabs');
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Erro ao fazer login';
+        setError(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [saveLoggedUser, clearTempUser, navigate],
+  );
+
+  // Registro com integração à API
+  const register = useCallback(
+    async (userData: registerRequest) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await authServices.register(userData);
+
+        // Após registro bem-sucedido, fazer login automaticamente
+        const loginCredentials = {
+          email: userData.email,
+          password: userData.password,
+        };
+
+        await login(loginCredentials);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Erro ao registrar usuário';
+        setError(errorMessage);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [login],
+  );
+
+  // Salvar usuário temporário (não cadastrado)
+  const saveTempUserData = useCallback(
     async (userData: User) => {
-      setUser(userData);
-      setIsLoggedIn(true);
-      await persistLogged(userData);
       try {
-        MMKVStorage.set(ANON_USER_KEY, JSON.stringify(userData));
-      } catch (e) {
-        console.warn(e);
+        setError(null);
+        setUser(userData);
+        setIsLoggedIn(false);
+        await saveTempUser(userData);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao salvar dados temporários';
+        setError(errorMessage);
+        throw error;
       }
     },
-    [persistLogged],
+    [saveTempUser],
   );
 
-  const setSession = useCallback(
-    async (payload: {user: User; token?: string}) => {
-      const {user: payloadUser, token} = payload;
-      setUser(payloadUser);
-      setIsLoggedIn(true);
-      await persistLogged(payloadUser);
-      if (token) {
-        await persistToken(token);
-      }
-      try {
-        MMKVStorage.set(ANON_USER_KEY, JSON.stringify(payloadUser));
-      } catch (e) {}
-    },
-    [persistLogged, persistToken],
-  );
+  // Refresh dos dados do usuário
+  const refreshUser = useCallback(async () => {
+    if (!user || !isLoggedIn) return;
 
-  const logout = useCallback(async () => {
-    setIsLoggedIn(false);
     try {
-      await asyncRemove(LOGGED_USER_KEY);
-      await persistToken(null);
-      const mmUser = MMKVStorage.getString(ANON_USER_KEY);
-      if (mmUser) {
-        setUser(JSON.parse(mmUser) as User);
-        return;
-      }
-      const cache = MMKVStorage.getString(MMKV_CACHE_USER_KEY);
-      if (cache) {
-        setUser(JSON.parse(cache) as User);
-        return;
-      }
-      setUser(null);
-    } catch (e) {
-      console.warn('logout persist error', e);
-      setUser(null);
-    }
-  }, [persistToken]);
+      setIsLoading(true);
+      setError(null);
 
-  const clearLocalRegistration = useCallback(async () => {
-    setUser(null);
-    setIsLoggedIn(false);
-    try {
-      MMKVStorage.delete(ANON_USER_KEY);
-      MMKVStorage.delete(MMKV_CACHE_USER_KEY);
-      MMKVStorage.delete(AUTH_TOKEN_KEY);
-      await asyncRemove(LOGGED_USER_KEY);
-      await asyncRemove(AUTH_TOKEN_KEY);
-    } catch (e) {
-      console.warn('clearLocalRegistration error', e);
+      const updatedUser = await authServices.getUserById(user.id);
+      setUser(updatedUser);
+      await saveLoggedUser(
+        updatedUser,
+        MMKVStorage.getString(AUTH_TOKEN_KEY) || '',
+      );
+    } catch (error) {
+      console.error('Refresh user error:', error);
+      setError('Erro ao atualizar dados do usuário');
+      // Se o erro for 401, fazer logout
+      if (error instanceof Error && error.message.includes('401')) {
+        await logout();
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  }, [user, isLoggedIn, saveLoggedUser, logout]);
 
+  // Atualizar dados do usuário
   const updateUser = useCallback(
     async (updatedUser: User) => {
-      setUser(updatedUser);
       try {
+        setError(null);
+        setUser(updatedUser);
+
         if (isLoggedIn) {
-          await persistLogged(updatedUser);
+          // Se logado, atualizar via API e salvar no storage de usuário logado
+          const token = MMKVStorage.getString(AUTH_TOKEN_KEY) || '';
+          await saveLoggedUser(updatedUser, token);
         } else {
-          await persistAnon(updatedUser);
+          // Se não logado, salvar como usuário temporário
+          await saveTempUser(updatedUser);
         }
-      } catch (e) {
-        console.warn('updateUser persist error', e);
+      } catch (error) {
+        console.error('Update user error:', error);
+        setError('Erro ao atualizar dados do usuário');
+        throw error;
       }
     },
-    [isLoggedIn, persistAnon, persistLogged],
+    [isLoggedIn, saveLoggedUser, saveTempUser],
   );
 
   const getPatientProfile = (): PatientProfile | null => {
@@ -226,44 +333,82 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return user ? user.profilePictureUrl ?? '' : '';
   };
 
-  const savePatientProfile = async (profile: PatientProfile) => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        profile,
-      };
-      setUser(updatedUser);
-      await persistLogged(updatedUser);
-    }
-  };
+  const savePatientProfile = useCallback(
+    async (profile: PatientProfile) => {
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
 
-  const savePreferences = async (preferences: Preferences) => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        preferences,
-      };
-      setUser(updatedUser);
-      await persistLogged(updatedUser);
-    }
-  };
+      try {
+        const updatedUser = {
+          ...user,
+          profile,
+        };
+        await updateUser(updatedUser);
+      } catch (error) {
+        console.error('Save patient profile error:', error);
+        setError('Erro ao salvar perfil do paciente');
+        throw error;
+      }
+    },
+    [user, updateUser],
+  );
+
+  const savePreferences = useCallback(
+    async (preferences: Preferences) => {
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      try {
+        const updatedUser = {
+          ...user,
+          preferences,
+        };
+        await updateUser(updatedUser);
+      } catch (error) {
+        console.error('Save preferences error:', error);
+        setError('Erro ao salvar preferências');
+        throw error;
+      }
+    },
+    [user, updateUser],
+  );
 
   return (
     <AuthContext.Provider
       value={{
+        // Estados principais
         user,
         isLoggedIn,
-        registerLocal,
+        isLoading,
+        isInitializing,
+        error,
+
+        // Ações de autenticação
         login,
-        setSession,
+        register,
         logout,
-        clearLocalRegistration,
+
+        // Gerenciamento de dados temporários
+        saveTempUser: saveTempUserData,
+        clearTempUser,
+
+        // Atualização de dados
         updateUser,
+
+        // Getters de dados do usuário
         getPatientProfile,
         getPreferences,
         getProfilePictureUrl,
+
+        // Salvar dados específicos
         savePatientProfile,
         savePreferences,
+
+        // Utilitários
+        clearError,
+        refreshUser,
       }}>
       {children}
     </AuthContext.Provider>

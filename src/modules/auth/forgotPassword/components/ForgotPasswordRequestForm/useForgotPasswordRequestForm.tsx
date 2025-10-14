@@ -37,7 +37,7 @@ const useRegisterForm = (onSuccess: () => void) => {
     isPending: isForgotPasswordRequesting,
   } = forgotPasswordRequestMutation;
 
-  const {setSession} = useAuth();
+  const {} = useAuth(); // Não precisa mais do setSession
 
   const navigateToLogin = () => {
     navigate('Auth', {screen: 'Login'});
@@ -65,7 +65,7 @@ const useRegisterForm = (onSuccess: () => void) => {
         throw error;
       }
     },
-    [forgotPasswordRequestMutate, setSession, reset, onSuccess],
+    [forgotPasswordRequestMutate, reset, onSuccess],
   );
 
   return {
@@ -79,6 +79,7 @@ const useRegisterForm = (onSuccess: () => void) => {
     isForgotPasswordRequesting,
     register,
     navigateToLogin,
+    isLoading: isForgotPasswordRequesting,
   };
 };
 

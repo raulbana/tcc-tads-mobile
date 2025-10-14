@@ -15,15 +15,15 @@ function App(): React.ReactElement {
   moment.locale('pt-br');
 
   return (
-    <AuthProvider>
+    <NavigationContainer>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <NavigationContainer>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
             <Navigator />
-          </NavigationContainer>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
-    </AuthProvider>
+    </NavigationContainer>
   );
 }
 

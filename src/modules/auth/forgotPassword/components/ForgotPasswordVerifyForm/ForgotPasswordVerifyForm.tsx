@@ -15,11 +15,36 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
   onSuccess,
   onBack,
 }) => {
-  const {register, handleSubmit, errors, control, onSubmit, onBackCleanup} =
-    useForgotPasswordVerifyForm(onSuccess);
+  const {
+    register,
+    handleSubmit,
+    errors,
+    control,
+    onSubmit,
+    onBackCleanup,
+    isLoading,
+  } = useForgotPasswordVerifyForm(onSuccess);
 
   return (
     <S.Container>
+      <Controller
+        control={control}
+        name="email"
+        render={({field}) => (
+          <Input
+            {...register('email')}
+            label="E-mail"
+            value={field.value}
+            onChangeText={field.onChange}
+            placeholder="Digite seu e-mail"
+            error={errors.email?.message as string | undefined}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            onChange={field.onChange}
+          />
+        )}
+      />
       <Controller
         control={control}
         name="otp"
@@ -78,6 +103,8 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
             onPress={() => {
               handleSubmit(onSubmit)();
             }}
+            loading={isLoading}
+            disabled={isLoading}
           />
           <Button
             type="SECONDARY"
@@ -86,6 +113,7 @@ const ForgotPasswordVerifyForm: React.FC<ForgotPasswordVerifyFormProps> = ({
               onBackCleanup();
               onBack();
             }}
+            disabled={isLoading}
           />
         </S.ButtonsSection>
       </S.ButtonContainer>

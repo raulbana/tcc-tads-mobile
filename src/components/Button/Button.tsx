@@ -11,6 +11,7 @@ export interface ButtonProps {
   size?: ButtonSize;
   onPress: () => void;
   disabled?: boolean;
+  loading?: boolean;
   text?: string | React.ReactNode;
   icon?: React.ReactNode;
   iconPosition?: 'LEFT' | 'RIGHT';
@@ -21,28 +22,38 @@ const Button: React.FC<ButtonProps> = ({
   size = 'MEDIUM',
   onPress,
   disabled,
+  loading = false,
   text,
   icon,
   iconPosition,
 }) => {
   const {getTextColor, getButtonTextSize} = useButton();
+
+  const isDisabled = disabled || loading;
+
   return (
     <S.ButtonContainer
       type={type}
       size={size}
       onPress={onPress}
-      disabled={disabled}>
-      {icon && iconPosition === 'LEFT' && icon}
+      disabled={isDisabled}>
+      {loading && iconPosition !== 'LEFT' && (
+        <S.LoadingSpinner size="small" color={getTextColor(type)} />
+      )}
+      {icon && iconPosition === 'LEFT' && !loading && icon}
       {text && typeof text === 'string' ? (
         <Label
-          text={text}
+          text={loading ? 'Carregando...' : text}
           typography={getButtonTextSize(size)}
           color={getTextColor(type)}
         />
       ) : (
         <>{text}</>
       )}
-      {icon && iconPosition === 'RIGHT' && icon}
+      {loading && iconPosition === 'LEFT' && (
+        <S.LoadingSpinner size="small" color={getTextColor(type)} />
+      )}
+      {icon && iconPosition === 'RIGHT' && !loading && icon}
     </S.ButtonContainer>
   );
 };

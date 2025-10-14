@@ -17,6 +17,7 @@ const LoginForm: React.FC = () => {
     register,
     onSubmit,
     remember,
+    isLoading,
   } = useLoginForm();
 
   return (
@@ -66,7 +67,13 @@ const LoginForm: React.FC = () => {
           color={theme.colors.gray_07}
         />
       </S.CheckboxRow>
-      <Button type="PRIMARY" text="Entrar" onPress={handleSubmit(onSubmit)} />
+      <Button
+        type="PRIMARY"
+        text="Entrar"
+        onPress={handleSubmit(onSubmit)}
+        loading={isLoading}
+        disabled={isLoading}
+      />
     </S.Container>
   );
 };

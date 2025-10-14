@@ -23,6 +23,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
   } = useForm<ForgotPasswordValidationFormData>({
     resolver: zodResolver(forgotPasswordValidationSchema),
     defaultValues: {
+      email: '',
       otp: '',
       newPassword: '',
       confirmPassword: '',
@@ -30,7 +31,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     mode: 'onSubmit',
   });
 
-  const {useForgotPasswordValidate} = useAuthQueries(['auth']);
+  const {useForgotPasswordReset} = useAuthQueries(['auth']);
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
@@ -42,21 +43,21 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     navigate('Auth', {screen: 'Login'});
   };
 
-  const forgotPasswordRequestMutation = useForgotPasswordValidate();
+  const forgotPasswordRequestMutation = useForgotPasswordReset();
   const {
     mutateAsync: forgotPasswordValidateMutate,
     isPending: isForgotPasswordValidating,
   } = forgotPasswordRequestMutation;
 
-  const {setSession} = useAuth();
+  const {} = useAuth(); // Não precisa mais do setSession
 
   const onSubmit = useCallback(
     async (values: ForgotPasswordValidationFormData) => {
       try {
         const payload: forgotPasswordValidateRequest = {
+          email: values.email,
           otp: values.otp,
           newPassword: values.newPassword,
-          confirmPassword: values.confirmPassword,
         };
 
         const res = await forgotPasswordValidateMutate(payload);
@@ -73,7 +74,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
         throw error;
       }
     },
-    [forgotPasswordValidateMutate, setSession, reset],
+    [forgotPasswordValidateMutate, reset],
   );
 
   return {
@@ -88,6 +89,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     register,
     navigateToLogin,
     onBackCleanup,
+    isLoading: isForgotPasswordValidating,
   };
 };
 

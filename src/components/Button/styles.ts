@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import {ActivityIndicator} from 'react-native';
 import {ButtonProps, ButtonSize, ButtonType} from './Button';
 import {
   verticalScale,
@@ -35,4 +36,9 @@ export const ButtonContainer = styled.TouchableOpacity<ButtonProps>`
   align-items: center;
   justify-content: center;
   width: 100%;
+  gap: ${horizontalScale(8)}px;
+`;
+
+export const LoadingSpinner = styled(ActivityIndicator)`
+  margin-right: ${horizontalScale(4)}px;
 `;

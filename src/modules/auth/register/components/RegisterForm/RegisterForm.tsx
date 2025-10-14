@@ -9,8 +9,16 @@ import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
 import theme from '../../../../../theme/theme';
 
 const RegisterForm: React.FC = () => {
-  const {register, handleSubmit, errors, control, setValue, onSubmit, watch} =
-    useRegisterForm();
+  const {
+    register,
+    handleSubmit,
+    errors,
+    control,
+    setValue,
+    onSubmit,
+    watch,
+    isLoading,
+  } = useRegisterForm();
 
   const terms = watch('acceptTerms');
 
@@ -104,6 +112,8 @@ const RegisterForm: React.FC = () => {
         onPress={() => {
           handleSubmit(onSubmit)();
         }}
+        loading={isLoading}
+        disabled={isLoading}
       />
     </S.Container>
   );

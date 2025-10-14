@@ -29,39 +29,20 @@ const useLoginForm = () => {
   const loginMutation = useLogin();
   const {mutateAsync: loginMutate, isPending: isLogging} = loginMutation;
 
-  const {login: authLogin, setSession} = useAuth();
+  const {login: authLogin, isLoading: authLoading} = useAuth();
 
   const onSubmit = useCallback(
     async (data: LoginFormData) => {
       try {
-        const res = await loginMutate({
+        await authLogin({
           email: data.email,
           password: data.password,
         });
-
-        const apiUser = res?.user;
-        const apiToken = res?.token;
-
-        if (apiUser) {
-          if (setSession) {
-            await setSession({user: apiUser, token: apiToken});
-          } else {
-            await authLogin(apiUser);
-          }
-        } else {
-          if (res) {
-            if (setSession) {
-              await setSession({user: res.user, token: res.token});
-            } else {
-              await authLogin(res.user);
-            }
-          }
-        }
       } catch (err) {
         throw err;
       }
     },
-    [loginMutate, authLogin, setSession],
+    [authLogin],
   );
 
   return {
@@ -75,6 +56,7 @@ const useLoginForm = () => {
     watch,
     control,
     isLogging,
+    isLoading: authLoading,
   };
 };
 

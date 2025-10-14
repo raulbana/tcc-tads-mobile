@@ -1,9 +1,11 @@
 const apiRoutes = {
   authentication: {
-    login: '/auth/login',
-    register: '/auth/register',
-    forgotPasswordRequest: '/auth/forgot-password/request',
-    forgotPasswordValidate: '/auth/forgot-password/validate',
+    login: '/users/login',
+    register: '/users',
+    updateUser: '/users',
+    getUserById: (id: number) => `/users/${id}`,
+    forgotPasswordRequest: '/users/password/forgot',
+    forgotPasswordReset: '/users/password/reset',
   },
   onboarding: {
     questions: {

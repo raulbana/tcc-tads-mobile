@@ -8,6 +8,9 @@ import {
   loginResponse,
   registerRequest,
   registerResponse,
+  updateUserRequest,
+  updateUserResponse,
+  getUserByIdResponse,
 } from '../../../types/auth';
 import authServices from './authServices';
 
@@ -28,9 +31,19 @@ export const authQueryFactory = (queryKey: QueryKey) => {
         mutationFn: (data: forgotPasswordRequestRequest) => authServices.forgotPasswordRequest(data),
       }),
 
-    useForgotPasswordValidate: () =>
+    useForgotPasswordReset: () =>
       useMutation<forgotPasswordValidateResponse, Error, forgotPasswordValidateRequest>({
-        mutationFn: (data: forgotPasswordValidateRequest) => authServices.forgotPasswordValidate(data),
+        mutationFn: (data: forgotPasswordValidateRequest) => authServices.forgotPasswordReset(data),
+      }),
+
+    useUpdateUser: () =>
+      useMutation<updateUserResponse, Error, updateUserRequest>({
+        mutationFn: (data: updateUserRequest) => authServices.updateUser(data),
+      }),
+
+    useGetUserById: () =>
+      useMutation<getUserByIdResponse, Error, number>({
+        mutationFn: (id: number) => authServices.getUserById(id),
       }),
   };
 };

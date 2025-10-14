@@ -5,15 +5,19 @@ import Label from '../../../components/Label/Label';
 import theme from '../../../theme/theme';
 import TrainingSection from './components/TrainingSection/TrainingSection';
 import CalendarRow from '../../../components/Calendar/components/CalendarRow/CalendarRow';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Home = () => {
+
+  const {user} = useAuth();
+
   return (
     <ScreenContainer>
       <S.Container>
         <Label
           typography={theme.typography.title.sb3}
           color={theme.colors.gray_08}
-          text={`Bem vinda Maria!`}
+          text={`Olá, ${user?.name}!`}
         />
         <CalendarRow />
         <RecommendationCard
