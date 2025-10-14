@@ -112,6 +112,8 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 placeholder="Digite o subconteúdo"
                 error={errors.subcontent?.message}
                 label="Subconteúdo"
+                multiline
+                numberOfLines={4}
               />
             )}
           />
