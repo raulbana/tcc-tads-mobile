@@ -31,6 +31,8 @@ const useUploadContentForm = () => {
       images: [],
       video: '',
       categories: [],
+      subtitle: '',
+      subcontent: '',
     },
   });
 
