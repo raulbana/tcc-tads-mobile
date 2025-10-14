@@ -183,7 +183,6 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                 keyExtractor={keyExtractor}
                 contentContainerStyle={{paddingVertical: verticalScale(8)}}
                 renderItem={renderUpload}
-                onDragEnd={({data}) => reorderFiles(data)}
                 dragItemOverflow={true}
                 activationDistance={Platform.OS === 'android' ? 15 : 10}
                 scrollEnabled={false}
@@ -195,7 +194,7 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                 dragHitSlop={
                   Platform.OS === 'android' ? {top: 10, bottom: 10} : undefined
                 }
-                dragScale={Platform.OS === 'android' ? 1.05 : 1.02}
+                // Removed dragScale prop, as it's not supported by DraggableFlatList
                 onDragBegin={() => {
                   // Disable parent scroll during drag on Android
                   if (Platform.OS === 'android' && parentScrollRef?.current) {
