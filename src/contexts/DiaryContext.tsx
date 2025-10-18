@@ -139,7 +139,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         const updatedDay = {
           ...currentDay || {},
           urinationData: updatedUrinationData,
-          eventsCount: currentDay?.eventsCount || 0 + 1,
+          eventsCount: (currentDay?.eventsCount || 0) + 1,
         };
 
         const newLeakageLevel = calculateLeakageLevel(updatedUrinationData);
