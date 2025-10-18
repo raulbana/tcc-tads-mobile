@@ -75,3 +75,18 @@ export const EditCell = styled.View<{width?: number; align?: string}>`
 
 `;
 
+export const DeleteCell = styled.View<{width?: number; align?: string}>`
+  width: ${({width}) => (width ? horizontalScale(width) : 'auto')}px;
+  justify-content: center;
+  align-items: ${({align}) => {
+    switch (align) {
+      case 'center':
+        return 'center';
+      case 'right':
+        return 'flex-end';
+      default:
+        return 'flex-start';
+    }
+  }};
+  padding-horizontal: ${horizontalScale(8)}px;
+`;

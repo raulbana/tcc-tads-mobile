@@ -1,16 +1,16 @@
 import {useMemo, useState, useCallback, useEffect} from 'react';
 import moment, {Moment} from 'moment';
 import {
-  CalendarDayData,
+  CalendarDayDTO,
   LeakageLevel,
-  UrinationData,
+  UrinationDataDTO,
 } from '../../../../types/diary';
 import {
   buildMonthMatrix,
   formatToFirstLetterUppercase,
   getMonthIsoRange,
 } from '../../../../utils/calendarUtils';
-import useDiaryQueries from '../../services/diaryQueryFactory';
+import {useDiary} from '../../../../contexts/DiaryContext';
 import {useWindowDimensions} from 'react-native';
 import {horizontalScale} from '../../../../utils/scales';
 
@@ -21,13 +21,16 @@ export function useCalendar() {
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
   const [isEditingModalOpen, setIsEditingModalOpen] = useState<boolean>(false);
 
+  const [isDeletingModalOpen, setIsDeletingModalOpen] =
+    useState<boolean>(false);
   const [selectedRegisterItem, setSelectedRegisterItem] =
-    useState<UrinationData | null>(null);
+    useState<UrinationDataDTO | null>(null);
 
-  const [selectedDayItem, setSelectedDayItem] =
-    useState<CalendarDayData | null>(null);
+  const [selectedDayItem, setSelectedDayItem] = useState<CalendarDayDTO | null>(
+    null,
+  );
 
-  const onPressDay = useCallback((dayItem: CalendarDayData) => {
+  const onPressDay = useCallback((dayItem: CalendarDayDTO) => {
     setSelectedDayItem(dayItem);
     setIsRegisterModalOpen(true);
   }, []);
@@ -40,16 +43,10 @@ export function useCalendar() {
 
   const matrix = useMemo(() => buildMonthMatrix(monthRef), [monthRef]);
 
-  const {from, to} = useMemo(() => getMonthIsoRange(monthRef), [monthRef]);
-
-  const diaryQueries = useDiaryQueries(['calendar-range', from, to]);
-  const {data, isLoading, refetch} = diaryQueries.getByRange(
-    new Date(from),
-    new Date(to),
-  );
+  const {calendarData, isLoading} = useDiary();
 
   const onEditRegister = useCallback(
-    (register: UrinationData) => {
+    (register: UrinationDataDTO) => {
       setIsRegisterModalOpen(false);
       setSelectedRegisterItem(register);
       setIsEditingModalOpen(true);
@@ -57,8 +54,32 @@ export function useCalendar() {
     [selectedDayItem, selectedRegisterItem],
   );
 
-  const daysFlat: CalendarDayData[] = useMemo(() => {
-    const backendMap: Record<string, CalendarDayData> = data ?? {};
+  const onDeleteRegister = useCallback(
+    (register: UrinationDataDTO) => {
+      setIsRegisterModalOpen(false);
+      setSelectedRegisterItem(register);
+      setIsDeletingModalOpen(true);
+    },
+    [selectedDayItem, selectedRegisterItem],
+  );
+
+  const findRegisterIndex = useCallback(
+    (register: UrinationDataDTO, dayData: CalendarDayDTO) => {
+      return dayData.urinationData.findIndex(item => {
+        const itemTime = Array.isArray(item.time)
+          ? `${item.time[0]}:${item.time[1]}`
+          : item.time;
+        const registerTime = Array.isArray(register.time)
+          ? `${register.time[0]}:${register.time[1]}`
+          : register.time;
+        return itemTime === registerTime;
+      });
+    },
+    [],
+  );
+
+  const daysFlat: CalendarDayDTO[] = useMemo(() => {
+    const backendMap: Record<string, CalendarDayDTO> = calendarData ?? {};
 
     const selectedMonth = monthRef.month();
     const selectedYear = monthRef.year();
@@ -78,14 +99,18 @@ export function useCalendar() {
         (dayData?.leakageLevel as LeakageLevel | undefined) ?? undefined;
 
       return {
+        date: cell.date.format('YYYY-MM-DD'),
+        leakageLevel: dayData?.leakageLevel || 'NONE',
+        eventsCount: dayData?.eventsCount || 0,
+        completedExercises: dayData?.completedExercises || 0,
+        notesPreview: dayData?.notesPreview,
+        urinationData: dayData?.urinationData || [],
         dayTitle: formatToFirstLetterUppercase(cell.date.format('ddd')),
         dayNumber: Number(cell.date.format('D')),
-        date: cell.date.toDate(),
         isToday: cell.isToday,
-        level,
       };
     });
-  }, [matrix, data, monthRef]);
+  }, [matrix, calendarData, monthRef]);
 
   const goPrevMonth = useCallback(
     () => setMonthRef(m => m.clone().subtract(1, 'month')),
@@ -106,7 +131,7 @@ export function useCalendar() {
     (screenWidth - PADDING_H * 2 - CELL_GAP * (COLUMNS - 1)) / COLUMNS,
   );
   const rows = useMemo(() => {
-    const out: CalendarDayData[][] = [];
+    const out: CalendarDayDTO[][] = [];
     for (let i = 0; i < daysFlat.length; i += COLUMNS) {
       out.push(daysFlat.slice(i, i + COLUMNS));
     }
@@ -119,7 +144,6 @@ export function useCalendar() {
     matrix,
     daysFlat,
     isLoading,
-    refetch,
     goPrevMonth,
     goNextMonth,
     setMonth,
@@ -137,5 +161,9 @@ export function useCalendar() {
     selectedRegisterItem,
     setSelectedRegisterItem,
     onEditRegister,
+    onDeleteRegister,
+    isDeletingModalOpen,
+    setIsDeletingModalOpen,
+    findRegisterIndex,
   };
 }

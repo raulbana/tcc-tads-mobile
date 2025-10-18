@@ -7,9 +7,9 @@ import { LeakageLevel } from "../../../../types/diary";
 const getBadgeColor = (level?: LeakageLevel) => {
   switch (level) {
     case 'NONE':
-      return theme.colors.pastel_green;
+      return theme.colors.gray_05;
     case 'LOW':
-      return theme.colors.pastel_blue;
+      return theme.colors.pastel_green;
     case 'MEDIUM':
       return theme.colors.pastel_yellow;
     case 'HIGH':
@@ -36,5 +36,5 @@ export const Badge = styled.View<CalendarTileProps>`
   height: ${horizontalScale(4)}px;
   border-radius: ${horizontalScale(4)}px;
   background-color: ${({dayItem}) =>
-    dayItem.isToday ? theme.colors.default_green : getBadgeColor(dayItem.level)};
+    dayItem.isToday ? theme.colors.default_green : getBadgeColor(dayItem.leakageLevel as LeakageLevel)};
 `;

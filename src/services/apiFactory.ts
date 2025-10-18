@@ -2,6 +2,7 @@ import axios from "axios";
 import {MMKVStorage} from "../storage/mmkvStorage";
 
 const AUTH_TOKEN_KEY = 'auth_token_v1';
+const LOGGED_USER_KEY = 'auth_user_v1';
 
 const apiFactory = (baseURL: string) => {
   const apiInstance = axios.create({
@@ -12,13 +13,27 @@ const apiFactory = (baseURL: string) => {
     },
   });
 
-  // Request interceptor - adiciona token JWT automaticamente
+  // Request interceptor - adiciona token JWT e user-id automaticamente
   apiInstance.interceptors.request.use(
     (config) => {
       const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+
+      // Adicionar user-id para endpoints que precisam (como diary)
+      const userData = MMKVStorage.getString(LOGGED_USER_KEY);
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          if (user?.id) {
+            config.headers['user-id'] = user.id.toString();
+          }
+        } catch (error) {
+          console.warn('Erro ao parsear dados do usuário:', error);
+        }
+      }
+
       return config;
     },
     (error) => {

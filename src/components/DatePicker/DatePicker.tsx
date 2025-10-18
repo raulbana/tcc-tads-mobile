@@ -58,7 +58,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
         />
       )}
 
-      {modal ? (
+      {modal && (
         <S.InputPressable disabled={disabled} onPress={openModal}>
           <Input
             type="date"
@@ -74,32 +74,31 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
             onChange={() => {}}
           />
         </S.InputPressable>
-      ) : (
-        <DatePicker
-          modal={modal}
-          open={modal ? isOpen : true}
-          date={value || new Date()}
-          mode={mode}
-          minimumDate={minimumDate}
-          maximumDate={maximumDate}
-          is24hourSource="locale"
-          locale="pt-BR"
-          theme="light"
-          dividerColor={theme.colors.gray_04}
-          onConfirm={date => {
-            onChange(date);
-            closeModal();
-          }}
-          onCancel={() => {
-            onCancel();
-            closeModal();
-          }}
-          onDateChange={date => {
-            if (modal) return;
-            onChange(date);
-          }}
-        />
       )}
+      <DatePicker
+        modal={modal}
+        open={modal ? isOpen : true}
+        date={value || new Date()}
+        mode={mode}
+        minimumDate={minimumDate}
+        maximumDate={maximumDate}
+        is24hourSource="locale"
+        locale="pt-BR"
+        theme="light"
+        dividerColor={theme.colors.gray_04}
+        onConfirm={date => {
+          onChange(date);
+          closeModal();
+        }}
+        onCancel={() => {
+          onCancel();
+          closeModal();
+        }}
+        onDateChange={date => {
+          if (modal) return;
+          onChange(date);
+        }}
+      />
     </S.Container>
   );
 };

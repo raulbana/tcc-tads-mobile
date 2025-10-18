@@ -6,10 +6,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import CalendarTile from '../../CalendarTile/CalendarTile';
 import {ITEM_WIDTH, SPACING, useCalendarRow} from '../useCalendarRow';
-import {CalendarDayData} from '../../../../../types/diary';
+import {CalendarDayDTO} from '../../../../../types/diary';
 
 interface CalendarRowItemProps {
-  dayItem: CalendarDayData;
+  dayItem: CalendarDayDTO;
   index: number;
   scrollX: ReturnType<typeof useCalendarRow>['scrollX'];
 }
@@ -36,7 +36,6 @@ const CalendarRowItem: React.FC<CalendarRowItemProps> = ({
       zIndex: scale > 1 ? 1 : 0,
     };
   });
-
 
   return (
     <Animated.View

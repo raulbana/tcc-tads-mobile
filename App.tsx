@@ -7,20 +7,24 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import {AuthProvider} from './src/contexts/AuthContext';
+import {DiaryProvider} from './src/contexts/DiaryContext';
 if (__DEV__) {
   require('./ReactotronConfig');
 }
+const queryClient = new QueryClient();
+
 function App(): React.ReactElement {
-  const queryClient = new QueryClient();
   moment.locale('pt-br');
 
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <Navigator />
-          </ThemeProvider>
+          <DiaryProvider>
+            <ThemeProvider theme={theme}>
+              <Navigator />
+            </ThemeProvider>
+          </DiaryProvider>
         </AuthProvider>
       </QueryClientProvider>
     </NavigationContainer>

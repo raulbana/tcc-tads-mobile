@@ -5,9 +5,13 @@ import CalendarTile from '../../../../components/Calendar/components/CalendarTil
 import Label from '../../../../components/Label/Label';
 import theme from '../../../../theme/theme';
 import {useCalendar} from './useCalendar';
+import {useDiary} from '../../../../contexts/DiaryContext';
 import * as S from './styles';
 import DayRegisterModal from '../DayRegisterModal/DayRegisterModal';
 import DayDataModal from '../DayDataModal/DayDataModal';
+import BottomModal from '../../../../components/BottomModal/BottomModal';
+import Button from '../../../../components/Button/Button';
+import moment from 'moment';
 
 const Calendar: React.FC = () => {
   const {
@@ -27,7 +31,13 @@ const Calendar: React.FC = () => {
     setIsEditingModalOpen,
     selectedRegisterItem,
     onEditRegister,
+    onDeleteRegister,
+    isDeletingModalOpen,
+    setIsDeletingModalOpen,
+    findRegisterIndex,
   } = useCalendar();
+
+  const {addUrinationData, editUrinationData, deleteUrinationData} = useDiary();
 
   return (
     <S.Container>
@@ -52,13 +62,14 @@ const Calendar: React.FC = () => {
           return (
             <S.Row key={`row-${idx}`} $center={shouldCenter}>
               {row.map((item, j) => (
-                <View
-                  key={`${item.date.toISOString()}-${j}`}
-                  style={{width: tileWidth}}>
+                <View key={`${item.date}-${j}`} style={{width: tileWidth}}>
                   <CalendarTile
                     dayItem={item}
                     width={tileWidth}
                     onPress={() => onPressDay(item)}
+                    isDisabled={
+                      moment(item.date).isAfter(moment())
+                    }
                   />
                 </View>
               ))}
@@ -76,15 +87,26 @@ const Calendar: React.FC = () => {
             setIsAddModalOpen(true);
           }}
           onEditRecord={onEditRegister}
+          onDeleteRecord={onDeleteRegister}
         />
       )}
       <DayDataModal
         title="Novo Registro"
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSubmit={formData => {
+        onSubmit={async formData => {
+          if (selectedDayItem) {
+            try {
+              await addUrinationData(selectedDayItem.date, formData);
+              setIsAddModalOpen(false);
+            } catch (error) {
+              console.error('Erro ao salvar dados de micção:', error);
+            }
+          }
         }}
-        baseDate={selectedDayItem?.date}
+        baseDate={
+          selectedDayItem?.date ? new Date(selectedDayItem.date) : undefined
+        }
       />
 
       {selectedRegisterItem && (
@@ -92,11 +114,76 @@ const Calendar: React.FC = () => {
           title="Editar Registro"
           isOpen={isEditingModalOpen}
           onClose={() => setIsEditingModalOpen(false)}
-          onSubmit={formData => {
+          onSubmit={async formData => {
+            if (selectedDayItem && selectedRegisterItem) {
+              try {
+                const index = findRegisterIndex(
+                  selectedRegisterItem,
+                  selectedDayItem,
+                );
+
+                if (index !== -1) {
+                  await editUrinationData(
+                    selectedDayItem.date,
+                    index,
+                    formData,
+                  );
+                  setIsEditingModalOpen(false);
+                }
+              } catch (error) {
+                console.error('Erro ao atualizar dados de micção:', error);
+              }
+            }
           }}
           selectedValues={selectedRegisterItem}
-          baseDate={selectedDayItem?.date}
+          baseDate={
+            selectedDayItem?.date ? new Date(selectedDayItem.date) : undefined
+          }
         />
+      )}
+
+      {isDeletingModalOpen && (
+        <BottomModal
+          isOpen={isDeletingModalOpen}
+          onClose={() => setIsDeletingModalOpen(false)}
+          footer={
+            <Button
+              text={'Cancelar'}
+              type="TERTIARY"
+              onPress={() => setIsDeletingModalOpen(false)}
+            />
+          }>
+          <S.DeleteModalContent>
+            <S.DeleteModalTitle>
+              <Label
+                text="Deseja deletar este registro?"
+                typography={theme.typography.paragraph.sb2}
+                color={theme.colors.gray_08}
+              />
+            </S.DeleteModalTitle>
+            <Button
+              text="Deletar"
+              onPress={async () => {
+                if (selectedRegisterItem && selectedDayItem) {
+                  try {
+                    const index = findRegisterIndex(
+                      selectedRegisterItem,
+                      selectedDayItem,
+                    );
+
+                    if (index !== -1) {
+                      await deleteUrinationData(selectedDayItem.date, index);
+                      setIsDeletingModalOpen(false);
+                    }
+                  } catch (error) {
+                    console.error('Erro ao deletar registro:', error);
+                  }
+                }
+              }}
+              disabled={!selectedRegisterItem || !selectedDayItem}
+            />
+          </S.DeleteModalContent>
+        </BottomModal>
       )}
     </S.Container>
   );

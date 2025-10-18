@@ -3,7 +3,7 @@ import BottomModal from '../../../../components/BottomModal/BottomModal';
 import DataTable, {
   TableColumn,
 } from '../../../../components/DataTable/DataTable';
-import {CalendarDayData, UrinationData} from '../../../../types/diary';
+import {CalendarDayDTO, UrinationDataDTO} from '../../../../types/diary';
 import Button from '../../../../components/Button/Button';
 import Label from '../../../../components/Label/Label';
 import theme from '../../../../theme/theme';
@@ -11,11 +11,12 @@ import moment from 'moment';
 import * as S from './styles';
 
 export interface DayRegisterModalProps {
-  dayItem: CalendarDayData;
+  dayItem: CalendarDayDTO;
   isOpen: boolean;
   onClose: () => void;
   onAddRecord: () => void;
-  onEditRecord: (row: UrinationData) => void;
+  onEditRecord: (row: UrinationDataDTO) => void;
+  onDeleteRecord: (row: UrinationDataDTO) => void;
 }
 
 const amountLabel: Record<string, string> = {
@@ -30,50 +31,16 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
   onClose,
   onAddRecord,
   onEditRecord,
+  onDeleteRecord,
 }) => {
-  const mockData: UrinationData[] = [
-    {
-      time: '14:25',
-      amount: 'HIGH',
-      leakage: true,
-      reason: 'Espirro',
-      urgency: false,
-      observation: '',
-    },
-    {
-      time: '13:25',
-      amount: 'HIGH',
-      leakage: true,
-      reason: 'Espirro',
-      urgency: false,
-      observation: '',
-    },
-    {
-      time: '11:25',
-      amount: 'HIGH',
-      leakage: true,
-      reason: 'Espirro',
-      urgency: false,
-      observation: '',
-    },
-    {
-      time: '12:25',
-      amount: 'HIGH',
-      leakage: true,
-      reason: 'Espirro',
-      urgency: false,
-      observation: '',
-    },
-  ];
-
   const records = (
     dayItem.urinationData?.length
       ? dayItem.urinationData.map(r => ({
           ...r,
-          urgency: (r as any).urgency ?? false,
+          urgency: r.urgency ?? false,
         }))
-      : mockData
-  ) as (UrinationData & {urgency: boolean})[];
+      : []
+  ) as (UrinationDataDTO & {urgency: boolean})[];
 
   type TableRow = {
     id: string;
@@ -92,12 +59,12 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
     {key: 'reason', label: 'Motivo'},
   ];
 
-  const dateIsoString = useMemo(() => dayItem.date.toISOString(), [dayItem.date]);
+  const dateIsoString = useMemo(() => dayItem.date, [dayItem.date]);
   const rows: TableRow[] = useMemo(
     () =>
       records.map((r, idx) => ({
         id: `${dateIsoString}-${idx}`,
-        time: r.time,
+        time: Array.isArray(r.time) ? `${r.time[0]}:${r.time[1]}` : r.time,
         amount: amountLabel[r.amount] ?? r.amount,
         urgency: r.urgency,
         leakage: r.leakage,
@@ -126,7 +93,12 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
               onEditRecord(records[idx]);
             }
           }}
-          showEditIcon
+          onDeleteRow={row => {
+            const idx = rows.findIndex(r => r.id === row.id);
+            if (idx !== -1 && records[idx]) {
+              onDeleteRecord(records[idx]);
+            }
+          }}
         />
       )}
       <S.Wrapper>

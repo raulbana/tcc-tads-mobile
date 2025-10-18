@@ -28,3 +28,13 @@ export const Row = styled.View<{$center?: boolean}>`
   flex-direction: row;
   gap: ${horizontalScale(8)}px;
 `;
+
+export const DeleteModalContent = styled.View`
+  flex-direction: column;
+  gap: ${verticalScale(12)}px;
+`;
+
+export const DeleteModalTitle = styled.View`
+  align-items: center;
+  justify-content: center;
+`;
