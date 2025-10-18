@@ -39,12 +39,15 @@ export const DraggableItem = styled.TouchableOpacity<{
   opacity: ${({isActive, isDraggable = true}) =>
     isActive ? 0.9 : isDraggable ? 1 : 0.7};
   transform: ${({isActive}) => (isActive ? 'scale(1.02)' : 'scale(1)')};
-  elevation: ${({isActive}) => (isActive ? 5 : 0)};
+  elevation: ${({isActive}) => (isActive ? 8 : 2)};
   shadow-color: ${({isActive}) => (isActive ? '#000' : 'transparent')};
-  shadow-offset: ${({isActive}) => (isActive ? '0px 2px' : '0px 0px')};
-  shadow-opacity: ${({isActive}) => (isActive ? 0.5 : 0)};
-  shadow-radius: ${({isActive}) => (isActive ? '4px' : '0px')};
-  z-index: 1000;
+  shadow-offset: ${({isActive}) => (isActive ? '0px 4px' : '0px 0px')};
+  shadow-opacity: ${({isActive}) => (isActive ? 0.3 : 0)};
+  shadow-radius: ${({isActive}) => (isActive ? '6px' : '0px')};
+  z-index: ${({isActive}) => (isActive ? 1000 : 1)};
+  background-color: ${({isActive}) => (isActive ? 'rgba(255, 255, 255, 0.95)' : 'transparent')};
+  border-radius: ${({isActive}) => (isActive ? '8px' : '0px')};
+  overflow: ${({isActive}) => (isActive ? 'visible' : 'hidden')};
 `;
 
 export const CardContainer = styled.View`

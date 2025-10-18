@@ -1,4 +1,5 @@
 import React, {useCallback, useMemo} from 'react';
+import {Platform} from 'react-native';
 import * as S from './styles';
 import {UploadFile, useUpload} from './useUpload';
 import Icon from '../../../../../components/Icon/Icon';
@@ -182,15 +183,32 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                 keyExtractor={keyExtractor}
                 contentContainerStyle={{paddingVertical: verticalScale(8)}}
                 renderItem={renderUpload}
-                onDragEnd={({data}) => reorderFiles(data)}
                 dragItemOverflow={true}
-                activationDistance={10}
+                activationDistance={Platform.OS === 'android' ? 15 : 10}
                 scrollEnabled={false}
                 style={{overflow: 'visible'}}
-                nestedScrollEnabled={true}
+                nestedScrollEnabled={Platform.OS === 'android'}
                 simultaneousHandlers={
                   parentScrollRef ? [parentScrollRef] : undefined
                 }
+                dragHitSlop={
+                  Platform.OS === 'android' ? {top: 10, bottom: 10} : undefined
+                }
+                onDragBegin={() => {
+                  if (Platform.OS === 'android' && parentScrollRef?.current) {
+                    parentScrollRef.current.setNativeProps({
+                      scrollEnabled: false,
+                    });
+                  }
+                }}
+                onDragEnd={({data}) => {
+                  if (Platform.OS === 'android' && parentScrollRef?.current) {
+                    parentScrollRef.current.setNativeProps({
+                      scrollEnabled: true,
+                    });
+                  }
+                  reorderFiles(data);
+                }}
               />
             </GestureHandlerRootView>
           </S.ListContainer>

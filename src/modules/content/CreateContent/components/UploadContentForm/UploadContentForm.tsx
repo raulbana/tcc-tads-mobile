@@ -85,6 +85,40 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
           />
         </S.FieldGroup>
         <S.FieldGroup>
+          <Controller
+            control={control}
+            name="subtitle"
+            render={({field}) => (
+              <Input
+                {...register('subtitle')}
+                {...field}
+                value={field.value ?? ''}
+                placeholder="Digite o subtítulo"
+                error={errors.subtitle?.message}
+                label="Subtítulo"
+              />
+            )}
+          />
+        </S.FieldGroup>
+        <S.FieldGroup>
+          <Controller
+            control={control}
+            name="subcontent"
+            render={({field}) => (
+              <Input
+                {...register('subcontent')}
+                {...field}
+                value={field.value ?? ''}
+                placeholder="Digite o subconteúdo"
+                error={errors.subcontent?.message}
+                label="Subconteúdo"
+                multiline
+                numberOfLines={4}
+              />
+            )}
+          />
+        </S.FieldGroup>
+        <S.FieldGroup>
           <CarouselSection
             carouselData={{
               data: categoriesList,
