@@ -1,11 +1,11 @@
 import React from 'react';
-import {CalendarDayData} from '../../../../types/diary';
+import {CalendarDayDTO} from '../../../../types/diary';
 import * as S from './styles';
 import Label from '../../../Label/Label';
 import theme from '../../../../theme/theme';
 
 export interface CalendarTileProps {
-  dayItem: CalendarDayData;
+  dayItem: CalendarDayDTO;
   isSelected?: boolean;
   isDisabled?: boolean;
   onPress?: () => void;
@@ -13,11 +13,11 @@ export interface CalendarTileProps {
 }
 
 const CalendarTile: React.FC<CalendarTileProps> = props => {
-  const {dayItem, isSelected} = props;
+  const {dayItem, isSelected, isDisabled} = props;
   const {dayTitle, dayNumber, isToday} = dayItem;
 
   return (
-    <S.Wrapper {...props}>
+    <S.Wrapper {...props} disabled={isDisabled}>
       <Label
         text={dayTitle}
         typography={
@@ -25,7 +25,7 @@ const CalendarTile: React.FC<CalendarTileProps> = props => {
             ? theme.typography.paragraph.sb1
             : theme.typography.paragraph.r1
         }
-        color={theme.colors.gray_08}
+        color={ isDisabled ? theme.colors.gray_06 : theme.colors.gray_08}
       />
       <Label
         text={dayNumber.toString()}

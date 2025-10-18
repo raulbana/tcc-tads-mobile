@@ -18,6 +18,9 @@ const apiRoutes = {
     byId: (contentId: string) => `/contents/${contentId}`,
     create: '/contents',
   },
+  diary: {
+    calendar: '/calendar',
+  },
 };
 
 export default apiRoutes;

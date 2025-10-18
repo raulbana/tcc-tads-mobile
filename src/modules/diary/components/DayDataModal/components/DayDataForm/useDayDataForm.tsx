@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo} from 'react';
 import moment from 'moment';
-import {UrinationData} from '../../../../../../types/diary';
+import {UrinationDataDTO} from '../../../../../../types/diary';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {
@@ -10,7 +10,7 @@ import {
   yesNoOptions,
 } from './schema/dayDataFormSchema';
 
-export type DayDataFormValues = UrinationData;
+export type DayDataFormValues = UrinationDataDTO;
 
 export interface UseDayDataFormParams {
   defaultValues?: Partial<DayDataFormValues>;
@@ -71,10 +71,9 @@ export function useDayDataForm({
         urgency: data.urgency === 'YES',
         leakage: data.leakage === 'YES',
         reason: data.reason || '',
-        observation: defaultValues?.observation ?? '',
       });
     },
-    [onSubmit, defaultValues?.observation],
+    [onSubmit],
   );
 
   const handleConfirm = handleSubmit(submit);

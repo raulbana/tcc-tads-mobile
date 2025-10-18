@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {Controller} from 'react-hook-form';
 import {useDayDataForm, DayDataFormValues} from './useDayDataForm';
 import * as S from './styles';
@@ -8,7 +8,6 @@ import RadioBoxInput from '../../../../../../components/RadioBoxInput/RadioBoxIn
 import theme from '../../../../../../theme/theme';
 import DatePickerInput from '../../../../../../components/DatePicker/DatePicker';
 import Button from '../../../../../../components/Button/Button';
-import moment from 'moment';
 import {volumeOptions, yesNoOptions} from './schema/dayDataFormSchema';
 
 export interface DayDataFormProps {

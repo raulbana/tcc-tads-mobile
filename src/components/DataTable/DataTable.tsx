@@ -1,6 +1,6 @@
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
-import {Pencil} from 'phosphor-react-native';
+import {Pencil, Trash} from 'phosphor-react-native';
 import * as S from './styles';
 import theme from '../../theme/theme';
 import Label from '../Label/Label';
@@ -21,15 +21,27 @@ export interface DataTableProps<
   columns: TableColumn<K>[];
   data: T[];
   onEditRow?: (row: T) => void;
+  onDeleteRow?: (row: T) => void;
   showEditIcon?: boolean;
+  showDeleteIcon?: boolean;
 }
 
 function DataTable<
   T extends {id: string} & Record<string, CellValue>,
   K extends Exclude<keyof T, 'id'> & string = Exclude<keyof T, 'id'> & string,
->({columns, data, onEditRow, showEditIcon = true}: DataTableProps<T, K>) {
+>({
+  columns,
+  data,
+  onEditRow,
+  onDeleteRow,
+  showEditIcon = true,
+  showDeleteIcon = true,
+}: DataTableProps<T, K>) {
   const handleEditPress = (row: T) => {
     onEditRow?.(row);
+  };
+  const handleDeletePress = (row: T) => {
+    onDeleteRow?.(row);
   };
 
   const renderCell = (row: T, column: TableColumn<K>) => {
@@ -68,6 +80,7 @@ function DataTable<
           </S.HeaderCell>
         ))}
         {showEditIcon && <S.EditCell width={32} align="center" />}
+        {showDeleteIcon && <S.DeleteCell width={32} align="center" />}
       </S.HeaderRow>
 
       {data.map(row => (
@@ -75,10 +88,29 @@ function DataTable<
           {columns.map(column => renderCell(row, column))}
           {showEditIcon && (
             <S.EditCell width={32} align="left">
-              <TouchableOpacity onPress={() => handleEditPress(row)}>
+              <TouchableOpacity
+                onPress={() => handleEditPress(row)}
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Pencil size={16} color={theme.colors.gray_08} />
               </TouchableOpacity>
             </S.EditCell>
+          )}
+          {showDeleteIcon && (
+            <S.DeleteCell width={32} align="left">
+              <TouchableOpacity
+                onPress={() => handleDeletePress(row)}
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Trash size={16} color={theme.colors.error} />
+              </TouchableOpacity>
+            </S.DeleteCell>
           )}
         </S.DataRow>
       ))}
