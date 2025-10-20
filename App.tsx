@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'moment/locale/pt-br';
 import {AuthProvider} from './src/contexts/AuthContext';
 import {DiaryProvider} from './src/contexts/DiaryContext';
+import {ContentProvider} from './src/contexts/ContentContext';
 if (__DEV__) {
   require('./ReactotronConfig');
 }
@@ -20,11 +21,13 @@ function App(): React.ReactElement {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <DiaryProvider>
-            <ThemeProvider theme={theme}>
-              <Navigator />
-            </ThemeProvider>
-          </DiaryProvider>
+          <ContentProvider>
+            <DiaryProvider>
+              <ThemeProvider theme={theme}>
+                <Navigator />
+              </ThemeProvider>
+            </DiaryProvider>
+          </ContentProvider>
         </AuthProvider>
       </QueryClientProvider>
     </NavigationContainer>

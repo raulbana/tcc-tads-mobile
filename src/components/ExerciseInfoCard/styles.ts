@@ -6,7 +6,7 @@ export const Container = styled.View`
   background-color: ${theme.colors.gray_03};
   border-radius: ${horizontalScale(16)}px;
   padding: ${verticalScale(20)}px ${horizontalScale(16)}px;
-  margin: ${verticalScale(24)}px ${horizontalScale(16)}px 0;
+  margin: ${verticalScale(24)}px ${horizontalScale(16)}px;
   gap: ${verticalScale(16)}px;
 `;
 
