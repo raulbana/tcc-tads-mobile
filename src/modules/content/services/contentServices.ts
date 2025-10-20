@@ -11,30 +11,20 @@ import {
   CommentCreatorDTO,
   ReportContentDTO,
 } from '../../../types/content';
-import {MMKVStorage} from '../../../storage/mmkvStorage';
 import {contentCache} from './contentCache';
 import {sanitizeContentData, sanitizeCategoriesData} from '../utils/contentValidation';
 
 const api = apiFactory(BASE_URL);
 
-const getCurrentUserId = (): string => {
-  const userData = MMKVStorage.getString('auth_user_v1');
-  if (userData) {
-    const user = JSON.parse(userData);
-    return user.id?.toString() || '1';
-  }
-  return '1';
-};
-
 const contentServices = {
-  getById: async (contentId: string): Promise<Content> => {
+  getById: async (contentId: string, userId: string): Promise<Content> => {
     const cached = contentCache.getContent(contentId);
     if (cached) {
       return cached;
     }
 
     const headers = {
-      'x-user-id': getCurrentUserId(),
+      'x-user-id': userId,
     };
     const response = await api.get(apiRoutes.content.byId(contentId), {headers});
     
@@ -59,7 +49,7 @@ const contentServices = {
       isLiked: apiContent.isLiked || false,
       likesCount: apiContent.likesCount || 0,
       repostsCount: apiContent.repostsCount || 0,
-      authorId: apiContent.authorId?.toString() || getCurrentUserId(),
+      authorId: apiContent.authorId?.toString() || userId,
       repostedFromContentId: apiContent.repostedFromContentId?.toString(),
       repostedByUserId: apiContent.repostedByUserId?.toString(),
       commentsCount: apiContent.commentsCount || 0,
@@ -74,7 +64,7 @@ const contentServices = {
     return sanitizedContent;
   },
 
-  getAll: async (profileMode?: boolean): Promise<Content[]> => {
+  getAll: async (userId: string, profileMode?: boolean): Promise<Content[]> => {
     if (!profileMode) {
       const cached = contentCache.getContents();
       if (cached) {
@@ -83,7 +73,7 @@ const contentServices = {
     }
 
     const headers = {
-      'x-user-id': getCurrentUserId(),
+      'x-user-id': userId,
       ...(profileMode && {'x-profile': 'true'}),
     };
     const response = await api.get(apiRoutes.content.all, {headers});
@@ -109,7 +99,7 @@ const contentServices = {
       isLiked: apiContent.isLiked || false,
       likesCount: apiContent.likesCount || 0,
       repostsCount: apiContent.repostsCount || 0,
-      authorId: apiContent.author?.id?.toString() || getCurrentUserId(),
+      authorId: apiContent.author?.id?.toString() || userId,
       repostedFromContentId: apiContent.repostedFromContentId?.toString(),
       repostedByUserId: apiContent.repostedByUserId?.toString(),
       commentsCount: apiContent.commentsCount || 0,
@@ -130,25 +120,19 @@ const contentServices = {
     }
 
     const response = await api.get(apiRoutes.content.categories);
-    const categoriesData: ContentCategoryDTO[] = response.data;
-    const mappedCategories: ContentCategory[] = categoriesData.map(cat => ({
-      id: cat.id.toString(),
-      name: cat.name,
-      auditable: cat.auditable,
-    }));
-    const sanitizedCategories = sanitizeCategoriesData(mappedCategories);
+    const sanitizedCategories = sanitizeCategoriesData(response.data);
     contentCache.setCategories(sanitizedCategories);
     return sanitizedCategories;
   },
 
-  createContent: async (contentData: CreateContentRequest): Promise<Content> => {
+  createContent: async (contentData: CreateContentRequest, userId: string): Promise<Content> => {
     const createData = {
       title: contentData.title,
       description: contentData.description,
       subtitle: contentData.subtitle,
       subcontent: contentData.subcontent,
       categoryId: parseInt(contentData.categories[0]) || 1,
-      authorId: parseInt(getCurrentUserId()),
+      authorId: parseInt(userId),
       media: contentData.images?.map((imageUri, index) => ({
         url: imageUri,
         contentType: 'image/jpeg',
@@ -192,9 +176,9 @@ const contentServices = {
     return mappedContent;
   },
 
-  updateContent: async (id: string, contentData: UpdateContentRequest): Promise<Content> => {
+  updateContent: async (id: string, contentData: UpdateContentRequest, userId: string): Promise<Content> => {
     const headers = {
-      'x-user-id': getCurrentUserId(),
+      'x-user-id': userId,
     };
     const updateData = {
       title: contentData.title,
@@ -206,7 +190,36 @@ const contentServices = {
 
     const response = await api.put(apiRoutes.content.update(id), updateData, {headers});
     contentCache.invalidateContent(id);
-    return response.data;
+    
+    const apiContent = response.data;
+    const mappedContent: Content = {
+      id: apiContent.id.toString(),
+      title: apiContent.title,
+      description: apiContent.description,
+      subtitle: apiContent.subtitle,
+      subcontent: apiContent.subcontent,
+      createdAt: new Date(apiContent.createdAt),
+      updatedAt: new Date(apiContent.updatedAt),
+      coverUrl: apiContent.cover?.url || '',
+      images: apiContent.media?.map((media: any) => media.url) || [],
+      video: apiContent.media?.find((media: any) => media.contentType.startsWith('video/'))?.url,
+      category: {
+        id: apiContent.categoryId.toString(),
+        name: apiContent.category || 'Unknown',
+        auditable: false,
+      },
+      isReposted: apiContent.isReposted || false,
+      isLiked: apiContent.isLiked || false,
+      likesCount: apiContent.likesCount || 0,
+      repostsCount: apiContent.repostsCount || 0,
+      authorId: apiContent.authorId.toString(),
+      repostedFromContentId: apiContent.repostedFromContentId?.toString(),
+      repostedByUserId: apiContent.repostedByUserId?.toString(),
+      commentsCount: apiContent.commentsCount || 0,
+      comments: apiContent.comments || [],
+    };
+    
+    return mappedContent;
   },
 
   deleteContent: async (id: string): Promise<void> => {
@@ -214,17 +227,17 @@ const contentServices = {
     contentCache.invalidateContent(id);
   },
 
-  toggleLike: async (id: string, liked: boolean): Promise<void> => {
+  toggleLike: async (id: string, liked: boolean, userId: string): Promise<void> => {
     const toggleData: ToggleDTO = {
-      userId: parseInt(getCurrentUserId()),
+      userId: parseInt(userId),
       control: liked,
     };
     await api.patch(apiRoutes.content.like(id), toggleData);
   },
 
-  toggleRepost: async (id: string, reposted: boolean): Promise<void> => {
+  toggleRepost: async (id: string, reposted: boolean, userId: string): Promise<void> => {
     const toggleData: ToggleDTO = {
-      userId: parseInt(getCurrentUserId()),
+      userId: parseInt(userId),
       control: reposted,
     };
     await api.patch(apiRoutes.content.repost(id), toggleData);
@@ -234,9 +247,9 @@ const contentServices = {
     await api.post(apiRoutes.comment.create, commentData);
   },
 
-  reportContent: async (contentId: string, reason: string): Promise<void> => {
+  reportContent: async (contentId: string, reason: string, userId: string): Promise<void> => {
     const reportData: ReportContentDTO = {
-      reporterId: parseInt(getCurrentUserId()),
+      reporterId: parseInt(userId),
       reason,
     };
     await api.post(apiRoutes.content.report(contentId), reportData);

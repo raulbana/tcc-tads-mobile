@@ -67,40 +67,57 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
     setError(null);
   }, []);
 
-  const loadContents = useCallback(async (profileMode?: boolean) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await contentServices.getAll();
-      setContents(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao carregar conteúdos';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const loadContents = useCallback(
+    async (profileMode?: boolean) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const data = await contentServices.getAll(
+          user?.id?.toString() || '1',
+          profileMode,
+        );
+        setContents(data);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Erro ao carregar conteúdos';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user],
+  );
 
-  const loadContentById = useCallback(async (id: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const content = await contentServices.getById(id);
-      setContents(prevContents =>
-        prevContents.map(c => (c.id === id ? content : c)),
-      );
-      return content;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao carregar conteúdo';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const loadContentById = useCallback(
+    async (id: string) => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const content = await contentServices.getById(
+          id,
+          user?.id?.toString() || '1',
+        );
+        setContents(prevContents => {
+          const existingIndex = prevContents.findIndex(c => c.id === id);
+          if (existingIndex !== -1) {
+            return prevContents.map(c => (c.id === id ? content : c));
+          } else {
+            return [content, ...prevContents];
+          }
+        });
+        return content;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Erro ao carregar conteúdo';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user],
+  );
 
   const createContent = useCallback(
     async (contentData: CreateContentRequest) => {
@@ -114,7 +131,10 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
           video: contentData.video,
           categories: contentData.categories,
         };
-        const newContent = await contentServices.createContent(serviceData);
+        const newContent = await contentServices.createContent(
+          serviceData,
+          user?.id?.toString() ?? '',
+        );
         setContents(prevContents => [newContent, ...prevContents]);
         return newContent;
       } catch (err) {
@@ -126,7 +146,7 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [],
+    [user],
   );
 
   const updateContent = useCallback(
@@ -166,59 +186,85 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
-  const toggleLikeContent = useCallback(async (id: string) => {
-    try {
-      setError(null);
-      setContents(prevContents =>
-        prevContents.map(c => {
-          if (c.id === id) {
-            return {
-              ...c,
-              isLiked: !c.isLiked,
-              likesCount: c.isLiked
-                ? (c.likesCount || 0) - 1
-                : (c.likesCount || 0) + 1,
-            };
-          }
-          return c;
-        }),
-      );
-      throw new Error('Toggle like not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : 'Erro ao curtir/descurtir conteúdo';
-      setError(errorMessage);
-      throw err;
-    }
-  }, []);
+  const toggleLikeContent = useCallback(
+    async (id: string) => {
+      try {
+        setError(null);
+        const currentContent = contents.find(c => c.id === id);
+        if (!currentContent) return;
 
-  const toggleRepostContent = useCallback(async (id: string) => {
-    try {
-      setError(null);
-      setContents(prevContents =>
-        prevContents.map(c => {
-          if (c.id === id) {
-            return {
-              ...c,
-              isReposted: !c.isReposted,
-              repostsCount: c.isReposted
-                ? (c.repostsCount || 0) - 1
-                : (c.repostsCount || 0) + 1,
-            };
-          }
-          return c;
-        }),
-      );
-      throw new Error('Toggle repost not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao repostar conteúdo';
-      setError(errorMessage);
-      throw err;
-    }
-  }, []);
+        const nextState = !currentContent.isLiked;
+
+        setContents(prevContents =>
+          prevContents.map(c => {
+            if (c.id === id) {
+              return {
+                ...c,
+                isLiked: nextState,
+                likesCount: nextState
+                  ? (c.likesCount || 0) + 1
+                  : Math.max(0, (c.likesCount || 1) - 1),
+              };
+            }
+            return c;
+          }),
+        );
+
+        await contentServices.toggleLike(
+          id,
+          nextState,
+          user?.id?.toString() || '1',
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : 'Erro ao curtir/descurtir conteúdo';
+        setError(errorMessage);
+        throw err;
+      }
+    },
+    [contents],
+  );
+
+  const toggleRepostContent = useCallback(
+    async (id: string) => {
+      try {
+        setError(null);
+        const currentContent = contents.find(c => c.id === id);
+        if (!currentContent) return;
+
+        const nextState = !currentContent.isReposted;
+
+        setContents(prevContents =>
+          prevContents.map(c => {
+            if (c.id === id) {
+              return {
+                ...c,
+                isReposted: nextState,
+                repostsCount: nextState
+                  ? (c.repostsCount || 0) + 1
+                  : Math.max(0, (c.repostsCount || 1) - 1),
+              };
+            }
+            return c;
+          }),
+        );
+
+        await contentServices.toggleRepost(
+          id,
+          nextState,
+          user?.id?.toString() || '1',
+        );
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Erro ao repostar conteúdo';
+        setError(errorMessage);
+        throw err;
+      }
+    },
+    [contents],
+  );
 
   const addComment = useCallback(
     async (contentId: string, text: string) => {
@@ -364,7 +410,11 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
     async (contentId: string, reason: string) => {
       try {
         setError(null);
-        await contentServices.reportContent(contentId, reason);
+        await contentServices.reportContent(
+          contentId,
+          reason,
+          user?.id?.toString() || '1',
+        );
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Erro ao reportar conteúdo';
@@ -372,7 +422,7 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
         throw err;
       }
     },
-    [],
+    [user],
   );
 
   const getContentStats = useCallback(async (): Promise<ContentStats> => {
@@ -400,7 +450,6 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
 
   const memoizedContents = useMemo(() => contents, [contents]);
   const memoizedCategories = useMemo(() => categories, [categories]);
-
 
   return (
     <ContentContext.Provider
