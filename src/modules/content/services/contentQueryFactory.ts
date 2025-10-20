@@ -13,10 +13,10 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
         refetchOnWindowFocus: false,
       }),
 
-    getList: () =>
+    getList: (profileMode?: boolean) =>
       useQuery({
-        queryKey: [...baseKey, 'contentList'],
-        queryFn: () => contentServices.getAll(),
+        queryKey: [...baseKey, 'contentList', profileMode],
+        queryFn: () => contentServices.getAll(profileMode),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
         retry: 1,
@@ -25,10 +25,10 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
 
     getCategories: () =>
       useQuery({
-        queryKey: [...baseKey, 'contentCategoryList'],
+        queryKey: [...baseKey, 'contentCategories'],
         queryFn: () => contentServices.getCategories(),
-        staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 10,
+        gcTime: 1000 * 60 * 10,
         retry: 1,
         refetchOnWindowFocus: false,
       }),

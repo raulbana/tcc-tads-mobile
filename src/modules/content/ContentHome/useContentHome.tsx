@@ -1,82 +1,18 @@
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {BadgeProps} from '../../../components/Badge/Badge';
 import {ContentCardProps} from '../../../components/ContentCard/ContentCard';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
-
-const badgeListMock: BadgeProps[] = [
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-  {
-    content: 'Teste',
-  },
-];
-
-const contentCardListMock: ContentCardProps[] = [
-  {
-    image: {uri: 'https://picsum.photos/200/300'},
-    badgeLabel: 'Comunidade',
-    title: 'Título do Conteúdo',
-    description: 'Descrição do Conteúdo',
-    onClick: () => {},
-  },
-  {
-    image: {uri: 'https://picsum.photos/200/300'},
-    badgeLabel: 'Comunidade',
-    title: 'Título do Conteúdo',
-    description: 'Descrição do Conteúdo',
-    onClick: () => {},
-  },
-  {
-    image: {uri: 'https://picsum.photos/200/300'},
-    badgeLabel: 'Comunidade',
-    title: 'Título do Conteúdo',
-    description: 'Descrição do Conteúdo',
-    onClick: () => {},
-  },
-];
+import {useContent} from '../../../contexts/ContentContext';
 
 const useContentHome = () => {
-  const [badgeList] = useState<BadgeProps[]>(badgeListMock);
-  const [contentCardList, setContentCardList] =
-    useState<ContentCardProps[]>(contentCardListMock);
-
+  const {contents, categories, loadContents,loadCategories, isLoading, error} = useContent();
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  const navigateToDetails = useCallback(() => {
-    navigate('Content', {screen: 'ContentDetails', params: {contentId: '1'}});
-  }, [navigate]);
+  useEffect(() => {
+    loadContents();
+    loadCategories();
+  }, [loadContents, loadCategories]);
 
   const handleCardClick = useCallback(
     (contentId: string) => {
@@ -89,13 +25,25 @@ const useContentHome = () => {
     navigate('Content', {screen: 'CreateContent'});
   }, [navigate]);
 
-  useEffect(() => {
-    const updatedContentCards = contentCardListMock.map((card, index) => ({
-      ...card,
-      onClick: () => handleCardClick((index + 1).toString()),
+  const navigateToDetails = useCallback(() => {
+    navigate('Content', {screen: 'ContentDetails', params: {contentId: '1'}});
+  }, [navigate]);
+
+  const badgeList = useMemo(() => {
+    return categories.map(category => ({
+      content: category.name,
     }));
-    setContentCardList(updatedContentCards);
-  }, [handleCardClick]);
+  }, [categories]);
+
+  const contentCardList = useMemo(() => {
+    return contents.map(content => ({
+      image: {uri: content.coverUrl},
+      badgeLabel: content.category.name,
+      title: content.title,
+      description: content.description,
+      onClick: () => handleCardClick(content.id),
+    }));
+  }, [contents, handleCardClick]);
 
   return {
     badgeList,
@@ -103,6 +51,9 @@ const useContentHome = () => {
     navigateToDetails,
     handleCardClick,
     navigateToCreateContent,
+    isLoading,
+    error,
+    refreshContents: () => loadContents(),
   };
 };
 

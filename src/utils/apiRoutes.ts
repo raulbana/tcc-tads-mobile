@@ -13,10 +13,21 @@ const apiRoutes = {
     },
   },
   content: {
-    all: '/contents',
-    category: '/contents/category',
-    byId: (contentId: string) => `/contents/${contentId}`,
-    create: '/contents',
+    all: '/content',
+    byId: (contentId: string) => `/content/${contentId}`,
+    create: '/content',
+    update: (contentId: string) => `/content/${contentId}`,
+    delete: (contentId: string) => `/content/${contentId}`,
+    like: (contentId: string) => `/content/${contentId}/like`,
+    repost: (contentId: string) => `/content/${contentId}/repost`,
+    report: (contentId: string) => `/content/${contentId}/report`,
+    categories: '/content-categories',
+  },
+  comment: {
+    create: '/comment',
+  },
+  media: {
+    upload: '/media/upload',
   },
   diary: {
     calendar: '/calendar',

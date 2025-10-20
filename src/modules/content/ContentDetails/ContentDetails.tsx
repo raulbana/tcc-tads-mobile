@@ -22,7 +22,7 @@ const ContentDetails = () => {
     comments,
     commentText,
     onChangeCommentText,
-    content,
+    contentData,
     onReplyComment,
     onLikeCommentOrReply,
     handleSend,
@@ -36,7 +36,7 @@ const ContentDetails = () => {
     setImageCarouselIndex,
   } = useContentDetails();
 
-  return isLoading || !content ? (
+  return isLoading || !contentData ? (
     <Loader overlay />
   ) : (
     <ScreenContainer
@@ -45,28 +45,28 @@ const ContentDetails = () => {
       scrollable
       header={
         <ContentDetailsHeader
-          image={content.video ?? content.coverUrl}
-          type={content.video ? 'video' : 'image'}
+          image={contentData.video ?? contentData.coverUrl}
+          type={contentData.video ? 'video' : 'image'}
         />
       }>
       <S.Wrapper>
         <Label
           typography={theme.typography.title.b3}
           color={theme.colors.gray_08}
-          text={content.title}
+          text={contentData.title}
         />
-        {content.description && (
+        {contentData.description && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={content.description}
+            text={contentData.description}
             textAlign="justify"
           />
         )}
 
         <CarouselSection
           carouselData={{
-            data: content?.images ?? [],
+            data: contentData?.images ?? [],
             itemWidth: 140,
             renderItem: ({item}) => (
               <ImageCard
@@ -74,9 +74,9 @@ const ContentDetails = () => {
                 onClick={() => {
                   setImageCarouselVisible(true);
                   setImageCarouselIndex(
-                    typeof content?.images?.indexOf(item) === 'number' &&
-                      content?.images?.indexOf(item) !== -1
-                      ? content.images.indexOf(item)
+                    typeof contentData?.images?.indexOf(item) === 'number' &&
+                      contentData?.images?.indexOf(item) !== -1
+                      ? contentData.images.indexOf(item)
                       : 0,
                   );
                 }}
@@ -85,18 +85,18 @@ const ContentDetails = () => {
           }}
           sectionTitle={''}
         />
-        {content.subtitle && (
+        {contentData.subtitle && (
           <Label
             typography={theme.typography.paragraph.sb3}
             color={theme.colors.gray_08}
-            text={content.subtitle}
+            text={contentData.subtitle}
           />
         )}
-        {content.subcontent && (
+        {contentData.subcontent && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={content.subcontent}
+            text={contentData.subcontent}
             textAlign="justify"
           />
         )}
@@ -105,7 +105,7 @@ const ContentDetails = () => {
           onLikePress={toggleLike}
           isReposted={isReposted}
           onRepostPress={toggleRepost}
-          category={content.category.name}
+          category={contentData.category.name}
         />
         <CommentSection
           comments={comments}
@@ -123,7 +123,7 @@ const ContentDetails = () => {
         />
       </S.Wrapper>
       <ImageCarouselModal
-        images={content.images ?? []}
+        images={contentData.images ?? []}
         isVisible={imageCarouselVisible}
         onClose={() => {
           setImageCarouselVisible(false);

@@ -92,7 +92,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           if (!mounted) return;
 
           try {
-            await authServices.getUserById(parsedUser.id);
             setUser(parsedUser);
             setIsLoggedIn(true);
           } catch (error) {

@@ -1,181 +1,258 @@
 import {BASE_URL} from '@env';
 import apiFactory from '../../../services/apiFactory';
-import {Content, ContentCategory} from '../../../types/content';
-
-const mockContents: Content[] = [
-  {
-    id: '1',
-    title: 'Content 1',
-    description: 'Description for content 1',
-    subtitle: 'Subtitle for content 1',
-    subcontent:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    coverUrl: 'https://picsum.photos/300/300',
-    images: [
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-    ],
-    category: {
-      id: '1',
-      name: 'Fitness',
-      auditable: false,
-    },
-    authorId: '123',
-    commentsCount: 1,
-    comments: [
-      {
-        id: 'c1',
-        contentId: '1',
-        text: 'Great content!',
-        authorId: 'u1',
-        authorName: 'User 1',
-        authorImage: 'https://picsum.photos/300/300',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ],
-  },
-  {
-    id: '2',
-    title: 'Content 2',
-    subtitle: 'Subtitle for content 2',
-    subcontent:
-      'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    description: 'Description for content 2',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    coverUrl: 'https://picsum.photos/300/300',
-    video: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    images: [
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-      'https://picsum.photos/300/300',
-    ],
-    category: {id: '2', name: 'Nutrition', auditable: false},
-    authorId: '456',
-    commentsCount: 1,
-    comments: [
-      {
-        id: 'c1',
-        contentId: '1',
-        text: 'Great content!',
-        authorId: 'u1',
-        authorName: 'User 1',
-        authorImage: 'https://picsum.photos/300/300',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: 'c2',
-        contentId: '1',
-        text: 'Thanks for sharing!',
-        authorId: 'u2',
-        authorName: 'User 2',
-        authorImage: 'https://picsum.photos/300/300',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        repliesCount: 1,
-        replies: [
-          {
-            id: 'c3',
-            contentId: '1',
-            text: 'You are welcome!',
-            authorId: 'u1',
-            authorName: 'User 1',
-            authorImage: 'https://picsum.photos/300/300',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 'c4',
-            contentId: '2',
-            text: 'You are welcome!',
-            authorId: 'u1',
-            authorName: 'User 1',
-            authorImage: 'https://picsum.photos/300/300',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 'c5',
-            contentId: '3',
-            text: 'You are welcome!',
-            authorId: 'u1',
-            authorName: 'User 1',
-            authorImage: 'https://picsum.photos/300/300',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      },
-    ],
-  },
-];
+import apiRoutes from '../../../utils/apiRoutes';
+import {
+  Content,
+  ContentCategory,
+  ContentCategoryDTO,
+  CreateContentRequest,
+  UpdateContentRequest,
+  ToggleDTO,
+  CommentCreatorDTO,
+  ReportContentDTO,
+} from '../../../types/content';
+import {contentCache} from './contentCache';
+import {sanitizeContentData, sanitizeCategoriesData} from '../utils/contentValidation';
 
 const api = apiFactory(BASE_URL);
 
 const contentServices = {
-  getById: async (contentId: string): Promise<Content> => {
-    const response = await api.get(`/contents/${contentId}`);
-    return response.data; 
+  getById: async (contentId: string, userId: string): Promise<Content> => {
+    const cached = contentCache.getContent(contentId);
+    if (cached) {
+      return cached;
+    }
+
+    const headers = {
+      'x-user-id': userId,
+    };
+    const response = await api.get(apiRoutes.content.byId(contentId), {headers});
+    
+    const apiContent = response.data;
+    const sanitizedContent = sanitizeContentData({
+      id: apiContent.id.toString(),
+      title: apiContent.title,
+      description: apiContent.description,
+      subtitle: apiContent.subtitle,
+      subcontent: apiContent.subcontent,
+      createdAt: new Date(apiContent.createdAt),
+      updatedAt: new Date(apiContent.updatedAt),
+      coverUrl: apiContent.cover?.url || '',
+      images: apiContent.media?.map((media: any) => media.url) || [],
+      video: apiContent.media?.find((media: any) => media.contentType.startsWith('video/'))?.url,
+      category: {
+        id: apiContent.categoryId?.toString() || '1',
+        name: apiContent.category || 'Unknown',
+        auditable: false,
+      },
+      isReposted: apiContent.isReposted || false,
+      isLiked: apiContent.isLiked || false,
+      likesCount: apiContent.likesCount || 0,
+      repostsCount: apiContent.repostsCount || 0,
+      authorId: apiContent.authorId?.toString() || userId,
+      repostedFromContentId: apiContent.repostedFromContentId?.toString(),
+      repostedByUserId: apiContent.repostedByUserId?.toString(),
+      commentsCount: apiContent.commentsCount || 0,
+      comments: apiContent.comments || [],
+    });
+    
+    if (!sanitizedContent) {
+      throw new Error('Invalid content data received from API');
+    }
+    
+    contentCache.setContent(contentId, sanitizedContent);
+    return sanitizedContent;
   },
 
-  getAll: async (): Promise<Content[]> => {
-    const response = await api.get('/contents');
-    return mockContents;
+  getAll: async (userId: string, profileMode?: boolean): Promise<Content[]> => {
+    if (!profileMode) {
+      const cached = contentCache.getContents();
+      if (cached) {
+        return cached;
+      }
+    }
+
+    const headers = {
+      'x-user-id': userId,
+      ...(profileMode && {'x-profile': 'true'}),
+    };
+    const response = await api.get(apiRoutes.content.all, {headers});
+    
+    const apiContents = response.data;
+    const mappedContents: Content[] = apiContents.map((apiContent: any) => ({
+      id: apiContent.id.toString(),
+      title: apiContent.title,
+      description: apiContent.description || '',
+      subtitle: apiContent.subtitle,
+      subcontent: apiContent.subcontent,
+      createdAt: new Date(apiContent.createdAt),
+      updatedAt: new Date(apiContent.updatedAt),
+      coverUrl: apiContent.cover?.url || '',
+      images: apiContent.media?.map((media: any) => media.url) || [],
+      video: apiContent.media?.find((media: any) => media.contentType.startsWith('video/'))?.url,
+      category: {
+        id: apiContent.categoryId?.toString() || '1',
+        name: apiContent.category || 'Unknown',
+        auditable: false,
+      },
+      isReposted: apiContent.isReposted || false,
+      isLiked: apiContent.isLiked || false,
+      likesCount: apiContent.likesCount || 0,
+      repostsCount: apiContent.repostsCount || 0,
+      authorId: apiContent.author?.id?.toString() || userId,
+      repostedFromContentId: apiContent.repostedFromContentId?.toString(),
+      repostedByUserId: apiContent.repostedByUserId?.toString(),
+      commentsCount: apiContent.commentsCount || 0,
+      comments: apiContent.comments || [],
+    }));
+    
+    if (!profileMode) {
+      contentCache.setContents(mappedContents);
+    }
+    
+    return mappedContents;
   },
 
   getCategories: async (): Promise<ContentCategory[]> => {
-    const response = await api.get('/contents/categories');
-    return response.data;
-  },
-
-  createContent: async (contentData: {
-    title: string;
-    description: string;
-    images: string[];
-    video?: string;
-    categories: string[];
-  }): Promise<Content> => {
-    const formData = new FormData();
-    
-    formData.append('title', contentData.title);
-    formData.append('description', contentData.description);
-    formData.append('categories', JSON.stringify(contentData.categories));
-
-    contentData.images.forEach((imageUri, index) => {
-      const filename = imageUri.split('/').pop() || `image_${index}.jpg`;
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : 'image/jpeg';
-
-      formData.append('images', {
-        uri: imageUri,
-        name: filename,
-        type: type,
-      } as any);
-    });
-
-    if (contentData.video) {
-      const filename = contentData.video.split('/').pop() || 'video.mp4';
-      formData.append('video', {
-        uri: contentData.video,
-        name: filename,
-        type: 'video/mp4',
-      } as any);
+    const cached = contentCache.getCategories();
+    if (cached) {
+      return cached;
     }
 
-    const response = await api.post('/contents', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.get(apiRoutes.content.categories);
+    const sanitizedCategories = sanitizeCategoriesData(response.data);
+    contentCache.setCategories(sanitizedCategories);
+    return sanitizedCategories;
+  },
 
-    return response.data;
+  createContent: async (contentData: CreateContentRequest, userId: string): Promise<Content> => {
+    const createData = {
+      title: contentData.title,
+      description: contentData.description,
+      subtitle: contentData.subtitle,
+      subcontent: contentData.subcontent,
+      categoryId: parseInt(contentData.categories[0]) || 1,
+      authorId: parseInt(userId),
+      media: contentData.images?.map((imageUri, index) => ({
+        url: imageUri,
+        contentType: 'image/jpeg',
+        contentSize: 0,
+        altText: `Image ${index + 1}`,
+        createdAt: new Date().toISOString(),
+      })) || [],
+    };
+
+    const response = await api.post(apiRoutes.content.create, createData);
+    contentCache.invalidateAll();
+    
+    const apiContent = response.data;
+    const mappedContent: Content = {
+      id: apiContent.id.toString(),
+      title: apiContent.title,
+      description: apiContent.description,
+      subtitle: apiContent.subtitle,
+      subcontent: apiContent.subcontent,
+      createdAt: new Date(apiContent.createdAt),
+      updatedAt: new Date(apiContent.updatedAt),
+      coverUrl: apiContent.cover?.url || '',
+      images: apiContent.media?.map((media: any) => media.url) || [],
+      video: apiContent.media?.find((media: any) => media.contentType.startsWith('video/'))?.url,
+      category: {
+        id: apiContent.categoryId.toString(),
+        name: apiContent.category || 'Unknown',
+        auditable: false,
+      },
+      isReposted: apiContent.isReposted || false,
+      isLiked: apiContent.isLiked || false,
+      likesCount: apiContent.likesCount || 0,
+      repostsCount: apiContent.repostsCount || 0,
+      authorId: apiContent.authorId.toString(),
+      repostedFromContentId: apiContent.repostedFromContentId?.toString(),
+      repostedByUserId: apiContent.repostedByUserId?.toString(),
+      commentsCount: apiContent.commentsCount || 0,
+      comments: apiContent.comments || [],
+    };
+    
+    return mappedContent;
+  },
+
+  updateContent: async (id: string, contentData: UpdateContentRequest, userId: string): Promise<Content> => {
+    const headers = {
+      'x-user-id': userId,
+    };
+    const updateData = {
+      title: contentData.title,
+      description: contentData.description,
+      subtitle: contentData.subtitle,
+      subcontent: contentData.subcontent,
+      categoryId: contentData.categories ? parseInt(contentData.categories[0]) : undefined,
+    };
+
+    const response = await api.put(apiRoutes.content.update(id), updateData, {headers});
+    contentCache.invalidateContent(id);
+    
+    const apiContent = response.data;
+    const mappedContent: Content = {
+      id: apiContent.id.toString(),
+      title: apiContent.title,
+      description: apiContent.description,
+      subtitle: apiContent.subtitle,
+      subcontent: apiContent.subcontent,
+      createdAt: new Date(apiContent.createdAt),
+      updatedAt: new Date(apiContent.updatedAt),
+      coverUrl: apiContent.cover?.url || '',
+      images: apiContent.media?.map((media: any) => media.url) || [],
+      video: apiContent.media?.find((media: any) => media.contentType.startsWith('video/'))?.url,
+      category: {
+        id: apiContent.categoryId.toString(),
+        name: apiContent.category || 'Unknown',
+        auditable: false,
+      },
+      isReposted: apiContent.isReposted || false,
+      isLiked: apiContent.isLiked || false,
+      likesCount: apiContent.likesCount || 0,
+      repostsCount: apiContent.repostsCount || 0,
+      authorId: apiContent.authorId.toString(),
+      repostedFromContentId: apiContent.repostedFromContentId?.toString(),
+      repostedByUserId: apiContent.repostedByUserId?.toString(),
+      commentsCount: apiContent.commentsCount || 0,
+      comments: apiContent.comments || [],
+    };
+    
+    return mappedContent;
+  },
+
+  deleteContent: async (id: string): Promise<void> => {
+    await api.delete(apiRoutes.content.delete(id));
+    contentCache.invalidateContent(id);
+  },
+
+  toggleLike: async (id: string, liked: boolean, userId: string): Promise<void> => {
+    const toggleData: ToggleDTO = {
+      userId: parseInt(userId),
+      control: liked,
+    };
+    await api.patch(apiRoutes.content.like(id), toggleData);
+  },
+
+  toggleRepost: async (id: string, reposted: boolean, userId: string): Promise<void> => {
+    const toggleData: ToggleDTO = {
+      userId: parseInt(userId),
+      control: reposted,
+    };
+    await api.patch(apiRoutes.content.repost(id), toggleData);
+  },
+
+  createComment: async (commentData: CommentCreatorDTO): Promise<void> => {
+    await api.post(apiRoutes.comment.create, commentData);
+  },
+
+  reportContent: async (contentId: string, reason: string, userId: string): Promise<void> => {
+    const reportData: ReportContentDTO = {
+      reporterId: parseInt(userId),
+      reason,
+    };
+    await api.post(apiRoutes.content.report(contentId), reportData);
   },
 };
 

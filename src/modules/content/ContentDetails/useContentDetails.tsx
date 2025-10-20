@@ -1,8 +1,8 @@
 import {useRoute} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {ContentParamList} from '../../../navigation/routes';
 import {RouteProp} from '@react-navigation/native';
-import useContentQueries from '../../content/services/contentQueryFactory';
+import {useContent} from '../../../contexts/ContentContext';
 import {Comment} from '../../../types/content';
 
 function updateCommentById(
@@ -65,82 +65,77 @@ function addReplyUnderRoot(
 const useContentDetails = () => {
   const {params} = useRoute<RouteProp<ContentParamList, 'ContentDetails'>>();
   const {contentId} = params;
-  const {getById} = useContentQueries(['content']);
-  const {data: contentData, isLoading, isError, refetch} = getById(contentId);
 
-  const [isLiked, setIsLiked] = useState(contentData?.isLiked);
-  const [isReposted, setIsReposted] = useState(contentData?.isReposted);
-  const [content, setContent] = useState(contentData);
-  const [comments, setComments] = useState(contentData?.comments || []);
+  const {
+    loadContentById,
+    toggleLikeContent,
+    toggleRepostContent,
+    addComment,
+    isLoading,
+    error,
+    contents,
+  } = useContent();
+
+  const [content, setContent] = useState(
+    () => contents.find(c => c.id === contentId) || null,
+  );
+  const [comments, setComments] = useState(content?.comments || []);
   const [commentText, setCommentText] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
-
   const [imageCarouselVisible, setImageCarouselVisible] = useState(false);
   const [imageCarouselIndex, setImageCarouselIndex] = useState(0);
 
   useEffect(() => {
-    if (contentData) {
-      setContent(contentData);
-      setIsLiked(contentData.isLiked);
-      setIsReposted(contentData.isReposted);
-      setComments(contentData.comments || []);
-    }
-  }, [isLoading, contentData, refetch]);
-
-  const onSendComment = () => {
-    if (commentText.trim() === '') return;
-    const newComment: Comment = {
-      id: Math.random().toString(36).substring(7),
-      contentId: contentId,
-      authorId: 'currentUser',
-      authorName: 'Current User',
-      text: commentText,
-      likesCount: 0,
-      isLikedByCurrentUser: false,
-      repliesCount: 0,
-      replies: [],
-      authorImage: 'https://i.pravatar.cc/150?img=3',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    const fetchContent = async () => {
+      try {
+        const contentData = await loadContentById(contentId);
+        console.log('contentData', contentData);
+        if (contentData) {
+          setContent(contentData);
+          setComments(contentData.comments || []);
+        }
+      } catch (err) {
+        console.error('Error loading content:', err);
+      }
     };
-    setComments(prevComments => [newComment, ...prevComments]);
-    setCommentText('');
-  };
 
-  const toggleLike = () => {
-    setIsLiked(prev => !prev);
-  };
+    if (!content) {
+      fetchContent();
+    }
+  }, [contentId, loadContentById, content]);
 
-  const toggleRepost = () => {
-    setIsReposted(prev => !prev);
-  };
+  useEffect(() => {
+    const updatedContent = contents.find(c => c.id === contentId);
+    if (updatedContent) {
+      setContent(updatedContent);
+      setComments(updatedContent.comments || []);
+    }
+  }, [contents, contentId]);
 
-  const onLikeCommentOrReply = (commentId: string, liked: boolean) => {
-    setComments(prevComments =>
-      updateCommentById(prevComments, commentId, comment => ({
-        ...comment,
-        isLikedByCurrentUser: liked,
-        likesCount: liked
-          ? (comment.likesCount || 0) + 1
-          : Math.max(0, (comment.likesCount || 1) - 1),
-      })),
-    );
-  };
+  const handleToggleLike = useCallback(async () => {
+    if (!content) return;
+    try {
+      await toggleLikeContent(content.id);
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
+  }, [content, toggleLikeContent]);
 
-  const onReplyComment = (commentId: string) => {
-    setReplyTo(commentId);
-    setReplyText('');
-  };
+  const handleToggleRepost = useCallback(async () => {
+    if (!content) return;
+    try {
+      await toggleRepostContent(content.id);
+    } catch (err) {
+      console.error('Error toggling repost:', err);
+    }
+  }, [content, toggleRepostContent]);
 
-  const onChangeCommentText = (text: string) => {
-    setCommentText(text);
-  };
+  const handleSendComment = useCallback(async () => {
+    if (!content || !commentText.trim()) return;
 
-  const handleSend = () => {
     if (replyTo) {
       if (replyText.trim() === '') return;
-
       const rootId = findRootCommentId(comments, replyTo) ?? replyTo;
 
       const newReply: Comment = {
@@ -164,42 +159,62 @@ const useContentDetails = () => {
       return;
     }
 
-    if (commentText.trim() === '') return;
-    const newComment: Comment = {
-      id: Math.random().toString(36).substring(7),
-      contentId: contentId,
-      authorId: 'currentUser',
-      authorName: 'Current User',
-      text: commentText,
-      likesCount: 0,
-      isLikedByCurrentUser: false,
-      repliesCount: 0,
-      replies: [],
-      authorImage: 'https://i.pravatar.cc/150?img=3',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setComments(prev => [newComment, ...prev]);
-    setCommentText('');
-  };
+    try {
+      await addComment(content.id, commentText);
+      setCommentText('');
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    }
+  }, [
+    content,
+    commentText,
+    replyTo,
+    replyText,
+    comments,
+    contentId,
+    addComment,
+  ]);
+
+  const handleLikeCommentOrReply = useCallback(
+    (commentId: string, liked: boolean) => {
+      setComments(prevComments =>
+        updateCommentById(prevComments, commentId, comment => ({
+          ...comment,
+          isLikedByCurrentUser: liked,
+          likesCount: liked
+            ? (comment.likesCount || 0) + 1
+            : Math.max(0, (comment.likesCount || 1) - 1),
+        })),
+      );
+    },
+    [],
+  );
+
+  const handleReplyComment = useCallback((commentId: string) => {
+    setReplyTo(commentId);
+    setReplyText('');
+  }, []);
+
+  const handleChangeCommentText = useCallback((text: string) => {
+    setCommentText(text);
+  }, []);
 
   return {
-    isLiked,
-    toggleLike,
-    isReposted,
-    toggleRepost,
+    isLiked: content?.isLiked || false,
+    toggleLike: handleToggleLike,
+    isReposted: content?.isReposted || false,
+    toggleRepost: handleToggleRepost,
     isLoading,
-    contentData,
-    isError,
-    refetch,
+    contentData: content,
+    isError: !!error,
+    error,
     comments,
     commentText,
-    onChangeCommentText,
-    onSendComment,
-    content,
-    onReplyComment,
-    onLikeCommentOrReply,
-    handleSend,
+    onChangeCommentText: handleChangeCommentText,
+    onSendComment: handleSendComment,
+    onReplyComment: handleReplyComment,
+    onLikeCommentOrReply: handleLikeCommentOrReply,
+    handleSend: handleSendComment,
     replyTo,
     replyText,
     setReplyText,
