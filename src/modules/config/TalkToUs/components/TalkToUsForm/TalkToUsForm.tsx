@@ -6,12 +6,31 @@ import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
 import theme from '../../../../../theme/theme';
 import Button from '../../../../../components/Button/Button';
+import Loader from '../../../../../components/Loader/Loader';
 
 const TalkToUsForm: React.FC = () => {
-  const {control, handleSubmit, errors, onSubmit, register} = useTalkToUsForm();
+  const {
+    control,
+    handleSubmit,
+    errors,
+    onSubmit,
+    register,
+    isLoading,
+    isSuccess,
+  } = useTalkToUsForm();
 
   return (
     <S.FormContainer>
+      {isSuccess && (
+        <S.SuccessMessage>
+          <Label
+            text="Mensagem enviada com sucesso! Entraremos em contato em breve."
+            typography={theme.typography.paragraph.r3}
+            color={theme.colors.success}
+          />
+        </S.SuccessMessage>
+      )}
+
       <S.FieldGroup>
         <Label
           text="E-mail"
@@ -31,6 +50,7 @@ const TalkToUsForm: React.FC = () => {
               error={errors.email?.message}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!isLoading}
             />
           )}
         />
@@ -52,6 +72,7 @@ const TalkToUsForm: React.FC = () => {
               placeholder="Digite o assunto da mensagem"
               required
               error={errors.subject?.message}
+              editable={!isLoading}
             />
           )}
         />
@@ -75,6 +96,7 @@ const TalkToUsForm: React.FC = () => {
               multiline
               numberOfLines={4}
               error={errors.message?.message}
+              editable={!isLoading}
             />
           )}
         />
@@ -82,9 +104,11 @@ const TalkToUsForm: React.FC = () => {
       <S.ButtonContainer>
         <Button
           type="PRIMARY"
-          text="Enviar Mensagem"
+          text={isLoading ? 'Enviando...' : 'Enviar Mensagem'}
           onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
         />
+        {isLoading && <Loader />}
       </S.ButtonContainer>
     </S.FormContainer>
   );

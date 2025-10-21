@@ -9,10 +9,25 @@ import 'moment/locale/pt-br';
 import {AuthProvider} from './src/contexts/AuthContext';
 import {DiaryProvider} from './src/contexts/DiaryContext';
 import {ContentProvider} from './src/contexts/ContentContext';
+import {
+  AccessibilityProvider,
+} from './src/contexts/AccessibilityContext';
+
 if (__DEV__) {
   require('./ReactotronConfig');
 }
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+
+
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Navigator />
+    </ThemeProvider>
+  );
+};
 
 function App(): React.ReactElement {
   moment.locale('pt-br');
@@ -21,13 +36,13 @@ function App(): React.ReactElement {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ContentProvider>
-            <DiaryProvider>
-              <ThemeProvider theme={theme}>
-                <Navigator />
-              </ThemeProvider>
-            </DiaryProvider>
-          </ContentProvider>
+          <AccessibilityProvider>
+            <ContentProvider>
+              <DiaryProvider>
+                <AppContent />
+              </DiaryProvider>
+            </ContentProvider>
+          </AccessibilityProvider>
         </AuthProvider>
       </QueryClientProvider>
     </NavigationContainer>

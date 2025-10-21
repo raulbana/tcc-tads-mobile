@@ -1,48 +1,80 @@
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {SettingItemProps} from './components/SettingsList/components/SettingItem';
-import {useState, useCallback} from 'react';
-
-const settingsListMock: SettingItemProps[] = [
-  {
-    isLastItem: false,
-    isToggled: false,
-    label: 'Alto Contraste',
-    onToggle: () => {},
-  },
-  {
-    isLastItem: true,
-    isToggled: false,
-    label: 'Texto Aumentado',
-    onToggle: () => {},
-  },
-];
+import {useState, useCallback, useEffect} from 'react';
+import {useAccessibility} from '../../../contexts/AccessibilityContext';
+import {useAuth} from '../../../contexts/AuthContext';
+import {AccessibilityPreferences} from '../../../types/config';
 
 const useAccessibilitySettings = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
-  const [settingsList, setSettingsList] =
-    useState<SettingItemProps[]>(settingsListMock);
+  const {
+    highContrast,
+    bigFont,
+    saveAccessibilityPreferences,
+    isLoading,
+    error,
+  } = useAccessibility();
+  const {user, isLoggedIn} = useAuth();
+  const [localHighContrast, setLocalHighContrast] = useState(highContrast);
+  const [localBigFont, setLocalBigFont] = useState(bigFont);
+
+  // Update local state when context state changes
+  useEffect(() => {
+    setLocalHighContrast(highContrast);
+    setLocalBigFont(bigFont);
+  }, [highContrast, bigFont]);
 
   const navigateToMyAccount = () => {
     navigate('MainTabs', {screen: 'MyAccount'});
   };
 
+  const handleSave = useCallback(async () => {
+    try {
+      const preferences: AccessibilityPreferences = {
+        isHighContrast: localHighContrast,
+        isBigFont: localBigFont,
+      };
+
+      await saveAccessibilityPreferences(preferences);
+
+      // Navigate back to MyAccount after successful save
+      navigateToMyAccount();
+    } catch (error) {
+      console.error('Error saving accessibility preferences:', error);
+      // Error handling is done in the context
+    }
+  }, [localHighContrast, localBigFont, saveAccessibilityPreferences]);
+
   const handleToggle = useCallback((index: number, value: boolean) => {
-    setSettingsList(prev =>
-      prev.map((item, idx) =>
-        idx === index ? {...item, isToggled: value} : item,
-      ),
-    );
+    if (index === 0) {
+      setLocalHighContrast(value);
+    } else if (index === 1) {
+      setLocalBigFont(value);
+    }
   }, []);
 
-  const itemsWithToggle = settingsList.map((item, idx) => ({
-    ...item,
-    onToggle: (value: boolean) => handleToggle(idx, value),
-  }));
+  const settingsList: SettingItemProps[] = [
+    {
+      isLastItem: false,
+      isToggled: localHighContrast,
+      label: 'Alto Contraste',
+      onToggle: (value: boolean) => handleToggle(0, value),
+    },
+    {
+      isLastItem: true,
+      isToggled: localBigFont,
+      label: 'Texto Aumentado',
+      onToggle: (value: boolean) => handleToggle(1, value),
+    },
+  ];
 
   return {
     navigateToMyAccount,
-    settingsList: itemsWithToggle,
+    settingsList,
+    handleSave,
+    isLoading,
+    error,
   };
 };
 

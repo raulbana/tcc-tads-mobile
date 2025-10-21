@@ -3,9 +3,11 @@ import theme from '../../../theme/theme';
 import {moderateScale} from '../../../utils/scales';
 import {OptionItem} from './components/OptionsList/OptionsList';
 import {NavigationStackProp} from '../../../navigation/routes';
+import {useAuth} from '../../../contexts/AuthContext';
 
 const useMyAccount = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
+  const {user, isLoggedIn, logout} = useAuth();
 
   const navigateToAccessibilitySettings = () => {
     navigate('Config', {screen: 'AccessibilitySettings'});
@@ -13,6 +15,30 @@ const useMyAccount = () => {
 
   const navigateToTalkToUs = () => {
     navigate('Config', {screen: 'TalkToUs'});
+  };
+
+  const navigateToRegister = () => {
+    navigate('Auth', {screen: 'Register'});
+  };
+
+  const navigateToEditProfile = () => {
+    navigate('Config', {screen: 'EditProfile'});
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const handleNotifications = () => {
+    navigate('Config', {screen: 'Notifications'});
+  };
+
+  const handleAboutApp = () => {
+    navigate('Config', {screen: 'AboutApp'});
   };
 
   const options: OptionItem[] = [
@@ -32,7 +58,7 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
-      onPress: () => {},
+      onPress: handleNotifications,
     },
     {
       label: 'Sobre o Aplicativo',
@@ -41,17 +67,22 @@ const useMyAccount = () => {
         size: moderateScale(24),
         color: theme.colors.gray_07,
       },
-      onPress: () => {},
+      onPress: handleAboutApp,
     },
-    {
-      label: 'Sair',
-      icon: {
-        name: 'SignOut',
-        size: moderateScale(24),
-        color: theme.colors.gray_07,
-      },
-      onPress: () => {},
-    },
+    // Only show logout option if user is logged in
+    ...(isLoggedIn
+      ? [
+          {
+            label: 'Sair',
+            icon: {
+              name: 'SignOut',
+              size: moderateScale(24),
+              color: theme.colors.gray_07,
+            },
+            onPress: handleLogout,
+          },
+        ]
+      : []),
   ];
 
   const advantages: string[] = [
@@ -62,7 +93,15 @@ const useMyAccount = () => {
     'Relatórios detalhados',
   ];
 
-  return {options, advantages, navigateToTalkToUs};
+  return {
+    options,
+    advantages,
+    navigateToTalkToUs,
+    navigateToRegister,
+    navigateToEditProfile,
+    user,
+    isLoggedIn,
+  };
 };
 
 export default useMyAccount;

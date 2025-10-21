@@ -1,6 +1,7 @@
 import React from 'react';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import CreateAccountCard from './components/CreateAccountCard/CreateAccountCard';
+import ProfileCard from './components/ProfileCard/ProfileCard';
 import * as S from './styles';
 import Label from '../../../components/Label/Label';
 import theme from '../../../theme/theme';
@@ -9,7 +10,15 @@ import useMyAccount from './useMyAccount';
 import ContactUsCard from './components/ContactUsCard/ContactUsCard';
 
 const MyAccount = () => {
-  const {options, advantages, navigateToTalkToUs} = useMyAccount();
+  const {
+    options,
+    advantages,
+    navigateToTalkToUs,
+    navigateToRegister,
+    navigateToEditProfile,
+    user,
+    isLoggedIn,
+  } = useMyAccount();
 
   return (
     <ScreenContainer scrollable>
@@ -19,7 +28,14 @@ const MyAccount = () => {
           color={theme.colors.gray_08}
           text="Minha Conta"
         />
-        <CreateAccountCard advantages={advantages} onCreateAccount={() => {}} />
+        {isLoggedIn && user ? (
+          <ProfileCard user={user} onEditProfile={navigateToEditProfile} />
+        ) : (
+          <CreateAccountCard
+            advantages={advantages}
+            onCreateAccount={navigateToRegister}
+          />
+        )}
         <OptionsList options={options} />
         <ContactUsCard onPress={navigateToTalkToUs} />
       </S.Wrapper>

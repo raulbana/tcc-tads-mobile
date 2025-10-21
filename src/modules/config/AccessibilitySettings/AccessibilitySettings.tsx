@@ -8,7 +8,8 @@ import theme from '../../../theme/theme';
 import Button from '../../../components/Button/Button';
 
 const AccessibilitySettings = () => {
-  const {navigateToMyAccount, settingsList} = useAccessibilitySettings();
+  const {navigateToMyAccount, settingsList, handleSave, isLoading} =
+    useAccessibilitySettings();
 
   return (
     <ScreenContainer
@@ -23,7 +24,11 @@ const AccessibilitySettings = () => {
         />
         <SettingsList items={settingsList} />
         <S.ButtonContainer>
-          <Button text="Salvar" onPress={() => {}} />
+          <Button
+            text={isLoading ? 'Salvando...' : 'Salvar'}
+            onPress={handleSave}
+            disabled={isLoading}
+          />
         </S.ButtonContainer>
       </S.Wrapper>
     </ScreenContainer>
