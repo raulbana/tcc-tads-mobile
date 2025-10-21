@@ -1,11 +1,11 @@
 import {ButtonSize, ButtonType} from './Button';
 import {TextProps as TypographyProps} from '../../theme';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 const useButton = () => {
-  
+  const theme = useDynamicTheme();
+
   const getTextColor = (type: ButtonType) => {
-    const theme = useDynamicTheme();
     switch (type) {
       case 'PRIMARY':
         return theme.colors.gray_01;
@@ -19,7 +19,6 @@ const useButton = () => {
   };
 
   const getButtonTextSize = (size: ButtonSize): TypographyProps => {
-    const theme = useDynamicTheme();
     switch (size) {
       case 'SMALL':
         return theme.typography.paragraph.sb2;
@@ -32,7 +31,17 @@ const useButton = () => {
     }
   };
 
-  return {getTextColor, getButtonTextSize};
+  const getBackgroundColor = (type?: ButtonType) => {
+    if (type === 'PRIMARY') {
+      return theme.colors.purple_04;
+    } else if (type === 'SECONDARY') {
+      return theme.colors.purple_02;
+    } else {
+      return theme.colors.white;
+    }
+  };
+
+  return {getTextColor, getButtonTextSize, getBackgroundColor};
 };
 
 export default useButton;

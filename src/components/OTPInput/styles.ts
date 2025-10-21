@@ -27,12 +27,12 @@ export const Input = styled(TextInput)<{
   height: ${verticalScale(36)}px;
   border-radius: ${moderateScale(10)}px;
   border: 2px solid ${({theme}) => theme.colors.gray_04};
-  border-color: ${({$isFocused, $hasError}) =>
+  border-color: ${({$isFocused, $hasError, theme}) =>
     $hasError
-      ? ({theme}) => theme.colors.error
+      ? theme.colors.error
       : $isFocused
-      ? ({theme}) => theme.colors.purple_03
-      : ({theme}) => theme.colors.gray_04};
+      ? theme.colors.purple_03
+      : theme.colors.gray_04};
   text-align: center;
   justify-content: center;
   align-items: center;

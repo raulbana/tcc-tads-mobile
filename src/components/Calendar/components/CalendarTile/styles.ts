@@ -1,25 +1,10 @@
-import styled from "styled-components/native";
-import { horizontalScale, moderateScale, verticalScale } from "../../../../utils/scales";
-import { CalendarTileProps } from "./CalendarTile";
-import { LeakageLevel } from "../../../../types/diary";
-import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
-
-
-const getBadgeColor = (level?: LeakageLevel) => {
-  const theme = useDynamicTheme();
-  switch (level) {
-    case 'NONE':
-      return theme.colors.gray_05;
-    case 'LOW':
-      return theme.colors.pastel_green;
-    case 'MEDIUM':
-      return theme.colors.pastel_yellow;
-    case 'HIGH':
-      return theme.colors.pastel_red;
-    default:
-      return theme.colors.gray_05;
-  }
-};
+import styled from 'styled-components/native';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../../../../utils/scales';
+import {CalendarTileProps} from './CalendarTile';
 
 export const Wrapper = styled.TouchableOpacity<CalendarTileProps>`
   padding-horizontal: ${horizontalScale(8)}px;
@@ -33,10 +18,13 @@ export const Wrapper = styled.TouchableOpacity<CalendarTileProps>`
   ${({width}) => (width ? `width: ${Math.max(0, Math.floor(width))}px;` : '')}
 `;
 
-export const Badge = styled.View<CalendarTileProps>`
+interface BadgeProps extends CalendarTileProps {
+  badgeColor: string;
+}
+
+export const Badge = styled.View<BadgeProps>`
   width: 100%;
   height: ${horizontalScale(4)}px;
   border-radius: ${horizontalScale(4)}px;
-  background-color: ${({dayItem, theme}) =>
-    dayItem.isToday ? theme.colors.default_green : getBadgeColor(dayItem.leakageLevel as LeakageLevel)};
+  background-color: ${({badgeColor}) => badgeColor};
 `;

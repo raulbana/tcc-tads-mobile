@@ -15,7 +15,7 @@ import {
 } from '../../../types/auth';
 import apiRoutes from '../../../utils/apiRoutes';
 
-const apiInstance = apiFactory('http://192.168.15.12:8080/v1');
+const apiInstance = apiFactory(BASE_URL);
 
 const authServices = {
   login: async (data: loginRequest): Promise<loginResponse> => {
@@ -25,7 +25,7 @@ const authServices = {
     );
     return response.data;
   },
-  
+
   register: async (data: registerRequest): Promise<registerResponse> => {
     const response = await apiInstance.post(
       apiRoutes.authentication.register,
@@ -34,7 +34,9 @@ const authServices = {
     return response.data;
   },
 
-  forgotPasswordRequest: async (data: forgotPasswordRequestRequest): Promise<forgotPasswordRequestResponse> => {
+  forgotPasswordRequest: async (
+    data: forgotPasswordRequestRequest,
+  ): Promise<forgotPasswordRequestResponse> => {
     const response = await apiInstance.post(
       apiRoutes.authentication.forgotPasswordRequest,
       {},
@@ -47,7 +49,9 @@ const authServices = {
     return response.data;
   },
 
-  forgotPasswordReset: async (data: forgotPasswordValidateRequest): Promise<forgotPasswordValidateResponse> => {
+  forgotPasswordReset: async (
+    data: forgotPasswordValidateRequest,
+  ): Promise<forgotPasswordValidateResponse> => {
     const response = await apiInstance.post(
       apiRoutes.authentication.forgotPasswordReset,
       data,

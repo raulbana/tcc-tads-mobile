@@ -6,19 +6,6 @@ import {
   horizontalScale,
   moderateScale,
 } from '../../utils/scales';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
-
-
-const getBackgroundColor = (type?: ButtonType) => {
-  const theme = useDynamicTheme();
-  if (type === 'PRIMARY') {
-    return theme.colors.purple_04;
-  } else if (type === 'SECONDARY') {
-    return theme.colors.purple_02;
-  } else {
-    return theme.colors.white;
-  }
-};
 
 const getPadding = (size?: ButtonSize) => {
   if (size === 'SMALL') {
@@ -30,8 +17,12 @@ const getPadding = (size?: ButtonSize) => {
   }
 };
 
-export const ButtonContainer = styled.TouchableOpacity<ButtonProps>`
-  background-color: ${({type}) => getBackgroundColor(type)};
+interface ButtonContainerProps extends ButtonProps {
+  backgroundColor: string;
+}
+
+export const ButtonContainer = styled.TouchableOpacity<ButtonContainerProps>`
+  background-color: ${({backgroundColor}) => backgroundColor};
   padding: ${({size}) => getPadding(size)};
   border-radius: ${moderateScale(12)}px;
   flex-direction: row;

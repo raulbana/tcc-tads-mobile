@@ -34,8 +34,8 @@ export const SendButton = styled.TouchableOpacity<{
   disabled?: boolean;
 }>`
   flex: 1;
-  background-color: ${({disabled}) =>
-    disabled ? ({theme}) => theme.colors.gray_04 : ({theme}) => theme.colors.purple_04};
+  background-color: ${({disabled, theme}) =>
+    disabled ? theme.colors.gray_04 : theme.colors.purple_04};
   border-radius: ${moderateScale(8)}px;
   padding: ${verticalScale(6)}px ${horizontalScale(16)}px;
   align-items: center;

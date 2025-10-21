@@ -1,12 +1,11 @@
 import {useEffect, useRef} from 'react';
 import {Animated} from 'react-native';
 import {ToastType} from './Toast';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 const useToast = (isOpen: boolean, duration: number, onClose?: () => void) => {
-
   const theme = useDynamicTheme();
-  
+
   const getTextColor = (type: ToastType) => {
     switch (type) {
       case 'SUCCESS':
@@ -19,6 +18,36 @@ const useToast = (isOpen: boolean, duration: number, onClose?: () => void) => {
         return theme.colors.gray_08;
       default:
         return theme.colors.gray_08;
+    }
+  };
+
+  const getBackgroundColor = (type: ToastType) => {
+    switch (type) {
+      case 'SUCCESS':
+        return theme.colors.success_02;
+      case 'ERROR':
+        return theme.colors.error_02;
+      case 'INFO':
+        return theme.colors.purple_02;
+      case 'WARNING':
+        return theme.colors.warning_02;
+      default:
+        return theme.colors.gray_02;
+    }
+  };
+
+  const getBorderColor = (type: ToastType) => {
+    switch (type) {
+      case 'SUCCESS':
+        return theme.colors.success;
+      case 'ERROR':
+        return theme.colors.error;
+      case 'INFO':
+        return theme.colors.info;
+      case 'WARNING':
+        return theme.colors.warning;
+      default:
+        return theme.colors.gray_05;
     }
   };
 
@@ -60,7 +89,7 @@ const useToast = (isOpen: boolean, duration: number, onClose?: () => void) => {
     };
   }, [isOpen, duration, onClose, opacity]);
 
-  return {opacity, getTextColor};
+  return {opacity, getTextColor, getBackgroundColor, getBorderColor};
 };
 
 export default useToast;

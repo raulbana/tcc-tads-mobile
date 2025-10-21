@@ -7,7 +7,7 @@ import {
 } from '../../../types/config';
 import apiRoutes from '../../../utils/apiRoutes';
 
-const apiInstance = apiFactory('http://192.168.15.12:8080/v1');
+const apiInstance = apiFactory(BASE_URL);
 
 const configServices = {
   sendContactEmail: async (data: ContactRequest): Promise<ContactResponse> => {
@@ -18,7 +18,9 @@ const configServices = {
     return response.data;
   },
 
-  getAccessibilityPreferences: async (userId: number): Promise<AccessibilityPreferences> => {
+  getAccessibilityPreferences: async (
+    userId: number,
+  ): Promise<AccessibilityPreferences> => {
     const response = await apiInstance.get(
       apiRoutes.config.preferences.accessibility,
       {

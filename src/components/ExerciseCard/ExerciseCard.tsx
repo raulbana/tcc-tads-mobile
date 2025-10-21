@@ -1,4 +1,4 @@
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 import {Exercise} from '../../types/exercise';
 import Button from '../Button/Button';
 import ExerciseLabel from '../ExerciseLabel/ExerciseLabel';
@@ -18,18 +18,22 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onPressPrimaryAction,
   onPressSecondaryAction,
 }) => {
-
   const theme = useDynamicTheme();
-  
+
   return (
     <S.Container>
       <S.HeaderRow>
-        <Label
-          typography={theme.typography.paragraph.sb5}
-          text={exercise.title}
-          color={theme.colors.gray_08}
-        />
-        <ExerciseLabel type={exercise.status} />
+        <S.TitleContainer>
+          <Label
+            typography={theme.typography.paragraph.sb5}
+            text={exercise.title}
+            color={theme.colors.gray_08}
+            numberOfLines={2}
+          />
+        </S.TitleContainer>
+        <S.LabelContainer>
+          <ExerciseLabel type={exercise.status} />
+        </S.LabelContainer>
       </S.HeaderRow>
       <S.DataRow>
         <S.DataRowItem>

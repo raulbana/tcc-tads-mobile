@@ -13,8 +13,7 @@ export const Overlay = styled.View`
   z-index: 9999;
 `;
 
-export const Spinner = styled.ActivityIndicator.attrs(() => ({
+export const Spinner = styled.ActivityIndicator.attrs(({theme}) => ({
   size: 'large',
-}))`
-  color: ${({theme}) => theme.colors.purple_04};
-`;
+  color: theme.colors.purple_04,
+}))``;

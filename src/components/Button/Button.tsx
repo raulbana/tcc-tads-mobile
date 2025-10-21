@@ -27,7 +27,7 @@ const Button: React.FC<ButtonProps> = ({
   icon,
   iconPosition,
 }) => {
-  const {getTextColor, getButtonTextSize} = useButton();
+  const {getTextColor, getButtonTextSize, getBackgroundColor} = useButton();
 
   const isDisabled = disabled || loading;
 
@@ -35,6 +35,7 @@ const Button: React.FC<ButtonProps> = ({
     <S.ButtonContainer
       type={type}
       size={size}
+      backgroundColor={getBackgroundColor(type)}
       onPress={onPress}
       disabled={isDisabled}>
       {loading && iconPosition !== 'LEFT' && (
