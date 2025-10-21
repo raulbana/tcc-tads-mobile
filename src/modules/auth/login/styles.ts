@@ -1,11 +1,10 @@
 import styled from 'styled-components/native';
-import theme from '../../../theme/theme';
 import { moderateScale, verticalScale, horizontalScale } from '../../../utils/scales';
 
 export const Outer = styled.View`
   flex: 1;
   justify-content: center;
-  background-color: ${theme.colors.white};
+  background-color: ${({theme}) => theme.colors.white};
   padding: ${moderateScale(24)}px;
   gap: ${verticalScale(16)}px;
 `;

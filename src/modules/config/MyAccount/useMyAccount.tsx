@@ -1,13 +1,15 @@
 import {useNavigation} from '@react-navigation/native';
-import theme from '../../../theme/theme';
 import {moderateScale} from '../../../utils/scales';
 import {OptionItem} from './components/OptionsList/OptionsList';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const useMyAccount = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
   const {user, isLoggedIn, logout} = useAuth();
+
+  const theme = useDynamicTheme();
 
   const navigateToAccessibilitySettings = () => {
     navigate('Config', {screen: 'AccessibilitySettings'});
@@ -69,13 +71,12 @@ const useMyAccount = () => {
       },
       onPress: handleAboutApp,
     },
-    // Only show logout option if user is logged in
     ...(isLoggedIn
       ? [
           {
             label: 'Sair',
             icon: {
-              name: 'SignOut',
+              name: 'SignOut' as const,
               size: moderateScale(24),
               color: theme.colors.gray_07,
             },

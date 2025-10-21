@@ -3,16 +3,17 @@ import * as S from './styles';
 import Calendar from './components/Calendar/Calendar';
 import ScreenContainer from '../../components/ScreenContainer/ScreenContainer';
 import Label from '../../components/Label/Label';
-import theme from '../../theme/theme';
 import ReportCard from './components/ReportCard/ReportCard';
 import {useDiary} from '../../contexts/DiaryContext';
 import {useAuth} from '../../contexts/AuthContext';
 import Loader from '../../components/Loader/Loader';
 import Toast from '../../components/Toast/Toast';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 const Diary = () => {
   const {user, isLoggedIn} = useAuth();
   const {isLoading, error, clearError, loadCalendarEvents} = useDiary();
+  const theme = useDynamicTheme();
 
   useEffect(() => {
     if (isLoggedIn && user) {

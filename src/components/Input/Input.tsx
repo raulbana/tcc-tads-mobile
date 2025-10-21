@@ -2,8 +2,8 @@ import React from 'react';
 import {TextInputProps} from 'react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import {ZodType} from 'zod';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type InputType = 'text' | 'date' | 'time';
 
@@ -40,6 +40,8 @@ const Input: React.FC<InputProps> = ({
     }
   }, [value, validationSchema, onValidate]);
 
+  const theme = useDynamicTheme();
+  
   return (
     <S.Wrapper>
       {label && (

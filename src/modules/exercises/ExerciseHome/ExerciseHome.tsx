@@ -4,9 +4,9 @@ import * as S from './styles';
 import useExerciseHome from './useExerciseHome';
 import WorkoutCard from '../../../components/WorkoutCard/WorkoutCard';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import { Exercise } from '../../../types/exercise';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const ExerciseHome = () => {
   const {workouts, handleWorkoutPress} = useExerciseHome();
@@ -22,6 +22,8 @@ const ExerciseHome = () => {
       onPress={() => handleWorkoutPress(item.id)}
     />
   );
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer scrollable>

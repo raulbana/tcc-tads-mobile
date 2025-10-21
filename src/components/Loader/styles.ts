@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import theme from '../../theme/theme';
 
 export const Overlay = styled.View`
   position: absolute;
@@ -16,6 +15,6 @@ export const Overlay = styled.View`
 
 export const Spinner = styled.ActivityIndicator.attrs(() => ({
   size: 'large',
-  color: theme.colors.purple_04,
 }))`
+  color: ${({theme}) => theme.colors.purple_04};
 `;

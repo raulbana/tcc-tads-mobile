@@ -2,7 +2,7 @@ import React from 'react';
 import {CalendarDayDTO} from '../../../../types/diary';
 import * as S from './styles';
 import Label from '../../../Label/Label';
-import theme from '../../../../theme/theme';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 export interface CalendarTileProps {
   dayItem: CalendarDayDTO;
@@ -13,6 +13,7 @@ export interface CalendarTileProps {
 }
 
 const CalendarTile: React.FC<CalendarTileProps> = props => {
+  const theme = useDynamicTheme();
   const {dayItem, isSelected, isDisabled} = props;
   const {dayTitle, dayNumber, isToday} = dayItem;
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from '../../styles';
 import Label from '../../../../../../../components/Label/Label';
-import theme from '../../../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../../../hooks/useDynamicTheme';
 
 interface EvaluationProgressProps {
   currentStep: number;
@@ -12,6 +12,9 @@ const EvaluationProgress: React.FC<EvaluationProgressProps> = ({
   currentStep,
   totalSteps,
 }) => {
+  
+  const theme = useDynamicTheme();
+
   return (
     <S.ProgressContainer>
       <Label

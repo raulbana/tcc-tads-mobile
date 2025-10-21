@@ -1,14 +1,16 @@
 import Label from '../../../components/Label/Label';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
-import theme from '../../../theme/theme';
 import ForgotPasswordRequestForm from './components/ForgotPasswordRequestForm/ForgotPasswordRequestForm';
 import ForgotPasswordVerifyForm from './components/ForgotPasswordVerifyForm/ForgotPasswordVerifyForm';
 import useForgotPassword from './useForgotPassword';
 import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
 import * as S from './styles';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 const ForgotPassword: React.FC = () => {
   const {step, onRequestSuccess, onVerifySuccess, goBack, setStep} =
     useForgotPassword();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer currentPage="Esqueceu sua senha?" goBack={goBack}>

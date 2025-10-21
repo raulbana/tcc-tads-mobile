@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
-import OptionBox, {OptionBoxProps} from './components/OptionBox/OptionBox';
+import OptionBox from './components/OptionBox/OptionBox';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface RadioBoxOption {
   label: string;
@@ -61,6 +61,8 @@ const RadioBoxInput: React.FC<RadioBoxInputProps> = ({
       }
     }
   };
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Wrapper>

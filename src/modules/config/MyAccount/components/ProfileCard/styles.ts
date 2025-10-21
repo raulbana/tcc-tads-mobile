@@ -1,12 +1,12 @@
 import styled from 'styled-components/native';
-import theme from '../../../../../theme/theme';
+import { verticalScale } from '../../../../../utils/scales';
 
 export const Container = styled.View`
-  background-color: ${theme.colors.gray_02};
+  background-color: ${({theme}) => theme.colors.gray_02};
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
-  border: 1px solid ${theme.colors.gray_04};
+  border: 1px solid ${({theme}) => theme.colors.gray_04};
 `;
 
 export const Section = styled.View`
@@ -15,7 +15,7 @@ export const Section = styled.View`
 
 export const Divider = styled.View`
   height: 1px;
-  background-color: ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_04};
   margin: 8px 0;
 `;
 
@@ -23,7 +23,7 @@ export const AvatarCircle = styled.View`
   width: 60px;
   height: 60px;
   border-radius: 30px;
-  background-color: ${theme.colors.gray_03};
+  background-color: ${({theme}) => theme.colors.gray_03};
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -35,7 +35,7 @@ export const profileImageStyle = {
   borderRadius: 30,
 };
 
-export const editButtonStyle = {
-  padding: 8,
-  alignSelf: 'flex-start',
-};
+export const EditButtonStyle = styled.TouchableOpacity`
+  padding: ${verticalScale(8)}px;
+  align-self: flex-start;
+`;

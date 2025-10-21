@@ -4,7 +4,6 @@ import {
   moderateScale,
   verticalScale,
 } from '../../../../../utils/scales';
-import theme from '../../../../../theme/theme';
 import LinearGradient from 'react-native-linear-gradient';
 
 export const Wrapper = styled.View`
@@ -14,7 +13,7 @@ export const Wrapper = styled.View`
 `;
 
 export const Container = styled.TouchableOpacity<{hasError?: boolean}>`
-  border: 1px dashed ${({hasError}) => (hasError ? theme.colors.error : '#cbd5e1')};
+  border: 1px dashed ${({hasError, theme}) => (hasError ? theme.colors.error : '#cbd5e1')};
   border-radius: ${moderateScale(12)}px;
   padding: ${verticalScale(20)}px;
   align-items: center;
@@ -58,8 +57,8 @@ export const CardContainer = styled.View`
   gap: ${horizontalScale(12)}px;
   padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
   border-radius: ${moderateScale(12)}px;
-  background-color: ${theme.colors.gray_02};
-  border: 1px solid ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_02};
+  border: 1px solid ${({theme}) => theme.colors.gray_04};
   overflow: visible;
 `;
 
@@ -69,7 +68,7 @@ export const IconWrapper = styled.View`
   border-radius: ${moderateScale(12)}px;
   align-items: center;
   justify-content: center;
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
 `;
 
 export const InfoWrapper = styled.View`
@@ -119,7 +118,7 @@ export const ThumbnailContainer = styled.View`
 `;
 
 export const HintContainer = styled.View`
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
   border-radius: ${moderateScale(8)}px;
   padding: ${verticalScale(12)}px ${horizontalScale(12)}px;
   flex-direction: row;

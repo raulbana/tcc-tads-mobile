@@ -2,14 +2,17 @@ import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import Icon from '../Icon/Icon';
-import theme from '../../theme/theme';
 import {ExerciseBenefit} from '../../types/exercise';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface BenefitsCardProps {
   benefits: ExerciseBenefit[];
 }
 
 const BenefitsCard: React.FC<BenefitsCardProps> = ({benefits}) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.TitleContainer>

@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import {CaretLeft, CaretRight} from 'phosphor-react-native';
 import CalendarTile from '../../../../components/Calendar/components/CalendarTile/CalendarTile';
 import Label from '../../../../components/Label/Label';
-import theme from '../../../../theme/theme';
 import {useCalendar} from './useCalendar';
 import {useDiary} from '../../../../contexts/DiaryContext';
 import * as S from './styles';
@@ -12,6 +11,7 @@ import DayDataModal from '../DayDataModal/DayDataModal';
 import BottomModal from '../../../../components/BottomModal/BottomModal';
 import Button from '../../../../components/Button/Button';
 import moment from 'moment';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 const Calendar: React.FC = () => {
   const {
@@ -38,6 +38,8 @@ const Calendar: React.FC = () => {
   } = useCalendar();
 
   const {addUrinationData, editUrinationData, deleteUrinationData} = useDiary();
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

@@ -1,10 +1,10 @@
 import React from 'react';
 import * as S from './styles';
-import theme from '../../../../../theme/theme';
 import {CheckCircle} from 'phosphor-react-native';
 import Button from '../../../../../components/Button/Button';
 import Label from '../../../../../components/Label/Label';
 import typography from '../../../../../theme/typography';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface RecommendationCardProps {
   onButtonClick: () => void;
@@ -19,6 +19,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   description,
   buttonLabel,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.InfoContainer>

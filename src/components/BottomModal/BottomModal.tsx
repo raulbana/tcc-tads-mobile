@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import {X} from 'phosphor-react-native';
 import {moderateScale} from '../../utils/scales';
 import useBottomModal from './useBottomModal';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export type BottomModalProps = {
   isOpen: boolean;
@@ -47,6 +47,8 @@ const BottomModal: React.FC<BottomModalProps> = ({
     maxHeightPercent,
     closeOnBackdropPress,
   });
+
+  const theme = useDynamicTheme();
 
   return (
     <Modal

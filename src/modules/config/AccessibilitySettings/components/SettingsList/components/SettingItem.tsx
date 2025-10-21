@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../../../../../../components/Label/Label';
-import theme from '../../../../../../theme/theme';
 import SwitchToggle from '../../../../../../components/SwitchToggle/SwitchToggle';
+import { useDynamicTheme } from '../../../../../../hooks/useDynamicTheme';
 
 export interface SettingItemProps {
   isLastItem: boolean;
@@ -17,6 +17,9 @@ const SettingItem: React.FC<SettingItemProps> = ({
   label,
   onToggle,
 }) => {
+
+  const theme = useDynamicTheme();
+
   return (
     <S.Item isLastItem={isLastItem}>
       <Label

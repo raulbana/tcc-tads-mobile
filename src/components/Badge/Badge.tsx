@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export interface BadgeProps {
   content: string | React.FC;
@@ -16,8 +16,18 @@ export interface BadgeProps {
 }
 
 const Badge: React.FC<BadgeProps> = props => {
-  const {content, textColor, disabled, isActive, numberOfLines, ellipsizeMode, backgroundColor} =
-    props;
+  const {
+    content,
+    textColor,
+    disabled,
+    isActive,
+    numberOfLines,
+    ellipsizeMode,
+    backgroundColor,
+  } = props;
+
+  const theme = useDynamicTheme();
+
   return (
     <S.BadgeContainer
       {...props}
@@ -27,7 +37,7 @@ const Badge: React.FC<BadgeProps> = props => {
       {typeof content === 'string' ? (
         <Label
           color={textColor || theme.colors.gray_08}
-          typography={theme.typography.paragraph.m2}
+          typography={theme.typography.paragraph.m0}
           text={content}
           ellipsizeMode={ellipsizeMode}
         />

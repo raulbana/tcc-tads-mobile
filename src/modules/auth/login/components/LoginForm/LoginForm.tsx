@@ -6,8 +6,7 @@ import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
 import Button from '../../../../../components/Button/Button';
 import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
-import theme from '../../../../../theme/theme';
-
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 const LoginForm: React.FC = () => {
   const {
     control,
@@ -19,6 +18,8 @@ const LoginForm: React.FC = () => {
     remember,
     isLoading,
   } = useLoginForm();
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

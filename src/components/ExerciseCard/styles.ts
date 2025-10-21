@@ -7,13 +7,14 @@ export const Container = styled.View`
     gap: ${moderateScale(12)}px;
     padding: ${moderateScale(16)}px;
 `;
-
+// break row when the text is too long
 export const HeaderRow = styled.View`
     display: flex;
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 `;
 
 export const DataRow = styled.View`

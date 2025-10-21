@@ -5,13 +5,11 @@ import Label from '../../../../../../../components/Label/Label';
 import Button from '../../../../../../../components/Button/Button';
 import Icon from '../../../../../../../components/Icon/Icon';
 import RadioButtonGroup from '../../../../../../../components/RadioButtonGroup/RadioButtonGroup';
-import SliderInput from '../../../../../../../components/Slider/SliderInput';
-import Input from '../../../../../../../components/Input/Input';
 import {QuestionOptions} from '../../../../../../../types/question';
 import {Exercise} from '../../../../../../../types/exercise';
-import theme from '../../../../../../../theme/theme';
 import * as S from '../../styles';
 import {ExerciseSpecificEvaluationAnswers} from '../../schema/exerciseEvaluation';
+import { useDynamicTheme } from '../../../../../../../hooks/useDynamicTheme';
 
 interface ExerciseSpecificEvaluationStepProps {
   control: Control<ExerciseSpecificEvaluationAnswers>;
@@ -33,15 +31,16 @@ const ExerciseSpecificEvaluationStep: React.FC<
   control,
   errors,
   completionOptions,
-  confidenceOptions,
   currentExercise,
   currentExerciseIndex,
   totalExercises,
   onContinue,
   onPrevious,
-  isValid,
   isLastExercise,
 }) => {
+  
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.Header>

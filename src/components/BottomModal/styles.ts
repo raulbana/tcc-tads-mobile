@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import theme from '../../theme/theme';
 import {horizontalScale, moderateScale, verticalScale} from '../../utils/scales';
 import {Dimensions, StyleSheet} from 'react-native';
 
@@ -25,7 +24,7 @@ export const animatedSheetStyle = StyleSheet.create({
 
 export const Container = styled.View`
   width: ${screenW}px;
-  background-color: ${theme.colors.white};
+  background-color: ${({theme}) => theme.colors.white};
   border-top-left-radius: ${moderateScale(16)}px;
   border-top-right-radius: ${moderateScale(16)}px;
   padding: ${verticalScale(12)}px ${horizontalScale(16)}px ${verticalScale(16)}px;
@@ -38,7 +37,7 @@ export const Handle = styled.View`
   width: ${horizontalScale(48)}px;
   height: ${verticalScale(4)}px;
   border-radius: ${moderateScale(2)}px;
-  background-color: ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_04};
   margin-bottom: ${verticalScale(4)}px;
 `;
 
@@ -67,5 +66,5 @@ export const Footer = styled.View`
   padding-top: ${verticalScale(8)}px;
   gap: ${verticalScale(8)}px;
   border-top-width: 1px;
-  border-top-color: ${theme.colors.gray_03};
+  border-top-color: ${({theme}) => theme.colors.gray_03};
 `;

@@ -1,9 +1,12 @@
 import {useEffect, useRef} from 'react';
 import {Animated} from 'react-native';
 import {ToastType} from './Toast';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 const useToast = (isOpen: boolean, duration: number, onClose?: () => void) => {
+
+  const theme = useDynamicTheme();
+  
   const getTextColor = (type: ToastType) => {
     switch (type) {
       case 'SUCCESS':

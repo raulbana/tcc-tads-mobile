@@ -4,7 +4,6 @@ import {
   moderateScale,
   verticalScale,
 } from '../../utils/scales';
-import theme from '../../theme/theme';
 
 export const Container = styled.TouchableOpacity`
   display: flex;
@@ -14,8 +13,8 @@ export const Container = styled.TouchableOpacity`
   gap: ${horizontalScale(12)}px;
   padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
   border-radius: ${moderateScale(12)}px;
-  background-color: ${theme.colors.gray_02};
-  border: 1px solid ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_02};
+  border: 1px solid ${({theme}) => theme.colors.gray_04};
 `;
 
 export const IconWrapper = styled.View`
@@ -24,7 +23,7 @@ export const IconWrapper = styled.View`
   border-radius: ${moderateScale(12)}px;
   align-items: center;
   justify-content: center;
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
 `;
 
 export const InfoWrapper = styled.View`

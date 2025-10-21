@@ -4,12 +4,14 @@ import useAccessibilitySettings from './useAccessibilitySettings';
 import SettingsList from './components/SettingsList/SettingsList';
 import * as S from './styles';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import Button from '../../../components/Button/Button';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const AccessibilitySettings = () => {
   const {navigateToMyAccount, settingsList, handleSave, isLoading} =
     useAccessibilitySettings();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer

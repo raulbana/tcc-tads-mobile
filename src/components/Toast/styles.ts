@@ -2,11 +2,13 @@ import styled from "styled-components/native";
 import { Animated } from 'react-native';
 import { verticalScale, horizontalScale, moderateScale } from "../../utils/scales";
 import { ToastType } from "./Toast";
-import theme from "../../theme/theme";
+import { useDynamicTheme } from "../../hooks/useDynamicTheme";
 
 interface ToastProps {
   type: ToastType;
 }
+
+const theme = useDynamicTheme();
 
 const getBackgroundColor = (type: ToastType) => {
   switch (type) {

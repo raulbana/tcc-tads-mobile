@@ -4,9 +4,9 @@ import * as S from './styles';
 import useTalkToUsForm from './useTalkToUsForm';
 import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import Button from '../../../../../components/Button/Button';
 import Loader from '../../../../../components/Loader/Loader';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 const TalkToUsForm: React.FC = () => {
   const {
@@ -18,6 +18,8 @@ const TalkToUsForm: React.FC = () => {
     isLoading,
     isSuccess,
   } = useTalkToUsForm();
+
+  const theme = useDynamicTheme();
 
   return (
     <S.FormContainer>

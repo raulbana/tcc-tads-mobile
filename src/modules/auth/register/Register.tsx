@@ -4,11 +4,13 @@ import * as S from './styles';
 import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
 import useRegister from './useRegister';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const Register: React.FC = () => {
   const {handleGoToLogin} = useRegister();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer>

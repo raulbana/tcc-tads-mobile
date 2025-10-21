@@ -4,9 +4,8 @@ import * as S from './styles';
 import Input from '../../../../../components/Input/Input';
 import Button from '../../../../../components/Button/Button';
 import useForgotPasswordRequestForm from './useForgotPasswordRequestForm';
-import {TouchableOpacity} from 'react-native';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface ForgotPasswordRequestFormProps {
   onSuccess: () => void;
@@ -24,6 +23,8 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
     navigateToLogin,
     isLoading,
   } = useForgotPasswordRequestForm(onSuccess);
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

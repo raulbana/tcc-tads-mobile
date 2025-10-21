@@ -1,8 +1,10 @@
 import styled from "styled-components/native";
 import { ExerciseStatus } from "../../types/exercise";
-import theme from "../../theme/theme";
 import { ExerciseLabelProps } from "./ExerciseLabel";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/scales";
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+
+const theme = useDynamicTheme();
 
 const getBackgroundColor = (type: ExerciseStatus) => {
   switch (type) {

@@ -6,9 +6,11 @@ import {
   horizontalScale,
   moderateScale,
 } from '../../utils/scales';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+
 
 const getBackgroundColor = (type?: ButtonType) => {
+  const theme = useDynamicTheme();
   if (type === 'PRIMARY') {
     return theme.colors.purple_04;
   } else if (type === 'SECONDARY') {

@@ -3,8 +3,8 @@ import * as S from './styles';
 import useOTPInput from './useOTPInput';
 import {TextInput} from 'react-native';
 import {ZodType} from 'zod';
-import theme from '../../theme/theme';
 import Label from '../Label/Label';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 interface OTPInputProps {
   length: number;
@@ -44,6 +44,8 @@ const OTPInput: React.FC<OTPInputProps> = ({
       onValidate(result.success);
     }
   }, [combinedValue, validationSchema, onValidate]);
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Wrapper>

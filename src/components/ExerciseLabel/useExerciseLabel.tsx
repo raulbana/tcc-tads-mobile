@@ -1,5 +1,7 @@
-import theme from '../../theme/theme';
 import {ExerciseStatus} from '../../types/exercise';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+
+const theme = useDynamicTheme();
 
 const useExerciseLabel = () => {
   const getLabel = (status: ExerciseStatus) => {

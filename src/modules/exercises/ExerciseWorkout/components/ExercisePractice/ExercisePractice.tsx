@@ -5,8 +5,8 @@ import Button from '../../../../../components/Button/Button';
 import {VideoPlayer} from '../../../../../components/VideoPlayer/VideoPlayer';
 import useExercisePractice from './useExercisePractice';
 import {Exercise, Workout} from '../../../../../types/exercise';
-import theme from '../../../../../theme/theme';
 import Icon from '../../../../../components/Icon/Icon';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface ExercisePracticeProps {
   workout: Workout;
@@ -45,6 +45,8 @@ const ExercisePractice: React.FC<ExercisePracticeProps> = ({
   );
   const exerciseNumber = currentExerciseIndex + 1;
   const totalExercises = workout.exercises.length;
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

@@ -1,11 +1,13 @@
 import styled from 'styled-components/native';
-import {moderateScale} from '../../utils/scales';
+import {moderateScale, verticalScale} from '../../utils/scales';
 import LinearGradient from 'react-native-linear-gradient';
 
 export const Container = styled.TouchableOpacity`
   width: 100%;
   aspect-ratio: 1.6;
   border-radius: ${moderateScale(16)}px;
+  gap: ${verticalScale(12)}px;
+
   overflow: hidden;
 `;
 
@@ -14,6 +16,7 @@ export const BackgroundImage = styled.ImageBackground`
   width: 100%;
   height: 100%;
   justify-content: flex-end;
+  gap: ${verticalScale(12)}px;
 `;
 
 export const BadgeContainer = styled.View`

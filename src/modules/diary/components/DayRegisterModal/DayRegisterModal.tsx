@@ -6,9 +6,9 @@ import DataTable, {
 import {CalendarDayDTO, UrinationDataDTO} from '../../../../types/diary';
 import Button from '../../../../components/Button/Button';
 import Label from '../../../../components/Label/Label';
-import theme from '../../../../theme/theme';
 import moment from 'moment';
 import * as S from './styles';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 export interface DayRegisterModalProps {
   dayItem: CalendarDayDTO;
@@ -74,6 +74,8 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
   );
 
   const hasRealData = !!dayItem.urinationData?.length;
+
+  const theme = useDynamicTheme();
 
   return (
     <BottomModal

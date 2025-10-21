@@ -3,8 +3,8 @@ import * as S from './styles';
 import Label from '../Label/Label';
 import Icon from '../Icon/Icon';
 import Button from '../Button/Button';
-import theme from '../../theme/theme';
 import { WorkoutDifficulty, WorkoutDifficultyLabels } from '../../types/exercise';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface ExerciseInfoCardProps {
   name: string;
@@ -23,6 +23,7 @@ const ExerciseInfoCard: React.FC<ExerciseInfoCardProps> = ({
   difficulty,
   onStartWorkout,
 }) => {
+  const theme = useDynamicTheme();
   return (
     <S.Container>
       <S.InfoIconContainer>

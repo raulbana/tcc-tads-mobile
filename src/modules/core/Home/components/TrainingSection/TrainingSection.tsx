@@ -1,9 +1,9 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import {TouchableOpacity} from 'react-native';
 import ExerciseCard from '../../../../../components/ExerciseCard/ExerciseCard';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface TrainingSectionProps {
   onRedirectToTrainingDetails: () => void;
@@ -12,6 +12,8 @@ interface TrainingSectionProps {
 const TrainingSection: React.FC<TrainingSectionProps> = ({
   onRedirectToTrainingDetails,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.Wrapper>
       <S.Row>

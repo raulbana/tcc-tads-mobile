@@ -1,4 +1,4 @@
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 import {Exercise} from '../../types/exercise';
 import Button from '../Button/Button';
 import ExerciseLabel from '../ExerciseLabel/ExerciseLabel';
@@ -18,6 +18,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onPressPrimaryAction,
   onPressSecondaryAction,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.HeaderRow>

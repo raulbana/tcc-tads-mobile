@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import Badge from '../Badge/Badge';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface ContentCardProps {
   image: number | {uri: string};
@@ -19,6 +19,8 @@ const ContentCard: React.FC<ContentCardProps> = ({
   description,
   onClick,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.Container onPress={onClick}>
       <S.BackgroundImage
@@ -33,14 +35,9 @@ const ContentCard: React.FC<ContentCardProps> = ({
         </S.BadgeContainer>
         <S.Content>
           <Label
-            typography={theme.typography.title.b4}
+            typography={theme.typography.paragraph.b3}
             color={theme.colors.white}
             text={title}
-          />
-          <Label
-            typography={theme.typography.paragraph.r2}
-            color={theme.colors.white}
-            text={description}
           />
         </S.Content>
       </S.BackgroundImage>

@@ -4,7 +4,6 @@ import {
   moderateScale,
   verticalScale,
 } from '../../../../../utils/scales';
-import theme from '../../../../../theme/theme';
 
 export const Outer = styled.TouchableOpacity`
   width: 100%;
@@ -14,7 +13,7 @@ export const Outer = styled.TouchableOpacity`
 export const Container = styled.View`
   width: 100%;
   border-radius: ${moderateScale(24)}px;
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
   padding: ${moderateScale(16)}px;
   flex-direction: row;
   align-items: flex-end;

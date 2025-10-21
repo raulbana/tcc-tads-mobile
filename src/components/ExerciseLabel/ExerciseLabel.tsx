@@ -3,7 +3,7 @@ import {ExerciseStatus} from '../../types/exercise';
 import * as S from './styles';
 import useExerciseLabel from './useExerciseLabel';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface ExerciseLabelProps {
   type: ExerciseStatus;
@@ -11,6 +11,8 @@ export interface ExerciseLabelProps {
 
 const ExerciseLabel: React.FC<ExerciseLabelProps> = ({type}) => {
   const {getLabel, getLabelColor} = useExerciseLabel();
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container type={type}>
       <Label

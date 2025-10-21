@@ -4,11 +4,10 @@ import {
   horizontalScale,
   moderateScale,
 } from '../../../../../utils/scales';
-import theme from '../../../../../theme/theme';
 
 export const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.white};
+  background-color: ${({theme}) => theme.colors.white};
   padding: ${verticalScale(20)}px ${horizontalScale(16)}px;
 `;
 
@@ -18,7 +17,7 @@ export const Header = styled.View`
 `;
 
 export const ExerciseTag = styled.View`
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
   padding: ${verticalScale(8)}px ${horizontalScale(16)}px;
   border-radius: ${moderateScale(20)}px;
   margin-bottom: ${verticalScale(16)}px;
@@ -43,7 +42,7 @@ export const TabButton = styled.TouchableOpacity<{isActive: boolean}>`
   margin-horizontal: ${horizontalScale(8)}px;
   align-items: center;
   border-bottom-width: ${moderateScale(1)}px;
-  border-bottom-color: ${({isActive}) =>
+  border-bottom-color: ${({isActive, theme}) =>
     isActive ? theme.colors.gray_08 : theme.colors.gray_04};
 `;
 
@@ -53,7 +52,7 @@ export const MediaContainer = styled.View`
 
 export const VideoWrapper = styled.TouchableOpacity`
   width: 100%;
-  background-color: ${theme.colors.gray_08};
+  background-color: ${({theme}) => theme.colors.gray_08};
   height: ${verticalScale(200)}px;
   border-radius: ${moderateScale(12)}px;
   overflow: hidden;
@@ -64,7 +63,7 @@ export const VideoWrapper = styled.TouchableOpacity`
 export const PlayButton = styled.Text`
   position: absolute;
   font-size: ${moderateScale(50)}px;
-  color: ${theme.colors.white};
+  color: ${({theme}) => theme.colors.white};
   opacity: 0.8;
 `;
 
@@ -87,7 +86,7 @@ export const ExerciseImage = styled.Image`
 `;
 
 export const DescriptionContainer = styled.View`
-  background-color: ${theme.colors.gray_03};
+  background-color: ${({theme}) => theme.colors.gray_03};
   padding: ${verticalScale(16)}px ${horizontalScale(16)}px;
   border-radius: ${moderateScale(12)}px;
   margin-bottom: ${verticalScale(24)}px;

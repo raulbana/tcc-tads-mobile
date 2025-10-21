@@ -1,15 +1,18 @@
 import React from 'react';
 import * as S from './styles';
 import {FileArchive} from 'phosphor-react-native';
-import theme from '../../../../theme/theme';
 import Label from '../../../../components/Label/Label';
 import Button from '../../../../components/Button/Button';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 export interface ReportCardProps {
   onGenerateReport: () => void;
 }
 
 const ReportCard: React.FC<ReportCardProps> = ({onGenerateReport}) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.HeaderRow>

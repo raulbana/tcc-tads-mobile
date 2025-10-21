@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import useToast from './useToast';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export type ToastType = 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING';
 
@@ -24,6 +24,8 @@ const Toast: React.FC<ToastProps> = ({
   isOpen,
 }) => {
   const {opacity, getTextColor} = useToast(isOpen, duration, onClose);
+
+  const theme = useDynamicTheme();
 
   if (!isOpen) return null;
 

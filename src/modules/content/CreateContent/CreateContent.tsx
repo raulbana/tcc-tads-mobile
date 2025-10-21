@@ -1,14 +1,16 @@
 import React, {useRef} from 'react';
 import Label from '../../../components/Label/Label';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
-import theme from '../../../theme/theme';
 import UploadContentForm from './components/UploadContentForm/UploadContentForm';
 import * as S from './styles';
 import useCreateContent from './useCreateContent';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const CreateContent = () => {
   const scrollRef = useRef<any>(null);
   const {goBack} = useCreateContent();
+  const theme = useDynamicTheme();
+  
   return (
     <ScreenContainer scrollable={true} ref={scrollRef} goBackTo="Conteúdos" goBack={goBack} headerShown>
       <S.Wrapper>

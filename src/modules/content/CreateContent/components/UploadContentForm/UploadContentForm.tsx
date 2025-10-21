@@ -1,14 +1,13 @@
 import {Controller} from 'react-hook-form';
 import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import * as S from './styles';
 import useUploadContentForm from './useUploadContentForm';
 import Badge from '../../../../../components/Badge/Badge';
 import CarouselSection from '../../../../../components/CarouselSection.tsx/CarouselSection';
 import UploadBox from '../UploadBox/UploadBox';
-import {UploadFile} from '../UploadBox/useUpload';
 import Button from '../../../../../components/Button/Button';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface UploadContentFormProps {
   parentScrollRef?: any;
@@ -33,6 +32,9 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
     isLoading,
     uploadError,
   } = useUploadContentForm();
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.FieldGroup>

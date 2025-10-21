@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Modal, FlatList} from 'react-native';
 import * as S from './styles';
 import Icon from '../../../../../components/Icon/Icon';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 export interface ImageCarouselModalProps {
   images: string[];
@@ -27,6 +27,8 @@ const ImageCarouselModal: React.FC<ImageCarouselModalProps> = ({
     if (currentIndex > 0) onChangeIndex?.(currentIndex - 1);
   };
 
+  const theme = useDynamicTheme();
+  
   return (
     <Modal visible={visible}>
       <S.ModalContainer>

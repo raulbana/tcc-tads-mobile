@@ -4,7 +4,6 @@ import {
   moderateScale,
   verticalScale,
 } from '../../utils/scales';
-import theme from '../../theme/theme';
 import {TextInput} from 'react-native';
 
 export const Wrapper = styled.View`
@@ -27,13 +26,13 @@ export const Input = styled(TextInput)<{
   width: ${horizontalScale(36)}px;
   height: ${verticalScale(36)}px;
   border-radius: ${moderateScale(10)}px;
-  border: 2px solid ${theme.colors.gray_04};
+  border: 2px solid ${({theme}) => theme.colors.gray_04};
   border-color: ${({$isFocused, $hasError}) =>
     $hasError
-      ? theme.colors.error
+      ? ({theme}) => theme.colors.error
       : $isFocused
-      ? theme.colors.purple_03
-      : theme.colors.gray_04};
+      ? ({theme}) => theme.colors.purple_03
+      : ({theme}) => theme.colors.gray_04};
   text-align: center;
   justify-content: center;
   align-items: center;

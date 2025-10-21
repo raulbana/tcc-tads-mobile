@@ -6,7 +6,7 @@ import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
 import Button from '../../../../../components/Button/Button';
 import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -21,6 +21,8 @@ const RegisterForm: React.FC = () => {
   } = useRegisterForm();
 
   const terms = watch('acceptTerms');
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

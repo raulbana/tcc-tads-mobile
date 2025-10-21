@@ -4,10 +4,10 @@ import CreateAccountCard from './components/CreateAccountCard/CreateAccountCard'
 import ProfileCard from './components/ProfileCard/ProfileCard';
 import * as S from './styles';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import OptionsList from './components/OptionsList/OptionsList';
 import useMyAccount from './useMyAccount';
 import ContactUsCard from './components/ContactUsCard/ContactUsCard';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const MyAccount = () => {
   const {
@@ -19,6 +19,8 @@ const MyAccount = () => {
     user,
     isLoggedIn,
   } = useMyAccount();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer scrollable>

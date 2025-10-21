@@ -1,10 +1,10 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
-import * as S from './styles';
+import {View, Image} from 'react-native';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import {User} from '../../../../../types/auth';
 import AnonymousUserProfileImage from '../../../../../assets/illustrations/anonymous_user.svg';
+import * as S from './styles';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 export interface ProfileCardProps {
   user: User;
@@ -14,6 +14,8 @@ export interface ProfileCardProps {
 const ProfileCard: React.FC<ProfileCardProps> = ({user, onEditProfile}) => {
   const hasProfilePicture =
     user.profilePictureUrl && user.profilePictureUrl.trim() !== '';
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>
@@ -43,13 +45,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({user, onEditProfile}) => {
       </S.Section>
       <S.Divider />
       <S.Section>
-        <TouchableOpacity onPress={onEditProfile} style={S.editButtonStyle}>
+        <S.EditButtonStyle onPress={onEditProfile}>
           <Label
             typography={theme.typography.paragraph.sb3}
             color={theme.colors.purple_04}
             text="Editar Perfil"
           />
-        </TouchableOpacity>
+        </S.EditButtonStyle>
       </S.Section>
     </S.Container>
   );

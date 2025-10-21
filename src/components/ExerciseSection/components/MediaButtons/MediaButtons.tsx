@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from './styles';
-import theme from '../../../../theme/theme';
 import Icon from '../../../Icon/Icon';
 import Label from '../../../Label/Label';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 
 export interface MediaButtonsProps {
@@ -20,6 +20,9 @@ const MediaButtons: React.FC<MediaButtonsProps> = ({
   onImagesPress,
   activeTab = 'videos',
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.Button
