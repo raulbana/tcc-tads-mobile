@@ -6,14 +6,14 @@ import {
 import {zodResolver} from '@hookform/resolvers/zod';
 import {UploadFile} from '../UploadBox/useUpload';
 import {useCallback, useState} from 'react';
-import theme from '../../../../../theme/theme';
-import contentServices from '../../../services/contentServices';
 import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 const useUploadContentForm = () => {
   const navigation = useNavigation<NavigationStackProp>();
+  const theme = useDynamicTheme();
 
   const {
     control,

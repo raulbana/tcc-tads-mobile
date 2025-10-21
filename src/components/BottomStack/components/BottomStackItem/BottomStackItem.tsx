@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../../../Label/Label';
-import theme from '../../../../theme/theme';
 import {BottomStackItemConfig} from '../../useBottomStack';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 interface BottomStackItemProps {
   item: BottomStackItemConfig;
@@ -19,6 +19,8 @@ const BottomStackItem: React.FC<BottomStackItemProps> = ({
   activeColor,
   inactiveColor,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.ItemButton
       accessibilityRole="button"

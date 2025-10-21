@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type RadioScaleProps = {
   label: string;
@@ -20,6 +20,9 @@ const RadioScale: React.FC<RadioScaleProps> = ({
   value,
   onChange,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <Label

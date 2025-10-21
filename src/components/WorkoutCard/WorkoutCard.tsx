@@ -1,10 +1,10 @@
 import React from 'react';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
 import * as S from './styles';
 import Badge from '../Badge/Badge';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface WorkoutCardProps {
   title: string;
@@ -25,6 +25,9 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   badge,
   onPress,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.Header>

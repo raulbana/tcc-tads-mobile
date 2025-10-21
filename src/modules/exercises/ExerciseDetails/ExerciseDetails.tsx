@@ -4,10 +4,10 @@ import Label from '../../../components/Label/Label';
 import Badge from '../../../components/Badge/Badge';
 import Button from '../../../components/Button/Button';
 import ExerciseSection from '../../../components/ExerciseSection/ExerciseSection';
-import theme from '../../../theme/theme';
 import {useExerciseDetails} from './useExerciseDetails';
 import {Exercise} from '../../../types/exercise';
 import * as S from './styles';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const ExerciseDetails = () => {
   const {
@@ -19,6 +19,8 @@ const ExerciseDetails = () => {
     handleImagesPress,
     handleStartWorkout,
   } = useExerciseDetails();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer scrollable>

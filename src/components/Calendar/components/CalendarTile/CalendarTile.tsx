@@ -2,7 +2,8 @@ import React from 'react';
 import {CalendarDayDTO} from '../../../../types/diary';
 import * as S from './styles';
 import Label from '../../../Label/Label';
-import theme from '../../../../theme/theme';
+import {useDynamicTheme} from '../../../../hooks/useDynamicTheme';
+import useCalendarTile from './useCalendarTile';
 
 export interface CalendarTileProps {
   dayItem: CalendarDayDTO;
@@ -13,8 +14,14 @@ export interface CalendarTileProps {
 }
 
 const CalendarTile: React.FC<CalendarTileProps> = props => {
+  const theme = useDynamicTheme();
+  const {getBadgeColor} = useCalendarTile();
   const {dayItem, isSelected, isDisabled} = props;
   const {dayTitle, dayNumber, isToday} = dayItem;
+
+  const badgeColor = isToday
+    ? theme.colors.default_green
+    : getBadgeColor(dayItem.leakageLevel);
 
   return (
     <S.Wrapper {...props} disabled={isDisabled}>
@@ -25,7 +32,7 @@ const CalendarTile: React.FC<CalendarTileProps> = props => {
             ? theme.typography.paragraph.sb1
             : theme.typography.paragraph.r1
         }
-        color={ isDisabled ? theme.colors.gray_06 : theme.colors.gray_08}
+        color={isDisabled ? theme.colors.gray_06 : theme.colors.gray_08}
       />
       <Label
         text={dayNumber.toString()}
@@ -34,7 +41,7 @@ const CalendarTile: React.FC<CalendarTileProps> = props => {
           isSelected || isToday ? theme.colors.gray_08 : theme.colors.gray_06
         }
       />
-      <S.Badge {...props} />
+      <S.Badge {...props} badgeColor={badgeColor} />
     </S.Wrapper>
   );
 };

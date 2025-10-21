@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Comment as CommentType} from '../../types/content';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import Comment from '../Comment/Comment';
 import * as S from './styles';
 import CommentInput from '../CommentInput/CommentInput';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export interface CommentSectionProps {
   comments: CommentType[];
@@ -31,12 +31,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onCommentTextChange,
   onPressLike,
   onPressMore,
-  onPressReply,
   replyTo,
   replyText,
   setReplyText,
   setReplyTo,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.HeaderRow>

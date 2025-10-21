@@ -2,8 +2,8 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {Pencil, Trash} from 'phosphor-react-native';
 import * as S from './styles';
-import theme from '../../theme/theme';
 import Label from '../Label/Label';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type CellValue = string | number | boolean | null | undefined | React.ReactNode;
 
@@ -37,6 +37,9 @@ function DataTable<
   showEditIcon = true,
   showDeleteIcon = true,
 }: DataTableProps<T, K>) {
+
+  const theme = useDynamicTheme();
+  
   const handleEditPress = (row: T) => {
     onEditRow?.(row);
   };

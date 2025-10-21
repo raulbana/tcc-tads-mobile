@@ -6,9 +6,9 @@ import Button from '../../../../../../../components/Button/Button';
 import Icon from '../../../../../../../components/Icon/Icon';
 import RadioButtonGroup from '../../../../../../../components/RadioButtonGroup/RadioButtonGroup';
 import {QuestionOptions} from '../../../../../../../types/question';
-import theme from '../../../../../../../theme/theme';
 import * as S from '../../styles';
 import {WorkoutEvaluationAnswers} from '../../schema/exerciseEvaluation';
+import { useDynamicTheme } from '../../../../../../../hooks/useDynamicTheme';
 
 interface WorkoutEvaluationStepProps {
   control: Control<WorkoutEvaluationAnswers>;
@@ -23,8 +23,10 @@ const WorkoutEvaluationStep: React.FC<WorkoutEvaluationStepProps> = ({
   errors,
   difficultyOptions,
   onContinue,
-  isValid,
 }) => {
+
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.Header>

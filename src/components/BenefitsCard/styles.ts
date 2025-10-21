@@ -1,9 +1,8 @@
 import styled from "styled-components/native";
 import { verticalScale, horizontalScale } from "../../utils/scales";
-import theme from "../../theme/theme";
 
 export const Container = styled.View`
-  background-color: ${theme.colors.gray_03};
+  background-color: ${({theme}) => theme.colors.gray_03};
   border-radius: ${horizontalScale(12)}px;
   padding: ${verticalScale(16)}px ${horizontalScale(16)}px;
   gap: ${verticalScale(12)}px;

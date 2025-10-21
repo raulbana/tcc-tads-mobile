@@ -1,8 +1,8 @@
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import * as S from './styles';
 import {Workout} from '../../../../../types/exercise';
 import ExerciseInfoCard from '../../../../../components/ExerciseInfoCard';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface StartWorkoutProps {
   workout: Workout;
@@ -11,6 +11,9 @@ interface StartWorkoutProps {
 
 const StartWorkout = ({workout, onStartWorkout}: StartWorkoutProps) => {
   const {name, duration, category, difficulty, description} = workout;
+
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.Header>

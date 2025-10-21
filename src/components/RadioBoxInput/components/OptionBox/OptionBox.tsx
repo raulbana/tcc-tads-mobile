@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from './styles';
-import theme from '../../../../theme/theme';
 import Label from '../../../Label/Label';
+import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
 
 export interface BoxOption {
   value: string;
@@ -27,6 +27,9 @@ const OptionBox: React.FC<OptionBoxProps> = ({
   label,
 }) => {
   const {disabled, value} = option;
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.OptionBox
       key={value}

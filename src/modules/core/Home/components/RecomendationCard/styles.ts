@@ -1,13 +1,12 @@
 import styled from "styled-components/native";
 import RecommendationIllustration from "../../../../../assets/illustrations/recommendation_illustration.svg";
-import theme from "../../../../../theme/theme";
 import { horizontalScale, moderateScale, verticalScale } from "../../../../../utils/scales";
 
 export const Illustration = styled(RecommendationIllustration).attrs({})``;
 
 export const Container = styled.View`
   flex-direction: row;
-  background-color: ${theme.colors.purple_01};
+  background-color: ${({theme}) => theme.colors.purple_01};
   border-radius: ${moderateScale(12)}px;
   gap: ${horizontalScale(16)}px;
   padding: ${moderateScale(16)}px;

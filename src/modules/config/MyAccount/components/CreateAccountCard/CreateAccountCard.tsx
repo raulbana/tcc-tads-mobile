@@ -1,9 +1,9 @@
 import * as S from './styles';
 import Label from '../../../../../components/Label/Label';
 import Button from '../../../../../components/Button/Button';
-import theme from '../../../../../theme/theme';
 import {CheckCircle} from 'phosphor-react-native';
 import AnonymousUserProfileImage from '../../../../../assets/illustrations/anonymous_user.svg';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 export interface CreateAccountCardProps {
   advantages: string[];
@@ -14,6 +14,9 @@ const CreateAccountCard: React.FC<CreateAccountCardProps> = ({
   advantages,
   onCreateAccount,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.Section style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>

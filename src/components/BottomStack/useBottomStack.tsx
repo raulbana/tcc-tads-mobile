@@ -5,13 +5,13 @@ import {
   Book,
   UserCircle,
 } from 'phosphor-react-native';
-import theme from '../../theme/theme';
 import {moderateScale} from '../../utils/scales';
 import {JSX} from 'react';
 import Home from '../../modules/core/Home/Home';
 import Diary from '../../modules/diary/Diary';
 import MyAccount from '../../modules/config/MyAccount/MyAccount';
 import { MainTabParamList } from '../../navigation/routes';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface BottomStackItemConfig {
   name: keyof MainTabParamList;
@@ -24,6 +24,7 @@ const Placeholder: React.FC = () => null;
 
 export const useBottomStack = () => {
   const defaultSize = moderateScale(28);
+  const theme = useDynamicTheme();
   const items: BottomStackItemConfig[] = [
     {
       name: 'Home',

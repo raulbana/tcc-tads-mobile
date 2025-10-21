@@ -32,6 +32,9 @@ export type ConfigParamList = {
   MyAccount: undefined;
   AccessibilitySettings: undefined;
   TalkToUs: undefined;
+  EditProfile: undefined;
+  Notifications: undefined;
+  AboutApp: undefined;
 };
 
 export type ContentParamList = {

@@ -3,8 +3,6 @@ import {Platform} from 'react-native';
 import * as S from './styles';
 import {UploadFile, useUpload} from './useUpload';
 import Icon from '../../../../../components/Icon/Icon';
-import theme from '../../../../../theme/theme';
-import UploadCardRow from '../../../../../components/UploadCardRow/UploadCardRow';
 import Label from '../../../../../components/Label/Label';
 import {verticalScale} from '../../../../../utils/scales';
 import DraggableFlatList, {
@@ -12,9 +10,8 @@ import DraggableFlatList, {
 } from 'react-native-draggable-flatlist';
 import {
   GestureHandlerRootView,
-  Gesture,
-  State,
 } from 'react-native-gesture-handler';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface UploadBoxProps {
   allowedTypes?: ('image' | 'video')[];
@@ -30,12 +27,9 @@ interface UploadBoxProps {
 
 const UploadBox: React.FC<UploadBoxProps> = ({
   allowedTypes = ['image', 'video'],
-  onSubmitFiles,
   onRemoveFile,
-  onReorderFiles,
   onUpdateFiles,
   title,
-  description,
   parentScrollRef,
   externalError,
 }) => {
@@ -47,6 +41,8 @@ const UploadBox: React.FC<UploadBoxProps> = ({
   React.useEffect(() => {
     onUpdateFiles(files);
   }, [files]);
+
+  const theme = useDynamicTheme();
 
   const renderUpload = useCallback(
     ({item, drag, isActive}: RenderItemParams<UploadFile>) => {

@@ -2,8 +2,6 @@ import React from 'react';
 import {Question} from '../../../../../types/question';
 import * as S from './styles';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
-import DatePicker from '../../../../../components/DatePicker/DatePicker';
 import RadioButtonGroup from '../../../../../components/RadioButtonGroup/RadioButtonGroup';
 import Button from '../../../../../components/Button/Button';
 import Input from '../../../../../components/Input/Input';
@@ -12,6 +10,7 @@ import {Control, useFormState} from 'react-hook-form';
 import {ICIQAnswers} from '../../schema/questionnaire';
 import {useQuestionSection} from './useQuestionSection';
 import DatePickerInput from '../../../../../components/DatePicker/DatePicker';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 export interface QuestionProps {
   question: Question;
@@ -27,6 +26,8 @@ const QuestionSection: React.FC<QuestionProps> = ({
   setValue,
 }) => {
   const {text: questionText, type, options, min, max, step} = question;
+
+  const theme = useDynamicTheme();
 
   const {errors} = useFormState({control});
   const fieldError = errors[question.id as keyof ICIQAnswers];

@@ -4,10 +4,9 @@ import {
   moderateScale,
   verticalScale,
 } from '../../utils/scales';
-import theme from '../../theme/theme';
 
 export const Container = styled.View`
-  background-color: ${theme.colors.gray_03};
+  background-color: ${({theme}) => theme.colors.gray_03};
   border-radius: ${moderateScale(16)}px;
   padding: ${verticalScale(20)}px ${horizontalScale(16)}px;
   margin-bottom: ${verticalScale(16)}px;
@@ -35,7 +34,7 @@ export const BadgeContainer = styled.View`
 `;
 
 export const Badge = styled.View`
-  background-color: ${theme.colors.purple_02};
+  background-color: ${({theme}) => theme.colors.purple_02};
   border-radius: ${moderateScale(12)}px;
   padding: ${verticalScale(4)}px ${horizontalScale(8)}px;
 `;

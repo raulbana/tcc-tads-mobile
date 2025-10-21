@@ -1,5 +1,4 @@
 import styled from "styled-components/native";
-import theme from "../../../../theme/theme";
 import { horizontalScale, verticalScale } from "../../../../utils/scales";
 
 export const Container = styled.View`
@@ -15,7 +14,7 @@ export const Button = styled.TouchableOpacity<{ isActive: boolean }>`
   justify-content: center;
   gap: ${horizontalScale(8)}px;
   padding: ${verticalScale(12)}px ${horizontalScale(16)}px;
-  background-color: ${({ isActive }) => 
+  background-color: ${({ isActive, theme }) => 
     isActive ? theme.colors.purple_04 : theme.colors.purple_02
   };
   border-radius: ${horizontalScale(8)}px;

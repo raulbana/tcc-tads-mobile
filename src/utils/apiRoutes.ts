@@ -32,6 +32,14 @@ const apiRoutes = {
   diary: {
     calendar: '/calendar',
   },
+  config: {
+    contact: {
+      support: '/contact/support',
+    },
+    preferences: {
+      accessibility: '/preferences/accessibility',
+    },
+  },
 };
 
 export default apiRoutes;

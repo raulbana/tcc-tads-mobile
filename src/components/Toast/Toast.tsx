@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import useToast from './useToast';
-import theme from '../../theme/theme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export type ToastType = 'SUCCESS' | 'ERROR' | 'INFO' | 'WARNING';
 
@@ -23,12 +23,22 @@ const Toast: React.FC<ToastProps> = ({
   onClose,
   isOpen,
 }) => {
-  const {opacity, getTextColor} = useToast(isOpen, duration, onClose);
+  const {opacity, getTextColor, getBackgroundColor, getBorderColor} = useToast(
+    isOpen,
+    duration,
+    onClose,
+  );
+
+  const theme = useDynamicTheme();
 
   if (!isOpen) return null;
 
   return (
-    <S.AnimatedToastContainer style={{opacity}} type={type}>
+    <S.AnimatedToastContainer
+      style={{opacity}}
+      type={type}
+      backgroundColor={getBackgroundColor(type)}
+      borderColor={getBorderColor(type)}>
       {icon && <S.IconContainer>{icon}</S.IconContainer>}
       {typeof message === 'string' ? (
         <Label

@@ -21,3 +21,11 @@ export const ButtonContainer = styled.View`
   justify-content: flex-end;
   margin-bottom: ${verticalScale(16)}px;
 `;
+
+export const SuccessMessage = styled.View`
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  padding: ${verticalScale(12)}px ${horizontalScale(16)}px;
+  margin-bottom: ${verticalScale(16)}px;
+`;

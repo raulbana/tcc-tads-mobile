@@ -1,0 +1,33 @@
+export const accessibleColors = {
+  purple_01: '#F8F8FF',
+  purple_02: '#F8F8FF',
+  purple_03: '#8B008B',
+  purple_04: '#8B008B',
+
+  gray_01: '#FFFFFF',
+  gray_02: '#FFFFFF',
+  gray_03: '#E8E8E8',
+  gray_04: '#C0C0C0',
+  gray_05: '#808080',
+  gray_06: '#404040',
+  gray_07: '#202020',
+  gray_08: '#000000',
+
+  default_green: '#006400',
+  checked_green: '#008000',
+  pastel_green: '#E0FFE0',
+  pastel_blue: '#E0F0FF',
+  pastel_red: '#FFE0E0',
+  pastel_yellow: '#FFFFE0',
+
+  error: '#CC0000',
+  error_02: '#FF0000',
+  info: '#0000CC',
+  info_02: '#0066CC',
+  info_03: '#004499',
+  warning: '#CC6600',
+  warning_02: '#FF6600',
+  success: '#006600',
+  success_02: '#004400',
+  white: '#FFFFFF',
+};

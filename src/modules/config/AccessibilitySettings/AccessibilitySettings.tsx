@@ -4,11 +4,14 @@ import useAccessibilitySettings from './useAccessibilitySettings';
 import SettingsList from './components/SettingsList/SettingsList';
 import * as S from './styles';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import Button from '../../../components/Button/Button';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const AccessibilitySettings = () => {
-  const {navigateToMyAccount, settingsList} = useAccessibilitySettings();
+  const {navigateToMyAccount, settingsList, handleSave, isLoading} =
+    useAccessibilitySettings();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer
@@ -23,7 +26,11 @@ const AccessibilitySettings = () => {
         />
         <SettingsList items={settingsList} />
         <S.ButtonContainer>
-          <Button text="Salvar" onPress={() => {}} />
+          <Button
+            text={isLoading ? 'Salvando...' : 'Salvar'}
+            onPress={handleSave}
+            disabled={isLoading}
+          />
         </S.ButtonContainer>
       </S.Wrapper>
     </ScreenContainer>

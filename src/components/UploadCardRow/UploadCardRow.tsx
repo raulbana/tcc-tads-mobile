@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './styles';
 import Icon from '../Icon/Icon';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface UploadCardRowProps {
   fileName: string;
@@ -17,6 +17,9 @@ const UploadCardRow: React.FC<UploadCardRowProps> = ({
   onPress,
   onRemove,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container activeOpacity={onPress ? 0.8 : 1} onPress={onPress}>
       <S.IconWrapper>

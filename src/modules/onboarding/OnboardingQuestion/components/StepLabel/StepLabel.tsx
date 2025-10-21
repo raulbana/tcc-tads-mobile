@@ -1,8 +1,8 @@
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
 import * as S from './styles';
 import {CheckCircle} from 'phosphor-react-native';
 import {moderateScale} from '../../../../../utils/scales';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface StepLabelProps {
   step: number;
@@ -10,6 +10,9 @@ interface StepLabelProps {
 }
 
 const StepLabel: React.FC<StepLabelProps> = ({step, totalSteps}) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <CheckCircle size={moderateScale(24)} color={theme.colors.purple_03} />

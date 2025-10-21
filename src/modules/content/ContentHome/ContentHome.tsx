@@ -2,15 +2,17 @@ import React from 'react';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import * as S from './styles';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import Badge from '../../../components/Badge/Badge';
 import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSection';
 import ContentCard from '../../../components/ContentCard/ContentCard';
 import useContentHome from './useContentHome';
 import Icon from '../../../components/Icon/Icon';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const ContentHome = () => {
-  const {badgeList, contentCardList, navigateToDetails, navigateToCreateContent} = useContentHome();
+  const {badgeList, contentCardList, navigateToCreateContent} = useContentHome();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer scrollable>

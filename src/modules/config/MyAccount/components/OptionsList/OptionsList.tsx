@@ -1,6 +1,6 @@
 import Icon, {IconProps} from '../../../../../components/Icon/Icon';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 import * as S from './styles';
 
 export interface OptionItem {
@@ -14,6 +14,9 @@ export interface OptionsListProps {
 }
 
 const OptionsList: React.FC<OptionsListProps> = ({options}) => {
+
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <Label

@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import {QuestionOptions} from '../../types/question';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type RadioButtonGroupProps = {
   options: QuestionOptions[];
@@ -29,6 +29,8 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({
       onChange([...arr, optionValue]);
     }
   };
+
+  const theme = useDynamicTheme();
 
   return (
     <S.Container>

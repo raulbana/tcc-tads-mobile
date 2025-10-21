@@ -1,14 +1,13 @@
 import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
-import {Heart, ChatCircle, DotsThree} from 'phosphor-react-native';
+import {ChatCircle, DotsThree} from 'phosphor-react-native';
 import moment from 'moment';
 import {Comment as CommentType} from '../../types/content';
 import LikeButton from '../LikeButton/LikeButton';
 import useComment from './useComment';
 import {verticalScale} from '../../utils/scales';
-import CommentInput from '../CommentInput/CommentInput';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface CommentProps {
   comment: CommentType;
@@ -25,6 +24,8 @@ const Comment: React.FC<CommentProps> = ({
   onPressMore,
   isReply = false,
 }) => {
+  const theme = useDynamicTheme();
+
   const {
     id,
     authorName,

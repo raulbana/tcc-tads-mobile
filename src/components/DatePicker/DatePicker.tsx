@@ -1,11 +1,11 @@
 import React, {useMemo} from 'react';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import DatePicker from 'react-native-date-picker';
 import useDatePicker from './useDatePicker';
 import Input from '../Input/Input';
 import * as S from './styles';
 import moment from 'moment';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type DatePickerInputProps = {
   label?: string;
@@ -35,6 +35,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
   disabled = false,
 }) => {
   const {isOpen, openModal, closeModal} = useDatePicker();
+  const theme = useDynamicTheme();
 
   const displayValue = useMemo(() => {
     if (!value) return '';

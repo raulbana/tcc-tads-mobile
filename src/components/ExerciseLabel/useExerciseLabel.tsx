@@ -1,7 +1,9 @@
-import theme from '../../theme/theme';
 import {ExerciseStatus} from '../../types/exercise';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 const useExerciseLabel = () => {
+  const theme = useDynamicTheme();
+
   const getLabel = (status: ExerciseStatus) => {
     switch (status) {
       case 'COMPLETED':
@@ -28,9 +30,23 @@ const useExerciseLabel = () => {
     }
   };
 
+  const getBackgroundColor = (status: ExerciseStatus) => {
+    switch (status) {
+      case 'COMPLETED':
+        return theme.colors.purple_03;
+      case 'PENDING':
+        return theme.colors.purple_02;
+      case 'IN_PROGRESS':
+        return theme.colors.purple_04;
+      default:
+        return theme.colors.purple_01;
+    }
+  };
+
   return {
     getLabel,
     getLabelColor,
+    getBackgroundColor,
   };
 };
 

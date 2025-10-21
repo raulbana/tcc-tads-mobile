@@ -2,12 +2,14 @@ import * as S from './styles';
 
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import Label from '../../../components/Label/Label';
-import theme from '../../../theme/theme';
 import Button from '../../../components/Button/Button';
 import useOnboardingHome from './useOnboardingHome';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const OnboardingHome = () => {
   const {navigateToQuestionnaire} = useOnboardingHome();
+
+  const theme = useDynamicTheme();
 
   return (
     <ScreenContainer>

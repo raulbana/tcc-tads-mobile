@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from './styles';
-import theme from '../../theme/theme';
 import Label from '../Label/Label';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 interface CommentInputProps {
   value: string;
@@ -22,6 +22,8 @@ const CommentInput: React.FC<CommentInputProps> = ({
   loading = false,
   row,
 }) => {
+  const theme = useDynamicTheme();
+
   return (
     <S.Container row={row}>
       <S.TextInput

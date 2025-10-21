@@ -1,8 +1,10 @@
-import theme from '../../theme/theme';
 import {ButtonSize, ButtonType} from './Button';
 import {TextProps as TypographyProps} from '../../theme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 const useButton = () => {
+  const theme = useDynamicTheme();
+
   const getTextColor = (type: ButtonType) => {
     switch (type) {
       case 'PRIMARY':
@@ -29,7 +31,17 @@ const useButton = () => {
     }
   };
 
-  return {getTextColor, getButtonTextSize};
+  const getBackgroundColor = (type?: ButtonType) => {
+    if (type === 'PRIMARY') {
+      return theme.colors.purple_04;
+    } else if (type === 'SECONDARY') {
+      return theme.colors.purple_02;
+    } else {
+      return theme.colors.white;
+    }
+  };
+
+  return {getTextColor, getButtonTextSize, getBackgroundColor};
 };
 
 export default useButton;

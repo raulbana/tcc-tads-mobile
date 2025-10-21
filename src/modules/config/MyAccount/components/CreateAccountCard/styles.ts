@@ -4,15 +4,14 @@ import {
   verticalScale,
   horizontalScale,
 } from '../../../../../utils/scales';
-import theme from '../../../../../theme/theme';
 
 export const Container = styled.View`
   width: 100%;
   padding: ${moderateScale(12)}px;
-  border: 1px solid ${theme.colors.gray_04};
+  border: 1px solid ${({theme}) => theme.colors.gray_04};
   gap: ${verticalScale(16)}px;
   border-radius: ${moderateScale(16)}px;
-  background-color: ${theme.colors.white};
+  background-color: ${({theme}) => theme.colors.white};
 `;
 
 export const Section = styled.View`
@@ -25,7 +24,7 @@ export const AvatarCircle = styled.View`
   width: ${horizontalScale(32)}px;
   height: ${verticalScale(32)}px;
   border-radius: ${moderateScale(24)}px;
-  background-color: ${theme.colors.pastel_green};
+  background-color: ${({theme}) => theme.colors.pastel_green};
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -40,7 +39,7 @@ export const AvatarImage = styled.Image`
 export const Divider = styled.View`
   width: 100%;
   height: ${verticalScale(1)}px;
-  background-color: ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_04};
 `;
 
 export const AdvantageRow = styled.View`

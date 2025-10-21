@@ -1,6 +1,6 @@
 import Icon from '../../../../../components/Icon/Icon';
 import Label from '../../../../../components/Label/Label';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 import * as S from './styles';
 
 export interface ContactUsCardProps {
@@ -8,6 +8,9 @@ export interface ContactUsCardProps {
 };
 
 const ContactUsCard: React.FC<ContactUsCardProps> = ({onPress}) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Outer onPress={onPress} activeOpacity={0.8}>
       <S.Container>

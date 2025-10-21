@@ -1,10 +1,10 @@
 import React from 'react';
 import Label from '../Label/Label';
 import BenefitsCard from '../BenefitsCard/BenefitsCard';
-import theme from '../../theme/theme';
 import {Exercise} from '../../types/exercise';
 import * as S from './styles';
 import MediaButtons from './components/MediaButtons';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 export interface ExerciseSectionProps {
   exercise: Exercise;
@@ -21,6 +21,9 @@ const ExerciseSection: React.FC<ExerciseSectionProps> = ({
   onImagesPress,
   activeMediaTab = 'videos',
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Container>
       <S.ExerciseTitle>

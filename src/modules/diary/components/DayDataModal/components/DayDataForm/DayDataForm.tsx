@@ -5,10 +5,10 @@ import * as S from './styles';
 import Input from '../../../../../../components/Input/Input';
 import Label from '../../../../../../components/Label/Label';
 import RadioBoxInput from '../../../../../../components/RadioBoxInput/RadioBoxInput';
-import theme from '../../../../../../theme/theme';
 import DatePickerInput from '../../../../../../components/DatePicker/DatePicker';
 import Button from '../../../../../../components/Button/Button';
 import {volumeOptions, yesNoOptions} from './schema/dayDataFormSchema';
+import { useDynamicTheme } from '../../../../../../hooks/useDynamicTheme';
 
 export interface DayDataFormProps {
   defaultValues?: Partial<DayDataFormValues>;
@@ -33,6 +33,7 @@ const DayDataForm: React.FC<DayDataFormProps> = ({
     setTimeFromDate,
     currentTimeDate,
   } = useDayDataForm({defaultValues, onSubmit, baseDate});
+  const theme = useDynamicTheme();
 
   return (
     <S.FormContainer>

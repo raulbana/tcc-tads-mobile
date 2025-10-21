@@ -1,5 +1,4 @@
 import styled from 'styled-components/native';
-import theme from '../../../theme/theme';
 import { horizontalScale, verticalScale } from '../../../utils/scales';
 
 export const Outer = styled.View`
@@ -7,7 +6,7 @@ export const Outer = styled.View`
   align-items: center;
   justify-content: center;
   padding-horizontal: ${horizontalScale(16)}px;
-  background-color: ${theme.colors.white};
+  background-color: ${({theme}) => theme.colors.white};
 `;
 
 
@@ -31,7 +30,7 @@ export const SeparatorRow = styled.View`
 export const Line = styled.View`
   flex: 1;
   height: 1px;
-  background-color: ${theme.colors.gray_04};
+  background-color: ${({theme}) => theme.colors.gray_04};  
 `;
 
 export const FooterRow = styled.View`

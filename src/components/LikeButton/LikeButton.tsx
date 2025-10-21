@@ -1,4 +1,4 @@
-import theme from '../../theme/theme';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 import {moderateScale} from '../../utils/scales';
 import Icon from '../Icon/Icon';
 import * as S from './styles';
@@ -10,6 +10,9 @@ export interface LikeButtonProps {
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({isLiked, onPress, size}) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.Button onPress={onPress}>
       <Icon

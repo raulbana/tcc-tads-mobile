@@ -4,8 +4,8 @@ import {CaretLeft} from 'phosphor-react-native';
 
 import * as S from './styles';
 import Label from '../Label/Label';
-import theme from '../../theme/theme';
 import {moderateScale} from '../../utils/scales';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type ScreenContainerProps = {
   children: React.ReactNode;
@@ -49,6 +49,8 @@ const ScreenContainer = forwardRef<any, ScreenContainerProps>(
       : safeArea
       ? S.StyledSafeArea
       : S.StyledContainer;
+
+    const theme = useDynamicTheme();
 
     const HeaderWithPageName = (
       <S.StyledHeader>

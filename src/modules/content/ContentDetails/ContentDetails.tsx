@@ -3,7 +3,6 @@ import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSec
 import Label from '../../../components/Label/Label';
 import Loader from '../../../components/Loader/Loader';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
-import theme from '../../../theme/theme';
 import ActionsRow from './components/ActionsRow/ActionsRow';
 import ContentDetailsHeader from './components/ContentDetailsHeader/ContentDetailsHeader';
 import * as S from './styles';
@@ -11,6 +10,7 @@ import useContentDetails from './useContentDetails';
 import ImageCard from '../../../components/ImageCard/ImageCard';
 import CommentSection from '../../../components/CommentSection/CommentSection';
 import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselModal';
+import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const ContentDetails = () => {
   const {
@@ -36,6 +36,8 @@ const ContentDetails = () => {
     setImageCarouselIndex,
   } = useContentDetails();
 
+  const theme = useDynamicTheme();
+  
   return isLoading || !contentData ? (
     <Loader overlay />
   ) : (

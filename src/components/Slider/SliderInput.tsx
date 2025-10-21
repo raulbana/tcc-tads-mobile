@@ -1,10 +1,10 @@
 import React from 'react';
 import {View} from 'react-native';
 import * as S from './styles';
-import theme from '../../theme/theme';
 import Label from '../Label/Label';
 import {Slider} from '@miblanchard/react-native-slider';
 import {moderateScale, verticalScale} from '../../utils/scales';
+import { useDynamicTheme } from '../../hooks/useDynamicTheme';
 
 type SliderProps = {
   min?: number;
@@ -27,6 +27,9 @@ const SliderInput: React.FC<SliderProps> = ({
   trackHeight = verticalScale(8),
   thumbSize = moderateScale(16),
 }) => {
+
+  const theme = useDynamicTheme();
+
   return (
     <S.Container>
       <S.LabelsRow>

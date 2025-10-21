@@ -1,6 +1,6 @@
 import Badge from '../../../../../components/Badge/Badge';
 import LikeButton from '../../../../../components/LikeButton/LikeButton';
-import theme from '../../../../../theme/theme';
+import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 import RepostButton from '../RepostButton/RepostButton';
 import * as S from './styles';
 
@@ -19,6 +19,9 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
   onRepostPress,
   category,
 }) => {
+
+  const theme = useDynamicTheme();
+  
   return (
     <S.ActionsRowContainer>
       <Badge

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {ThemeProvider} from 'styled-components/native';
 import theme from './src/theme/theme';
 import {NavigationContainer} from '@react-navigation/native';
@@ -9,10 +9,39 @@ import 'moment/locale/pt-br';
 import {AuthProvider} from './src/contexts/AuthContext';
 import {DiaryProvider} from './src/contexts/DiaryContext';
 import {ContentProvider} from './src/contexts/ContentContext';
+import {
+  AccessibilityProvider,
+  useAccessibility,
+} from './src/contexts/AccessibilityContext';
+import { accessibleColors } from './src/theme/accessibleColors';
+import { accessibleTypography } from './src/theme/accessibleTypography';
+import colors from './src/theme/colors';
+import fonts from './src/theme/fonts';
+import typography from './src/theme/typography';
+
 if (__DEV__) {
   require('./ReactotronConfig');
 }
 const queryClient = new QueryClient();
+
+const AppContent = () => {
+  const {highContrast, bigFont} = useAccessibility();
+
+  const currentTheme = useMemo(
+    () => ({
+      colors: highContrast ? accessibleColors : colors,
+      typography: bigFont ? accessibleTypography : typography,
+      fonts,
+    }),
+    [highContrast, bigFont],
+  );
+
+  return (
+    <ThemeProvider theme={currentTheme}>
+      <Navigator />
+    </ThemeProvider>
+  );
+};
 
 function App(): React.ReactElement {
   moment.locale('pt-br');
@@ -21,13 +50,13 @@ function App(): React.ReactElement {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ContentProvider>
-            <DiaryProvider>
-              <ThemeProvider theme={theme}>
-                <Navigator />
-              </ThemeProvider>
-            </DiaryProvider>
-          </ContentProvider>
+          <AccessibilityProvider>
+            <ContentProvider>
+              <DiaryProvider>
+                <AppContent />
+              </DiaryProvider>
+            </ContentProvider>
+          </AccessibilityProvider>
         </AuthProvider>
       </QueryClientProvider>
     </NavigationContainer>
