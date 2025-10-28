@@ -15,15 +15,12 @@ export {useContentCache} from './hooks/useContentCache';
 export {useDebounce} from './hooks/useDebounce';
 export {useImageOptimization} from './hooks/useImageOptimization';
 export {useLazyLoading} from './hooks/useLazyLoading';
-export {useContentTesting} from './hooks/useContentTesting';
 
 export {
   validateContent,
   validateContentCategory,
   validateComment,
   validateCreateContentRequest,
-  sanitizeContentData,
-  sanitizeCategoriesData,
 } from './utils/contentValidation';
 
 export type {
