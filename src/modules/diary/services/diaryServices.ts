@@ -7,6 +7,7 @@ const api = apiFactory(BASE_URL);
 
 const diaryServices = {
   getCalendarEvents: async (from?: string, to?: string): Promise<CalendarRangeResponse> => {
+    
     const params = new URLSearchParams();
     if (from) params.append('from', from);
     if (to) params.append('to', to);

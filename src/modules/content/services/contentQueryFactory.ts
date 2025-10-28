@@ -178,9 +178,9 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
       }),
 
     toggleSaveContent: () =>
-      useMutation<void, Error, {contentId: string; saved: boolean}>({
-        mutationFn: ({contentId, saved}) =>
-          contentServices.toggleSaveContent(contentId, saved),
+      useMutation<void, Error, {contentId: string; userId: string; control: boolean}>({
+        mutationFn: ({contentId, userId, control}) =>
+          contentServices.toggleSaveContent(contentId, userId, control),
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [...baseKey, 'savedContent'],
@@ -188,17 +188,15 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
         },
       }),
 
-    getSavedContent: (userId: string) =>
+    getSavedContent: () =>
       useQuery<Content[]>({
-        queryKey: [...baseKey, 'savedContent', userId],
-        queryFn: () => contentServices.getSavedContent(userId),
+        queryKey: [...baseKey, 'savedContent'],
+        queryFn: () => contentServices.getSavedContent(),
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
         retry: 1,
-        enabled: !!userId,
       }),
 
-    // Comments
     getComments: (contentId: string, page?: number, size?: number) =>
       useQuery<Comment[]>({
         queryKey: [...baseKey, 'comments', contentId, page, size],

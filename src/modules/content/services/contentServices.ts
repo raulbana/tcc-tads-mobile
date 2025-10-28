@@ -25,6 +25,7 @@ const contentServices = {
     const headers = {
       'x-user-id': userId,
     };
+
     const response = await api.get(apiRoutes.content.byId(contentId), {
       headers,
     });
@@ -159,8 +160,8 @@ const contentServices = {
     return response.data;
   },
 
-  getSavedContent: async (userId: string): Promise<Content[]> => {
-    const response = await api.get(apiRoutes.content.saved(userId));
+  getSavedContent: async (): Promise<Content[]> => {
+    const response = await api.get(apiRoutes.content.saved);
     return response.data;
   },
 
@@ -174,9 +175,10 @@ const contentServices = {
 
   toggleSaveContent: async (
     contentId: string,
-    saved: boolean,
+    userId: string,
+    control: boolean,
   ): Promise<void> => {
-    await api.patch(apiRoutes.content.save(contentId), {saved: saved});
+    await api.patch(apiRoutes.content.save(contentId), {control: control, userId: userId});
   },
 
   getComments: async (

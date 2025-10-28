@@ -119,7 +119,8 @@ const useContentDetails = () => {
     try {
       await toggleSaveMutation.mutateAsync({
         contentId: content.id,
-        saved: !content.isSaved,
+        userId: user.id.toString(),
+        control: !content.isSaved,
       });
     } catch (err) {
       console.error('Error toggling save:', err);

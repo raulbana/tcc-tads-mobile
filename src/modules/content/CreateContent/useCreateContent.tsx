@@ -22,7 +22,8 @@ const useCreateContent = () => {
           contentData,
           userId: user?.id.toString() || '',
         });
-        navigation.navigate('MainTabs', {screen: 'Contents'});
+        console.log(contentData);
+        console.log('Content created successfully');
       } catch (error) {
         console.error('Error creating content:', error);
         throw error;
