@@ -1,11 +1,9 @@
 import React, {
   createContext,
   useContext,
-  useState,
   ReactNode,
-  useCallback,
-  useEffect,
   useMemo,
+  useCallback,
 } from 'react';
 import {
   Content,
@@ -16,8 +14,8 @@ import {
   ContentStats,
   ReportContentDTO,
 } from '../types/content';
-import contentServices from '../modules/content/services/contentServices';
 import {useAuth} from './AuthContext';
+import useContentQueries from '../modules/content/services/contentQueryFactory';
 
 interface ContentContextType {
   contents: Content[];
@@ -57,350 +55,190 @@ interface ContentContextType {
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 export const ContentProvider = ({children}: {children: ReactNode}) => {
-  const [contents, setContents] = useState<Content[]>([]);
-  const [categories, setCategories] = useState<ContentCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const {user} = useAuth();
 
+  // React Query hooks
+  const contentQueries = useContentQueries(['content']);
+  const {
+    data: contents = [],
+    isLoading: isLoadingContents,
+    error: contentsError,
+    refetch: refetchContents,
+  } = contentQueries.getList(user?.id.toString() || '', false);
+
+  const {
+    data: categories = [],
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = contentQueries.getCategories();
+
+  const createContentMutation = contentQueries.createContent();
+  const updateContentMutation = contentQueries.updateContent();
+  const deleteContentMutation = contentQueries.deleteContent();
+  const toggleLikeMutation = contentQueries.toggleLike();
+  const toggleRepostMutation = contentQueries.toggleRepost();
+  const createCommentMutation = contentQueries.createComment();
+  const reportContentMutation = contentQueries.reportContent();
+
+  // Estados combinados
+  const isLoading = isLoadingContents || isLoadingCategories;
+  const error = contentsError?.message || categoriesError?.message;
+
   const clearError = useCallback(() => {
-    setError(null);
+    // React Query gerencia erros automaticamente
   }, []);
 
   const loadContents = useCallback(
     async (profileMode?: boolean) => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await contentServices.getAll(
-          user?.id?.toString() || '1',
-          profileMode,
-        );
-        setContents(data);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao carregar conteúdos';
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      return refetchContents();
     },
-    [user],
+    [refetchContents],
   );
 
   const loadContentById = useCallback(
     async (id: string) => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const content = await contentServices.getById(
-          id,
-          user?.id?.toString() || '1',
-        );
-        setContents(prevContents => {
-          const existingIndex = prevContents.findIndex(c => c.id === id);
-          if (existingIndex !== -1) {
-            return prevContents.map(c => (c.id === id ? content : c));
-          } else {
-            return [content, ...prevContents];
-          }
-        });
-        return content;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao carregar conteúdo';
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      // React Query gerencia isso automaticamente
+      return contents.find(c => c.id === id) || null;
     },
-    [user],
+    [contents],
   );
 
   const createContent = useCallback(
     async (contentData: CreateContentRequest) => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const serviceData = {
-          title: contentData.title,
-          description: contentData.description,
-          images: contentData.images || [],
-          video: contentData.video,
-          categories: contentData.categories,
-        };
-        const newContent = await contentServices.createContent(
-          serviceData,
-          user?.id?.toString() ?? '',
-        );
-        setContents(prevContents => [newContent, ...prevContents]);
-        return newContent;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao criar conteúdo';
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      if (!user) throw new Error('User not authenticated');
+      return createContentMutation.mutateAsync({
+        contentData,
+        userId: user.id.toString(),
+      });
     },
-    [user],
+    [createContentMutation, user],
   );
 
   const updateContent = useCallback(
     async (id: string, contentData: UpdateContentRequest) => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        setContents(prevContents =>
-          prevContents.map(c => (c.id === id ? {...c, ...contentData} : c)),
-        );
-        throw new Error('Update content not implemented yet');
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao atualizar conteúdo';
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setIsLoading(false);
-      }
+      if (!user) throw new Error('User not authenticated');
+      return updateContentMutation.mutateAsync({
+        id,
+        contentData,
+        userId: user.id.toString(),
+      });
     },
-    [],
+    [updateContentMutation, user],
   );
 
-  const deleteContent = useCallback(async (id: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setContents(prevContents => prevContents.filter(c => c.id !== id));
-      throw new Error('Delete content not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao deletar conteúdo';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const deleteContent = useCallback(
+    async (id: string) => {
+      return deleteContentMutation.mutateAsync(id);
+    },
+    [deleteContentMutation],
+  );
 
   const toggleLikeContent = useCallback(
     async (id: string) => {
-      try {
-        setError(null);
-        const currentContent = contents.find(c => c.id === id);
-        if (!currentContent) return;
+      if (!user) throw new Error('User not authenticated');
+      const content = contents.find(c => c.id === id);
+      if (!content) throw new Error('Content not found');
 
-        const nextState = !currentContent.isLiked;
-
-        setContents(prevContents =>
-          prevContents.map(c => {
-            if (c.id === id) {
-              return {
-                ...c,
-                isLiked: nextState,
-                likesCount: nextState
-                  ? (c.likesCount || 0) + 1
-                  : Math.max(0, (c.likesCount || 1) - 1),
-              };
-            }
-            return c;
-          }),
-        );
-
-        await contentServices.toggleLike(
-          id,
-          nextState,
-          user?.id?.toString() || '1',
-        );
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error
-            ? err.message
-            : 'Erro ao curtir/descurtir conteúdo';
-        setError(errorMessage);
-        throw err;
-      }
+      return toggleLikeMutation.mutateAsync({
+        id,
+        liked: !content.isLiked,
+        userId: user.id.toString(),
+      });
     },
-    [contents],
+    [toggleLikeMutation, user, contents],
   );
 
   const toggleRepostContent = useCallback(
     async (id: string) => {
-      try {
-        setError(null);
-        const currentContent = contents.find(c => c.id === id);
-        if (!currentContent) return;
+      if (!user) throw new Error('User not authenticated');
+      const content = contents.find(c => c.id === id);
+      if (!content) throw new Error('Content not found');
 
-        const nextState = !currentContent.isReposted;
-
-        setContents(prevContents =>
-          prevContents.map(c => {
-            if (c.id === id) {
-              return {
-                ...c,
-                isReposted: nextState,
-                repostsCount: nextState
-                  ? (c.repostsCount || 0) + 1
-                  : Math.max(0, (c.repostsCount || 1) - 1),
-              };
-            }
-            return c;
-          }),
-        );
-
-        await contentServices.toggleRepost(
-          id,
-          nextState,
-          user?.id?.toString() || '1',
-        );
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao repostar conteúdo';
-        setError(errorMessage);
-        throw err;
-      }
+      return toggleRepostMutation.mutateAsync({
+        id,
+        reposted: !content.isReposted,
+        userId: user.id.toString(),
+      });
     },
-    [contents],
+    [toggleRepostMutation, user, contents],
   );
 
   const addComment = useCallback(
     async (contentId: string, text: string) => {
-      try {
-        setError(null);
-        const newComment: Comment = {
-          id: Math.random().toString(36).substring(7),
-          contentId: contentId,
-          text: text,
-          authorId: user?.id?.toString() || 'currentUser',
-          authorName: user?.name || 'Current User',
-          authorImage:
-            user?.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          likesCount: 0,
-          isLikedByCurrentUser: false,
-          repliesCount: 0,
-          replies: [],
-        };
+      if (!user) throw new Error('User not authenticated');
 
-        setContents(prevContents =>
-          prevContents.map(c => {
-            if (c.id === contentId) {
-              return {
-                ...c,
-                comments: [newComment, ...c.comments],
-                commentsCount: c.commentsCount + 1,
-              };
-            }
-            return c;
-          }),
-        );
+      await createCommentMutation.mutateAsync({
+        contentId: parseInt(contentId),
+        authorId: user.id,
+        text,
+      });
 
-        return newComment;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao adicionar comentário';
-        setError(errorMessage);
-        throw err;
-      }
+      // Mock comment para resposta imediata
+      const mockComment: Comment = {
+        id: Math.random().toString(36).substring(7),
+        contentId,
+        authorId: user.id.toString(),
+        authorName: user.name,
+        text,
+        likesCount: 0,
+        isLikedByCurrentUser: false,
+        repliesCount: 0,
+        replies: [],
+        authorImage:
+          user.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      return mockComment;
     },
-    [user],
+    [createCommentMutation, user],
   );
 
   const updateComment = useCallback(async (commentId: string, text: string) => {
-    try {
-      setError(null);
-      throw new Error('Update comment not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao atualizar comentário';
-      setError(errorMessage);
-      throw err;
-    }
+    // TODO: Implementar quando API estiver disponível
+    throw new Error('Not implemented yet');
   }, []);
 
   const deleteComment = useCallback(async (commentId: string) => {
-    try {
-      setError(null);
-      throw new Error('Delete comment not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao deletar comentário';
-      setError(errorMessage);
-      throw err;
-    }
+    // TODO: Implementar quando API estiver disponível
+    throw new Error('Not implemented yet');
   }, []);
 
   const toggleLikeComment = useCallback(async (commentId: string) => {
-    try {
-      setError(null);
-      throw new Error('Toggle like comment not implemented yet');
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao curtir comentário';
-      setError(errorMessage);
-      throw err;
-    }
+    // TODO: Implementar quando API estiver disponível
+    throw new Error('Not implemented yet');
   }, []);
 
   const loadCategories = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await contentServices.getCategories();
-      setCategories(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao carregar categorias';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+    // React Query gerencia isso automaticamente
   }, []);
 
-  const refreshContent = useCallback(
-    async (id: string) => {
-      try {
-        setError(null);
-        await loadContentById(id);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao atualizar conteúdo';
-        setError(errorMessage);
-        throw err;
-      }
-    },
-    [loadContentById],
-  );
+  const refreshContent = useCallback(async (id: string) => {
+    // React Query gerencia isso automaticamente
+  }, []);
 
   const getContentById = useCallback(
     (id: string) => {
-      return contents.find(content => content.id === id) || null;
+      return contents.find(c => c.id === id) || null;
     },
     [contents],
   );
 
   const getContentsByCategory = useCallback(
     (categoryId: string) => {
-      return contents.filter(content => content.category.id === categoryId);
+      return contents.filter(c => c.category.id === categoryId);
     },
     [contents],
   );
 
   const searchContents = useCallback(
     (query: string) => {
-      if (!query.trim()) return contents;
-
       const lowercaseQuery = query.toLowerCase();
       return contents.filter(
-        content =>
-          content.title.toLowerCase().includes(lowercaseQuery) ||
-          content.description.toLowerCase().includes(lowercaseQuery) ||
-          content.category.name.toLowerCase().includes(lowercaseQuery),
+        c =>
+          c.title.toLowerCase().includes(lowercaseQuery) ||
+          c.description.toLowerCase().includes(lowercaseQuery),
       );
     },
     [contents],
@@ -408,78 +246,81 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
 
   const reportContent = useCallback(
     async (contentId: string, reason: string) => {
-      try {
-        setError(null);
-        await contentServices.reportContent(
-          contentId,
-          reason,
-          user?.id?.toString() || '1',
-        );
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Erro ao reportar conteúdo';
-        setError(errorMessage);
-        throw err;
-      }
+      if (!user) throw new Error('User not authenticated');
+      return reportContentMutation.mutateAsync({
+        contentId,
+        reason,
+        userId: user.id.toString(),
+      });
     },
-    [user],
+    [reportContentMutation, user],
   );
 
-  const getContentStats = useCallback(async (): Promise<ContentStats> => {
-    try {
-      setError(null);
-      return {
-        totalContents: contents.length,
-        totalCategories: categories.length,
-        totalComments: contents.reduce(
-          (acc, content) => acc + content.commentsCount,
-          0,
-        ),
-        totalLikes: contents.reduce(
-          (acc, content) => acc + (content.likesCount || 0),
-          0,
-        ),
-      };
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Erro ao obter estatísticas';
-      setError(errorMessage);
-      throw err;
-    }
+  const getContentStats = useCallback(async () => {
+    // TODO: Implementar quando API estiver disponível
+    return {
+      totalContents: contents.length,
+      totalCategories: categories.length,
+      totalComments: 0,
+      totalLikes: 0,
+    };
   }, [contents, categories]);
 
-  const memoizedContents = useMemo(() => contents, [contents]);
-  const memoizedCategories = useMemo(() => categories, [categories]);
+  const value = useMemo(
+    () => ({
+      contents,
+      categories,
+      isLoading,
+      error,
+      loadContents,
+      loadContentById,
+      createContent,
+      updateContent,
+      deleteContent,
+      toggleLikeContent,
+      toggleRepostContent,
+      addComment,
+      updateComment,
+      deleteComment,
+      toggleLikeComment,
+      loadCategories,
+      clearError,
+      refreshContent,
+      getContentById,
+      getContentsByCategory,
+      searchContents,
+      reportContent,
+      getContentStats,
+    }),
+    [
+      contents,
+      categories,
+      isLoading,
+      error,
+      loadContents,
+      loadContentById,
+      createContent,
+      updateContent,
+      deleteContent,
+      toggleLikeContent,
+      toggleRepostContent,
+      addComment,
+      updateComment,
+      deleteComment,
+      toggleLikeComment,
+      loadCategories,
+      clearError,
+      refreshContent,
+      getContentById,
+      getContentsByCategory,
+      searchContents,
+      reportContent,
+      getContentStats,
+    ],
+  );
 
   return (
-    <ContentContext.Provider
-      value={{
-        contents: memoizedContents,
-        categories: memoizedCategories,
-        isLoading,
-        error,
-        loadContents,
-        loadContentById,
-        createContent,
-        updateContent,
-        deleteContent,
-        toggleLikeContent,
-        toggleRepostContent,
-        addComment,
-        updateComment,
-        deleteComment,
-        toggleLikeComment,
-        loadCategories,
-        clearError,
-        refreshContent,
-        getContentById,
-        getContentsByCategory,
-        searchContents,
-        reportContent,
-        getContentStats,
-      }}>
-      {children}
-    </ContentContext.Provider>
+    <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
   );
 };
 

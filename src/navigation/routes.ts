@@ -35,6 +35,7 @@ export type ConfigParamList = {
   EditProfile: undefined;
   Notifications: undefined;
   AboutApp: undefined;
+  EditContent: {contentId: string};
 };
 
 export type ContentParamList = {
@@ -54,7 +55,7 @@ export type ExercisesParamList = {
   ExerciseDetails: {exerciseId: string};
   EvaluateExercise: {exerciseId: string};
   ExerciseWorkout: {exerciseId: string};
-}
+};
 
 export type RootParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;

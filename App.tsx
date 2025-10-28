@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, {useMemo} from 'react';
 import {ThemeProvider} from 'styled-components/native';
 import theme from './src/theme/theme';
 import {NavigationContainer} from '@react-navigation/native';
@@ -7,14 +7,13 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import {AuthProvider} from './src/contexts/AuthContext';
-import {DiaryProvider} from './src/contexts/DiaryContext';
-import {ContentProvider} from './src/contexts/ContentContext';
 import {
   AccessibilityProvider,
   useAccessibility,
 } from './src/contexts/AccessibilityContext';
-import { accessibleColors } from './src/theme/accessibleColors';
-import { accessibleTypography } from './src/theme/accessibleTypography';
+import AuthenticatedProviders from './src/components/AuthenticatedProviders/AuthenticatedProviders';
+import {accessibleColors} from './src/theme/accessibleColors';
+import {accessibleTypography} from './src/theme/accessibleTypography';
 import colors from './src/theme/colors';
 import fonts from './src/theme/fonts';
 import typography from './src/theme/typography';
@@ -51,11 +50,9 @@ function App(): React.ReactElement {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <AccessibilityProvider>
-            <ContentProvider>
-              <DiaryProvider>
-                <AppContent />
-              </DiaryProvider>
-            </ContentProvider>
+            <AuthenticatedProviders>
+              <AppContent />
+            </AuthenticatedProviders>
           </AccessibilityProvider>
         </AuthProvider>
       </QueryClientProvider>

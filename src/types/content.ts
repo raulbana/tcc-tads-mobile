@@ -67,12 +67,19 @@ export interface Content {
   subcontent?: string;
   createdAt: Date;
   updatedAt: Date;
-  coverUrl: string;
-  images?: string[];
-  video?: string;
-  category: ContentCategory;
+  cover: {
+    url: string;
+    id: number;
+    contentType: string;
+    contentSize: number;
+    altText: string;
+    createdAt: Date;
+  };
+  media: MediaDTO[];
+  categories: string[];
   isReposted?: boolean;
   isLiked?: boolean;
+  isSaved?: boolean;
   likesCount?: number;
   repostsCount?: number;
   authorId: string;

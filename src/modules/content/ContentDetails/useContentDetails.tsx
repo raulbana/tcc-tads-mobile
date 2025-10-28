@@ -2,8 +2,9 @@ import {useRoute} from '@react-navigation/native';
 import {useEffect, useState, useCallback} from 'react';
 import {ContentParamList} from '../../../navigation/routes';
 import {RouteProp} from '@react-navigation/native';
-import {useContent} from '../../../contexts/ContentContext';
+import {useAuth} from '../../../contexts/AuthContext';
 import {Comment} from '../../../types/content';
+import useContentQueries from '../services/contentQueryFactory';
 
 function updateCommentById(
   comments: Comment[],
@@ -48,14 +49,8 @@ function addReplyUnderRoot(
     if (root.id === rootId) {
       return {
         ...root,
-        replies: [newReply, ...(root.replies || [])],
+        replies: [...(root.replies || []), newReply],
         repliesCount: (root.repliesCount || 0) + 1,
-      };
-    }
-    if (root.replies && root.replies.length > 0) {
-      return {
-        ...root,
-        replies: addReplyUnderRoot(root.replies, rootId, newReply),
       };
     }
     return root;
@@ -65,21 +60,22 @@ function addReplyUnderRoot(
 const useContentDetails = () => {
   const {params} = useRoute<RouteProp<ContentParamList, 'ContentDetails'>>();
   const {contentId} = params;
+  const {user} = useAuth();
 
+  const contentQueries = useContentQueries(['content']);
   const {
-    loadContentById,
-    toggleLikeContent,
-    toggleRepostContent,
-    addComment,
+    data: content,
     isLoading,
     error,
-    contents,
-  } = useContent();
+    refetch: refetchContent,
+  } = contentQueries.getById(contentId, user?.id.toString() || '');
 
-  const [content, setContent] = useState(
-    () => contents.find(c => c.id === contentId) || null,
-  );
-  const [comments, setComments] = useState(content?.comments || []);
+  const toggleLikeMutation = contentQueries.toggleLike();
+  const toggleRepostMutation = contentQueries.toggleRepost();
+  const toggleSaveMutation = contentQueries.toggleSaveContent();
+  const createCommentMutation = contentQueries.createComment();
+
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
@@ -87,52 +83,51 @@ const useContentDetails = () => {
   const [imageCarouselIndex, setImageCarouselIndex] = useState(0);
 
   useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const contentData = await loadContentById(contentId);
-        console.log('contentData', contentData);
-        if (contentData) {
-          setContent(contentData);
-          setComments(contentData.comments || []);
-        }
-      } catch (err) {
-        console.error('Error loading content:', err);
-      }
-    };
-
-    if (!content) {
-      fetchContent();
+    if (content) {
+      setComments(content.comments || []);
     }
-  }, [contentId, loadContentById, content]);
-
-  useEffect(() => {
-    const updatedContent = contents.find(c => c.id === contentId);
-    if (updatedContent) {
-      setContent(updatedContent);
-      setComments(updatedContent.comments || []);
-    }
-  }, [contents, contentId]);
+  }, [content]);
 
   const handleToggleLike = useCallback(async () => {
-    if (!content) return;
+    if (!content || !user) return;
     try {
-      await toggleLikeContent(content.id);
+      await toggleLikeMutation.mutateAsync({
+        id: content.id,
+        liked: !content.isLiked,
+        userId: user.id.toString(),
+      });
     } catch (err) {
       console.error('Error toggling like:', err);
     }
-  }, [content, toggleLikeContent]);
+  }, [content, user, toggleLikeMutation]);
 
   const handleToggleRepost = useCallback(async () => {
-    if (!content) return;
+    if (!content || !user) return;
     try {
-      await toggleRepostContent(content.id);
+      await toggleRepostMutation.mutateAsync({
+        id: content.id,
+        reposted: !content.isReposted,
+        userId: user.id.toString(),
+      });
     } catch (err) {
       console.error('Error toggling repost:', err);
     }
-  }, [content, toggleRepostContent]);
+  }, [content, user, toggleRepostMutation]);
+
+  const handleToggleSave = useCallback(async () => {
+    if (!content || !user) return;
+    try {
+      await toggleSaveMutation.mutateAsync({
+        contentId: content.id,
+        saved: !content.isSaved,
+      });
+    } catch (err) {
+      console.error('Error toggling save:', err);
+    }
+  }, [content, user, toggleSaveMutation]);
 
   const handleSendComment = useCallback(async () => {
-    if (!content || !commentText.trim()) return;
+    if (!content || !commentText.trim() || !user) return;
 
     if (replyTo) {
       if (replyText.trim() === '') return;
@@ -141,14 +136,15 @@ const useContentDetails = () => {
       const newReply: Comment = {
         id: Math.random().toString(36).substring(7),
         contentId: contentId,
-        authorId: 'currentUser',
-        authorName: 'Current User',
+        authorId: user.id.toString(),
+        authorName: user.name,
         text: replyText,
         likesCount: 0,
         isLikedByCurrentUser: false,
         repliesCount: 0,
         replies: [],
-        authorImage: 'https://i.pravatar.cc/150?img=3',
+        authorImage:
+          user.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -160,7 +156,11 @@ const useContentDetails = () => {
     }
 
     try {
-      await addComment(content.id, commentText);
+      await createCommentMutation.mutateAsync({
+        contentId: parseInt(contentId),
+        authorId: user.id,
+        text: commentText,
+      });
       setCommentText('');
     } catch (err) {
       console.error('Error adding comment:', err);
@@ -172,56 +172,76 @@ const useContentDetails = () => {
     replyText,
     comments,
     contentId,
-    addComment,
+    user,
+    createCommentMutation,
   ]);
 
-  const handleLikeCommentOrReply = useCallback(
-    (commentId: string, liked: boolean) => {
-      setComments(prevComments =>
-        updateCommentById(prevComments, commentId, comment => ({
-          ...comment,
-          isLikedByCurrentUser: liked,
-          likesCount: liked
-            ? (comment.likesCount || 0) + 1
-            : Math.max(0, (comment.likesCount || 1) - 1),
-        })),
-      );
-    },
-    [],
-  );
+  const handleLikeComment = useCallback((commentId: string) => {
+    setComments(prev =>
+      updateCommentById(prev, commentId, comment => ({
+        ...comment,
+        isLikedByCurrentUser: !comment.isLikedByCurrentUser,
+        likesCount: comment.isLikedByCurrentUser
+          ? (comment.likesCount || 0) - 1
+          : (comment.likesCount || 0) + 1,
+      })),
+    );
+  }, []);
 
-  const handleReplyComment = useCallback((commentId: string) => {
+  const handleReplyToComment = useCallback((commentId: string) => {
     setReplyTo(commentId);
+  }, []);
+
+  const handleCancelReply = useCallback(() => {
+    setReplyTo(null);
     setReplyText('');
   }, []);
 
-  const handleChangeCommentText = useCallback((text: string) => {
-    setCommentText(text);
+  const handleImagePress = useCallback((index: number) => {
+    setImageCarouselIndex(index);
+    setImageCarouselVisible(true);
   }, []);
 
+  const handleCloseImageCarousel = useCallback(() => {
+    setImageCarouselVisible(false);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    refetchContent();
+  }, [refetchContent]);
+
   return {
-    isLiked: content?.isLiked || false,
-    toggleLike: handleToggleLike,
-    isReposted: content?.isReposted || false,
-    toggleRepost: handleToggleRepost,
-    isLoading,
-    contentData: content,
-    isError: !!error,
-    error,
+    content,
     comments,
     commentText,
-    onChangeCommentText: handleChangeCommentText,
-    onSendComment: handleSendComment,
-    onReplyComment: handleReplyComment,
-    onLikeCommentOrReply: handleLikeCommentOrReply,
-    handleSend: handleSendComment,
+    setCommentText,
     replyTo,
     replyText,
     setReplyText,
-    setReplyTo,
     imageCarouselVisible,
-    setImageCarouselVisible,
     imageCarouselIndex,
+    isLoading:
+      isLoading ||
+      toggleLikeMutation.isPending ||
+      toggleRepostMutation.isPending ||
+      toggleSaveMutation.isPending ||
+      createCommentMutation.isPending,
+    error:
+      error?.message ||
+      toggleLikeMutation.error?.message ||
+      toggleRepostMutation.error?.message ||
+      toggleSaveMutation.error?.message ||
+      createCommentMutation.error?.message,
+    handleToggleLike,
+    handleToggleRepost,
+    handleToggleSave,
+    handleSendComment,
+    handleLikeComment,
+    handleReplyToComment,
+    handleCancelReply,
+    handleImagePress,
+    handleCloseImageCarousel,
+    handleRefresh,
     setImageCarouselIndex,
   };
 };

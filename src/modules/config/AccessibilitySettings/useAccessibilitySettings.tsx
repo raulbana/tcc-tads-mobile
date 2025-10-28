@@ -3,7 +3,6 @@ import {NavigationStackProp} from '../../../navigation/routes';
 import {SettingItemProps} from './components/SettingsList/components/SettingItem';
 import {useState, useCallback, useEffect} from 'react';
 import {useAccessibility} from '../../../contexts/AccessibilityContext';
-import {useAuth} from '../../../contexts/AuthContext';
 import {AccessibilityPreferences} from '../../../types/config';
 
 const useAccessibilitySettings = () => {
@@ -15,11 +14,9 @@ const useAccessibilitySettings = () => {
     isLoading,
     error,
   } = useAccessibility();
-  const {user, isLoggedIn} = useAuth();
   const [localHighContrast, setLocalHighContrast] = useState(highContrast);
   const [localBigFont, setLocalBigFont] = useState(bigFont);
 
-  // Update local state when context state changes
   useEffect(() => {
     setLocalHighContrast(highContrast);
     setLocalBigFont(bigFont);
@@ -38,11 +35,9 @@ const useAccessibilitySettings = () => {
 
       await saveAccessibilityPreferences(preferences);
 
-      // Navigate back to MyAccount after successful save
       navigateToMyAccount();
     } catch (error) {
       console.error('Error saving accessibility preferences:', error);
-      // Error handling is done in the context
     }
   }, [localHighContrast, localBigFont, saveAccessibilityPreferences]);
 

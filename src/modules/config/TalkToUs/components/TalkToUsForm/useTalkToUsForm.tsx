@@ -2,14 +2,17 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
 import {TalkToUsFormData, talkToUsSchema} from '../../schema/talkToUsSchema';
 import {useAuth} from '../../../../../contexts/AuthContext';
-import configServices from '../../../services/configServices';
+import useConfigQueries from '../../../services/configQueryFactory';
 import {ContactRequest} from '../../../../../types/config';
 import {useState} from 'react';
 
 const useTalkToUsForm = () => {
   const {user} = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // React Query hooks
+  const configQueries = useConfigQueries(['config']);
+  const sendContactEmailMutation = configQueries.useSendContactEmail();
 
   const {
     register,
@@ -31,7 +34,6 @@ const useTalkToUsForm = () => {
 
   const onSubmit = async (data: TalkToUsFormData) => {
     try {
-      setIsLoading(true);
       setIsSuccess(false);
 
       const contactRequest: ContactRequest = {
@@ -40,7 +42,7 @@ const useTalkToUsForm = () => {
         text: data.message,
       };
 
-      await configServices.sendContactEmail(contactRequest);
+      await sendContactEmailMutation.mutateAsync(contactRequest);
 
       setIsSuccess(true);
       reset();
@@ -52,8 +54,6 @@ const useTalkToUsForm = () => {
     } catch (error) {
       console.error('Error sending contact email:', error);
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -66,7 +66,7 @@ const useTalkToUsForm = () => {
     onSubmit,
     watch,
     control,
-    isLoading,
+    isLoading: sendContactEmailMutation.isPending,
     isSuccess,
   };
 };
