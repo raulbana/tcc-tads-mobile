@@ -137,7 +137,7 @@ const diaryServices = {
     try {
       const calendarData = JSON.parse(cachedData) as CalendarRangeResponse;
 
-      for (const [date, dayData] of Object.entries(calendarData)) {
+      for (const [_date, dayData] of Object.entries(calendarData)) {
         const requestData: CalendarRequestDTO = {
           date: dayData.date,
           leakageLevel: dayData.leakageLevel,

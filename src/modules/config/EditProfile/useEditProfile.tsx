@@ -1,7 +1,7 @@
 import {useState, useEffect, useCallback} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {Alert} from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
+import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../../contexts/AuthContext';
 import {NavigationStackProp} from '../../../navigation/routes';
@@ -13,7 +13,7 @@ const useEditProfile = () => {
   const {user, updateUser} = useAuth();
   const navigation = useNavigation<NavigationStackProp>();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const {

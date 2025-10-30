@@ -4,7 +4,6 @@ import {
   verticalScale,
   horizontalScale,
 } from '../../../../../../utils/scales';
-import {TouchableOpacity} from 'react-native';
 
 export const Container = styled.View`
   flex-direction: row;

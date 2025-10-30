@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image} from 'react-native';
 import {Pencil} from 'phosphor-react-native';
 import Label from '../../../../../components/Label/Label';
 import Button from '../../../../../components/Button/Button';

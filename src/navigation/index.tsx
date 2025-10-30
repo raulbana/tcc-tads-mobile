@@ -7,7 +7,7 @@ const Stack = createNativeStackNavigator<RootParamList>();
 export type StackScreenProps = React.ComponentProps<typeof Stack.Screen>;
 
 const Navigator: React.FC = () => {
-  const {isLoggedIn, isInitializing} = useAuth();
+  useAuth();
 
   const initialRouteName = useMemo(() => {
     return 'Auth';

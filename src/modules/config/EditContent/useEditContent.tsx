@@ -12,7 +12,6 @@ const useEditContent = () => {
   const {user} = useAuth();
   const {categories, loadCategories, updateContent} = useContent();
   const [content, setContent] = useState<Content | null>(null);
-  const [selectedContent, setSelectedContent] = useState<Content | null>(null);
 
   const contentQueries = useContentQueries(['content']);
   const contentId = (route.params as any)?.contentId;
@@ -43,7 +42,6 @@ const useEditContent = () => {
   }, [contentData]);
 
   const handleSelectContent = useCallback((selected: Content) => {
-    setSelectedContent(selected);
     setContent(selected);
   }, []);
 

@@ -24,8 +24,8 @@ const ContentSelector: React.FC<ContentSelectorProps> = ({
         onPress={() => onSelectContent(item)}
         style={S.cardStyle}>
         <S.CardContainer>
-          {item.coverUrl && (
-            <S.Thumbnail source={{uri: item.coverUrl}} resizeMode="cover" />
+          {item.cover?.url && (
+            <S.Thumbnail source={{uri: item.cover.url}} resizeMode="cover" />
           )}
           <S.InfoContainer>
             <Label
@@ -40,12 +40,12 @@ const ContentSelector: React.FC<ContentSelectorProps> = ({
               text={item.description || 'Sem descrição'}
               numberOfLines={2}
             />
-            {item.category && (
+            {item.categories && item.categories.length > 0 && (
               <S.CategoryBadge>
                 <Label
                   typography={theme.typography.paragraph.sm2}
                   color={theme.colors.purple_04}
-                  text={item.category.name}
+                  text={item.categories[0]}
                 />
               </S.CategoryBadge>
             )}

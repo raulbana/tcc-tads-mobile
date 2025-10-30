@@ -146,8 +146,8 @@ const useContentDetails = () => {
         replies: [],
         authorImage:
           user.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       setComments(prev => addReplyUnderRoot(prev, rootId, newReply));

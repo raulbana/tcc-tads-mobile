@@ -61,12 +61,12 @@ const PostCard: React.FC<PostCardProps> = ({post, onDelete, isDeleting}) => {
         </TouchableOpacity>
       </S.Header>
 
-      {post.content && (
+      {post.description && (
         <S.ContentContainer>
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_07}
-            text={post.content}
+            text={post.description}
             numberOfLines={3}
           />
         </S.ContentContainer>
@@ -89,7 +89,7 @@ const PostCard: React.FC<PostCardProps> = ({post, onDelete, isDeleting}) => {
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={post.likes?.toString() || '0'}
+              text={(post.likesCount ?? 0).toString()}
             />
           </S.StatItem>
 
@@ -98,7 +98,7 @@ const PostCard: React.FC<PostCardProps> = ({post, onDelete, isDeleting}) => {
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={post.comments?.toString() || '0'}
+              text={(post.commentsCount ?? 0).toString()}
             />
           </S.StatItem>
 
@@ -107,7 +107,7 @@ const PostCard: React.FC<PostCardProps> = ({post, onDelete, isDeleting}) => {
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={post.views?.toString() || '0'}
+              text={'0'}
             />
           </S.StatItem>
         </S.StatsContainer>

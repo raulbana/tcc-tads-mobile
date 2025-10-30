@@ -1,4 +1,3 @@
-import {Platform} from 'react-native';
 import RNPrint from 'react-native-print';
 import {ReportDTO, CalendarDayDTO} from '../../../types/diary';
 

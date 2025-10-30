@@ -180,8 +180,8 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
         replies: [],
         authorImage:
           user.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
       return mockComment;
@@ -214,7 +214,7 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
 
   const getContentsByCategory = useCallback(
     (categoryId: string) => {
-      return contents.filter(c => c.category.id === categoryId);
+      return contents.filter(c => c.categories?.includes(categoryId));
     },
     [contents],
   );

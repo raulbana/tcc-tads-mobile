@@ -4,7 +4,6 @@ import {
   verticalScale,
   horizontalScale,
 } from '../../../../../utils/scales';
-import {ImageStyle} from 'react-native';
 
 export const Container = styled.TouchableOpacity`
   background-color: ${({theme}) => theme.colors.white};
@@ -60,7 +59,6 @@ export const StatItem = styled.View`
   gap: ${horizontalScale(4)}px;
 `;
 
-
 export const ActionButton = styled.TouchableOpacity`
   padding: ${verticalScale(8)}px;
   border-radius: ${moderateScale(6)}px;
@@ -72,4 +70,3 @@ export const MediaImage = styled.Image`
   height: ${verticalScale(200)}px;
   resize-mode: cover;
 `;
-

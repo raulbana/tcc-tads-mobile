@@ -2,7 +2,6 @@ import React from 'react';
 import {Controller} from 'react-hook-form';
 import Input from '../../../../../components/Input/Input';
 import Button from '../../../../../components/Button/Button';
-import DatePicker from '../../../../../components/DatePicker/DatePicker';
 import RadioButtonGroup from '../../../../../components/RadioButtonGroup/RadioButtonGroup';
 import Label from '../../../../../components/Label/Label';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';

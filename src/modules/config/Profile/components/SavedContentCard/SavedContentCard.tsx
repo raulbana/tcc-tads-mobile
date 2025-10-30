@@ -75,11 +75,11 @@ const SavedContentCard: React.FC<SavedContentCardProps> = ({
           color={theme.colors.gray_08}
           text={content.title}
         />
-        {content.content && (
+        {content.description && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_07}
-            text={content.content}
+            text={content.description}
             numberOfLines={3}
           />
         )}
@@ -102,7 +102,7 @@ const SavedContentCard: React.FC<SavedContentCardProps> = ({
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={content.likes?.toString() || '0'}
+              text={(content.likesCount ?? 0).toString()}
             />
           </S.StatItem>
 
@@ -111,7 +111,7 @@ const SavedContentCard: React.FC<SavedContentCardProps> = ({
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={content.comments?.toString() || '0'}
+              text={(content.commentsCount ?? 0).toString()}
             />
           </S.StatItem>
 
@@ -120,7 +120,7 @@ const SavedContentCard: React.FC<SavedContentCardProps> = ({
             <Label
               typography={theme.typography.paragraph.sm2}
               color={theme.colors.gray_06}
-              text={content.views?.toString() || '0'}
+              text={'0'}
             />
           </S.StatItem>
         </S.StatsContainer>

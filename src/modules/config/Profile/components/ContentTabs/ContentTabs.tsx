@@ -1,5 +1,4 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
 import Label from '../../../../../components/Label/Label';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 import * as S from './styles';

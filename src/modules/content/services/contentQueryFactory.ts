@@ -11,8 +11,6 @@ import {
   CreateContentRequest,
   UpdateContentRequest,
   Comment,
-  ReportContentDTO,
-  ContentStats,
 } from '../../../types/content';
 
 export const contentQueryFactory = (baseKey: QueryKey) => {

@@ -4,7 +4,7 @@ import {
   verticalScale,
   horizontalScale,
 } from '../../../../../utils/scales';
-import {ImageStyle, TouchableOpacity} from 'react-native';
+import {ImageStyle} from 'react-native';
 
 export const Container = styled.View`
   background-color: ${({theme}) => theme.colors.white};

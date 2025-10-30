@@ -24,7 +24,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
   const {
     control,
     handleSubmit,
-    formState: {errors, isValid},
+    formState: {errors},
     filesList,
     categoriesList,
     isLoading,

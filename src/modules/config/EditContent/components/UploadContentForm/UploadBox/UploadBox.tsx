@@ -34,8 +34,10 @@ const UploadBox: React.FC<UploadBoxProps> = ({
   externalError,
   initialFiles = [],
 }) => {
-  const {files, pickFile, removeFile, reorderFiles, listRef, error, setError} =
-    useUpload(allowedTypes, initialFiles);
+  const {files, pickFile, removeFile, reorderFiles, listRef, error} = useUpload(
+    allowedTypes,
+    initialFiles,
+  );
 
   const displayError = externalError || error;
 
