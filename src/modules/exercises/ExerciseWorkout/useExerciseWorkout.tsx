@@ -2,73 +2,10 @@ import {useEffect, useState} from 'react';
 import {Exercise, Workout} from '../../../types/exercise';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {ExercisesParamList, RootParamList} from '../../../navigation/routes';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import useExerciseQueries from '../services/exerciseQueryFactory';
 
-const mockWorkout: Workout = {
-  id: '1',
-  name: 'Treino XYZ',
-  exercises: [
-    {
-      id: '1',
-      title: 'Exercício 1',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 3,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-    {
-      id: '2',
-      title: 'Exercício 2',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 0,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-    {
-      id: '3',
-      title: 'Exercício 3',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 0,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-  ],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  status: 'IN_PROGRESS',
-  difficulty: 'EASY',
-  duration: '1:30h',
-  description:
-    'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-  category: 'Pelvis',
-};
+const fallbackVideo = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
 type ExerciseWorkoutStep =
   | 'START_WORKOUT'
@@ -89,28 +26,44 @@ const useExerciseWorkout = () => {
   const [currentExercise, setCurrentExercise] = useState<Exercise>();
   const [step, setStep] = useState<ExerciseWorkoutStep>('START_WORKOUT');
   const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
+  const queries = useExerciseQueries(['exercises']);
+  const {data: workoutApi} = queries.getWorkoutById(exerciseId);
   useEffect(() => {
-    setWorkout(mockWorkout);
-    setCurrentExercise(mockWorkout.exercises[0]);
-  }, []);
+    if (workoutApi) {
+      const withMedia = {
+        ...workoutApi,
+        exercises: (workoutApi.exercises || []).map(e => ({
+          ...e,
+          media: e.media || {videos: [fallbackVideo], images: []},
+        })),
+      };
+      setWorkout(withMedia);
+      setCurrentExercise(withMedia.exercises[0]);
+    }
+  }, [workoutApi]);
 
   const onStartWorkout = () => {
     setStep('EXERCISE');
-    setCurrentExercise(mockWorkout.exercises[0]);
-    setWorkout({...mockWorkout, status: 'IN_PROGRESS'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'IN_PROGRESS'});
+    if (!workout) return;
+    const first = workout.exercises[0];
+    setCurrentExercise({...first, status: 'IN_PROGRESS'});
+    setWorkout({...workout, status: 'IN_PROGRESS'});
   };
 
   const onLeaveWorkout = () => {
     setStep('START_WORKOUT');
-    setWorkout({...mockWorkout, status: 'PAUSED'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'PENDING'});
+    if (!workout) return;
+    const first = workout.exercises[0];
+    setWorkout({...workout, status: 'PAUSED'});
+    setCurrentExercise({...first, status: 'PENDING'});
   };
 
   const onFinishWorkout = () => {
     setStep('FINISH_WORKOUT');
-    setWorkout({...mockWorkout, status: 'COMPLETED'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'COMPLETED'});
+    if (!workout) return;
+    const first = workout.exercises[0];
+    setWorkout({...workout, status: 'COMPLETED'});
+    setCurrentExercise({...first, status: 'COMPLETED'});
   };
 
   const handleNextStep = () => {
@@ -126,7 +79,7 @@ const useExerciseWorkout = () => {
   };
 
   const onEvaluate = () => {
-    setWorkout({...mockWorkout, status: 'COMPLETED'});
+    if (workout) setWorkout({...workout, status: 'COMPLETED'});
     navigation.navigate(`Exercises`, {screen: 'ExercisesHome'});
   };
 

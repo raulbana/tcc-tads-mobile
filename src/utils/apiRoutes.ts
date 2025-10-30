@@ -38,6 +38,16 @@ const apiRoutes = {
     calendar: '/calendar',
     report: '/report',
   },
+  exercises: {
+    listExercises: '/exercise',
+    getExerciseById: (id: string) => `/exercise/${id}`,
+    listWorkouts: '/exercise/workout',
+    getWorkoutById: (id: string) => `/exercise/workout/${id}`,
+    listWorkoutPlans: '/exercise/workout/plan',
+    getWorkoutPlanById: (id: string) => `/exercise/workout/plan/${id}`,
+    submitWorkoutFeedback: '/users/workout/feedback',
+    submitWorkoutCompletion: '/users/workout/completion',
+  },
   config: {
     contact: {
       support: '/contact/support',

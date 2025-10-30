@@ -1,6 +1,7 @@
 import React, {ReactNode} from 'react';
 import {ContentProvider} from '../../contexts/ContentContext';
 import {DiaryProvider} from '../../contexts/DiaryContext';
+import {ExerciseProvider} from '../../contexts/ExerciseContext';
 import {useAuth} from '../../contexts/AuthContext';
 
 interface AuthenticatedProvidersProps {
@@ -18,7 +19,9 @@ const AuthenticatedProviders: React.FC<AuthenticatedProvidersProps> = ({
 
   return (
     <ContentProvider>
-      <DiaryProvider>{children}</DiaryProvider>
+      <DiaryProvider>
+        <ExerciseProvider>{children}</ExerciseProvider>
+      </DiaryProvider>
     </ContentProvider>
   );
 };

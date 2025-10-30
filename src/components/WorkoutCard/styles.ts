@@ -41,6 +41,7 @@ export const Badge = styled.View`
 
 export const MetadataRow = styled.View`
   flex-direction: row;
+  flex-wrap: wrap;
   gap: ${horizontalScale(16)}px;
   margin-bottom: ${verticalScale(12)}px;
 `;
@@ -49,6 +50,8 @@ export const MetadataItem = styled.View`
   flex-direction: row;
   align-items: center;
   gap: ${horizontalScale(4)}px;
+  margin-bottom: ${verticalScale(8)}px;
+  flex-shrink: 0;
 `;
 
 export const DescriptionContainer = styled.View`
