@@ -97,7 +97,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [], // Dependências vazias para evitar recriação
+    [],
   );
 
   const saveCalendarEvent = useCallback(
