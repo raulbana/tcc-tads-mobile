@@ -55,7 +55,7 @@ const useOnboardingQuestion = () => {
     },
   });
 
-  const {savePatientProfile} = useAuth();
+  const {savePatientProfile, saveOfflineOnboardingData, isLoggedIn} = useAuth();
 
   const getDefaultValueForQuestion = (question: Question) => {
     switch (question.type) {
@@ -119,9 +119,8 @@ const useOnboardingQuestion = () => {
 
   const onSubmitAnswer = useCallback(() => {
     handleSubmit(() => {
-
       const answers = getValues();
-      
+
       const profileData: PatientProfile = {
         id: uuidv7(),
         birthDate: answers.birthdate,
@@ -132,9 +131,21 @@ const useOnboardingQuestion = () => {
         q4Score: answers.q6_when.length as number,
       };
 
-      savePatientProfile(profileData);
+      // Se o usuário não está logado, salvar dados offline
+      if (!isLoggedIn) {
+        saveOfflineOnboardingData(profileData);
+      } else {
+        savePatientProfile(profileData);
+      }
     });
-  }, [getValues, handleSubmit, isValid]);
+  }, [
+    getValues,
+    handleSubmit,
+    isValid,
+    isLoggedIn,
+    saveOfflineOnboardingData,
+    savePatientProfile,
+  ]);
 
   const navigateBack = () => {
     if (currentQuestionIndex === 0) {

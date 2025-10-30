@@ -38,6 +38,8 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
   const [bigFont, setBigFont] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [themeKey, setThemeKey] = useState<string>('theme-default');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const {user, isLoggedIn, savePreferences} = useAuth();
 
   const currentTheme = useMemo(
@@ -55,6 +57,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
   const loadAccessibilityPreferences = useCallback(async () => {
     try {
+      console.log('Loading accessibility preferences, isSaving:', isSaving);
       setIsLoading(true);
       setError(null);
 
@@ -90,8 +93,10 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
     async (preferences: AccessibilityPreferences) => {
       try {
         setIsLoading(true);
+        setIsSaving(true);
         setError(null);
 
+        console.log('Setting preferences:', preferences);
         setHighContrast(preferences.isHighContrast);
         setBigFont(preferences.isBigFont);
 
@@ -124,19 +129,30 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
         throw error;
       } finally {
         setIsLoading(false);
+        setIsSaving(false);
       }
     },
     [user, isLoggedIn, savePreferences],
   );
 
   useEffect(() => {
-    if (user) {
+    if (user && !isSaving) {
       loadAccessibilityPreferences();
-    } else {
+    } else if (!user) {
       setHighContrast(false);
       setBigFont(false);
     }
-  }, [user, loadAccessibilityPreferences]);
+  }, [user, loadAccessibilityPreferences, isSaving]);
+
+  useEffect(() => {
+    const newThemeKey = `theme-${highContrast}-${bigFont}`;
+    setThemeKey(newThemeKey);
+    console.log('Theme updated:', {
+      highContrast,
+      bigFont,
+      themeKey: newThemeKey,
+    });
+  }, [highContrast, bigFont]);
 
   const value = {
     highContrast,
@@ -150,7 +166,9 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
   return (
     <AccessibilityContext.Provider value={value}>
-      <ThemeProvider theme={currentTheme}>{children}</ThemeProvider>
+      <ThemeProvider theme={currentTheme} key={themeKey}>
+        {children}
+      </ThemeProvider>
     </AccessibilityContext.Provider>
   );
 };

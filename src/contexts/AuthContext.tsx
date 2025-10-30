@@ -86,10 +86,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsInitializing(true);
         setError(null);
 
-        // Verificar se "lembrar de mim" está desabilitado
         const rememberMe = MMKVStorage.getString(REMEMBER_ME_KEY);
         if (rememberMe === 'false') {
-          // Se não deve lembrar, limpar dados e carregar usuário temporário
           await clearAuthData();
           await loadTempUser();
           if (mounted) {
@@ -193,7 +191,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setUser(response.user);
         setIsLoggedIn(true);
 
-        // Passar o valor de remember (default true se não especificado)
         const shouldRemember = credentials.remember !== false;
         await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();

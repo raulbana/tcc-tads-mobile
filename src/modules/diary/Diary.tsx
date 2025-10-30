@@ -8,27 +8,15 @@ import {useDiary} from '../../contexts/DiaryContext';
 import {useAuth} from '../../contexts/AuthContext';
 import Loader from '../../components/Loader/Loader';
 import Toast from '../../components/Toast/Toast';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 const Diary = () => {
   const {user, isLoggedIn} = useAuth();
-  const {isLoading, error, clearError, loadCalendarEvents} = useDiary();
+  const {isLoading, error, clearError} = useDiary();
   const theme = useDynamicTheme();
 
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      const today = new Date();
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-      loadCalendarEvents(
-        startOfMonth.toISOString().split('T')[0],
-        endOfMonth.toISOString().split('T')[0],
-      ).catch(err => {
-        console.error('Erro ao carregar eventos do calendário:', err);
-      });
-    }
-  }, [isLoggedIn, user, loadCalendarEvents]);
+  // A busca inicial dos dados do calendário agora é feita automaticamente pelo componente Calendar
+  // quando o mês é carregado, então não precisamos mais desta lógica aqui
 
   if (isLoading) {
     return <Loader overlay />;
