@@ -37,6 +37,7 @@ const useLoginForm = () => {
         await authLogin({
           email: data.email,
           password: data.password,
+          remember: data.remember,
         });
       } catch (err) {
         throw err;

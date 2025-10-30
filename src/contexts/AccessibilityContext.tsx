@@ -7,12 +7,15 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
+import {ThemeProvider} from 'styled-components/native';
 import {useAuth} from './AuthContext';
 import {AccessibilityPreferences} from '../types/config';
 import configServices from '../modules/config/services/configServices';
 import colors from '../theme/colors';
 import typography from '../theme/typography';
 import fonts from '../theme/fonts';
+import {accessibleColors} from '../theme/accessibleColors';
+import {accessibleTypography} from '../theme/accessibleTypography';
 
 interface AccessibilityContextType {
   highContrast: boolean;
@@ -35,7 +38,18 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
   const [bigFont, setBigFont] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [themeKey, setThemeKey] = useState<string>('theme-default');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const {user, isLoggedIn, savePreferences} = useAuth();
+
+  const currentTheme = useMemo(
+    () => ({
+      colors: highContrast ? accessibleColors : colors,
+      typography: bigFont ? accessibleTypography : typography,
+      fonts,
+    }),
+    [highContrast, bigFont],
+  );
 
   const clearError = useCallback(() => {
     setError(null);
@@ -43,6 +57,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
   const loadAccessibilityPreferences = useCallback(async () => {
     try {
+      console.log('Loading accessibility preferences, isSaving:', isSaving);
       setIsLoading(true);
       setError(null);
 
@@ -78,8 +93,10 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
     async (preferences: AccessibilityPreferences) => {
       try {
         setIsLoading(true);
+        setIsSaving(true);
         setError(null);
 
+        console.log('Setting preferences:', preferences);
         setHighContrast(preferences.isHighContrast);
         setBigFont(preferences.isBigFont);
 
@@ -91,7 +108,6 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           };
           await savePreferences(updatedPreferences);
 
-          // If user is logged in, also save to API
           if (isLoggedIn) {
             try {
               await configServices.updateAccessibilityPreferences(
@@ -112,19 +128,30 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
         throw error;
       } finally {
         setIsLoading(false);
+        setIsSaving(false);
       }
     },
     [user, isLoggedIn, savePreferences],
   );
 
   useEffect(() => {
-    if (user) {
+    if (user && !isSaving) {
       loadAccessibilityPreferences();
-    } else {
+    } else if (!user) {
       setHighContrast(false);
       setBigFont(false);
     }
-  }, [user, loadAccessibilityPreferences]);
+  }, [user, loadAccessibilityPreferences, isSaving]);
+
+  useEffect(() => {
+    const newThemeKey = `theme-${highContrast}-${bigFont}`;
+    setThemeKey(newThemeKey);
+    console.log('Theme updated:', {
+      highContrast,
+      bigFont,
+      themeKey: newThemeKey,
+    });
+  }, [highContrast, bigFont]);
 
   const value = {
     highContrast,
@@ -138,7 +165,9 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
   return (
     <AccessibilityContext.Provider value={value}>
-      {children}
+      <ThemeProvider theme={currentTheme} key={themeKey}>
+        {children}
+      </ThemeProvider>
     </AccessibilityContext.Provider>
   );
 };

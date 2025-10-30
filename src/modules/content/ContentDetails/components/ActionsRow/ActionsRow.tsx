@@ -1,6 +1,7 @@
 import Badge from '../../../../../components/Badge/Badge';
 import LikeButton from '../../../../../components/LikeButton/LikeButton';
-import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import SaveButton from '../../../../../components/SaveButton/SaveButton';
+import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 import RepostButton from '../RepostButton/RepostButton';
 import * as S from './styles';
 
@@ -9,6 +10,8 @@ export interface ActionsRowProps {
   onLikePress: () => void;
   isReposted?: boolean;
   onRepostPress: () => void;
+  isSaved?: boolean;
+  onSavePress: () => void;
   category: string;
 }
 
@@ -17,11 +20,12 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
   onLikePress,
   isReposted,
   onRepostPress,
+  isSaved,
+  onSavePress,
   category,
 }) => {
-
   const theme = useDynamicTheme();
-  
+
   return (
     <S.ActionsRowContainer>
       <Badge
@@ -31,6 +35,7 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
       />
       <S.RightActions>
         <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
+        <SaveButton onPress={onSavePress} size={28} isSaved={isSaved} />
         <S.RepostButtonContainer>
           <RepostButton onPress={onRepostPress} isReposted={isReposted} />
         </S.RepostButtonContainer>

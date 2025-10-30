@@ -1,13 +1,21 @@
+import React, {useMemo} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import routes, {RootParamList} from './routes';
+import {useAuth} from '../contexts/AuthContext';
 
 const Stack = createNativeStackNavigator<RootParamList>();
 export type StackScreenProps = React.ComponentProps<typeof Stack.Screen>;
 
 const Navigator: React.FC = () => {
+  useAuth();
+
+  const initialRouteName = useMemo(() => {
+    return 'Auth';
+  }, []);
+
   return (
     <Stack.Navigator
-      initialRouteName="Auth"
+      initialRouteName={initialRouteName}
       screenOptions={{headerShown: false}}>
       {routes.map(route => (
         <Stack.Screen

@@ -42,14 +42,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({user, onEditProfile}) => {
             text={user.email}
           />
         </View>
-      </S.Section>
-      <S.Divider />
-      <S.Section>
         <S.EditButtonStyle onPress={onEditProfile}>
           <Label
             typography={theme.typography.paragraph.sb3}
             color={theme.colors.purple_04}
-            text="Editar Perfil"
+            text="Perfil"
           />
         </S.EditButtonStyle>
       </S.Section>

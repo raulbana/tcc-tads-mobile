@@ -13,7 +13,7 @@ import {
   loginRequest,
   registerRequest,
 } from '../types/auth';
-import {MMKVStorage} from '../storage/mmkvStorage';
+import {MMKVStorage, REMEMBER_ME_KEY} from '../storage/mmkvStorage';
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
@@ -57,6 +57,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     try {
       MMKVStorage.delete(LOGGED_USER_KEY);
       MMKVStorage.delete(AUTH_TOKEN_KEY);
+      MMKVStorage.delete(REMEMBER_ME_KEY);
     } catch (error) {
       console.error('Error clearing auth data:', error);
     }
@@ -84,6 +85,17 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       try {
         setIsInitializing(true);
         setError(null);
+
+        const rememberMe = MMKVStorage.getString(REMEMBER_ME_KEY);
+        if (rememberMe === 'false') {
+          await clearAuthData();
+          await loadTempUser();
+          if (mounted) {
+            setIsInitializing(false);
+          }
+          return;
+        }
+
         const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
         const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
 
@@ -94,6 +106,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           try {
             setUser(parsedUser);
             setIsLoggedIn(true);
+            navigate('MainTabs');
           } catch (error) {
             await clearAuthData();
             await loadTempUser();
@@ -130,18 +143,22 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [clearAuthData, navigate]);
 
-  const saveLoggedUser = useCallback(async (userObj: User, token: string) => {
-    try {
-      const userJson = JSON.stringify(userObj);
-      MMKVStorage.set(LOGGED_USER_KEY, userJson);
-      MMKVStorage.set(AUTH_TOKEN_KEY, token);
-    } catch (error) {
-      console.error('Error saving logged user:', error);
-      throw new Error('Erro ao salvar dados do usuário');
-    }
-  }, []);
+  const saveLoggedUser = useCallback(
+    async (userObj: User, token: string, remember: boolean = true) => {
+      try {
+        const userJson = JSON.stringify(userObj);
+        MMKVStorage.set(LOGGED_USER_KEY, userJson);
+        MMKVStorage.set(AUTH_TOKEN_KEY, token);
+        MMKVStorage.set(REMEMBER_ME_KEY, remember.toString());
+      } catch (error) {
+        console.error('Error saving logged user:', error);
+        throw new Error('Erro ao salvar dados do usuário');
+      }
+    },
+    [],
+  );
 
   const saveTempUser = useCallback(async (userObj: User) => {
     try {
@@ -173,7 +190,9 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const response = await authServices.login(credentials);
         setUser(response.user);
         setIsLoggedIn(true);
-        await saveLoggedUser(response.user, response.token);
+
+        const shouldRemember = credentials.remember !== false;
+        await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();
         navigate('MainTabs');
       } catch (error) {
@@ -238,9 +257,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       setError(null);
       const updatedUser = await authServices.getUserById(user.id);
       setUser(updatedUser);
+      const rememberMe = MMKVStorage.getString(REMEMBER_ME_KEY);
       await saveLoggedUser(
         updatedUser,
         MMKVStorage.getString(AUTH_TOKEN_KEY) || '',
+        rememberMe !== 'false',
       );
     } catch (error) {
       console.error('Refresh user error:', error);

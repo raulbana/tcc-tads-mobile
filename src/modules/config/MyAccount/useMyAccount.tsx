@@ -3,7 +3,7 @@ import {moderateScale} from '../../../utils/scales';
 import {OptionItem} from './components/OptionsList/OptionsList';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
-import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 
 const useMyAccount = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
@@ -27,6 +27,10 @@ const useMyAccount = () => {
     navigate('Config', {screen: 'EditProfile'});
   };
 
+  const navigateToProfile = () => {
+    navigate('Config', {screen: 'Profile' as any});
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -44,6 +48,19 @@ const useMyAccount = () => {
   };
 
   const options: OptionItem[] = [
+    ...(isLoggedIn
+      ? [
+          {
+            label: 'Meu Perfil',
+            icon: {
+              name: 'User' as const,
+              size: moderateScale(24),
+              color: theme.colors.gray_07,
+            },
+            onPress: navigateToProfile,
+          },
+        ]
+      : []),
     {
       label: 'Acessibilidade',
       icon: {
@@ -100,6 +117,7 @@ const useMyAccount = () => {
     navigateToTalkToUs,
     navigateToRegister,
     navigateToEditProfile,
+    navigateToProfile,
     user,
     isLoggedIn,
   };

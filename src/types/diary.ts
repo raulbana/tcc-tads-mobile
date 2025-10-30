@@ -29,3 +29,20 @@ export interface CalendarRequestDTO {
 }
 
 export type CalendarRangeResponse = Record<string, CalendarDayDTO>;
+
+export interface ReportParamDTO {
+  from: string; // YYYY-MM-DD
+  to: string; // YYYY-MM-DD
+}
+
+export interface ReportUserDTO {
+  name: string;
+  age: number;
+  gender: string;
+}
+
+export interface ReportDTO {
+  user: ReportUserDTO;
+  history: CalendarDayDTO[];
+  generatedAt: string; // ISO date-time
+}

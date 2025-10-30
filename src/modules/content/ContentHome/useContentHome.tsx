@@ -1,18 +1,26 @@
-import {useCallback, useEffect, useMemo} from 'react';
-import {BadgeProps} from '../../../components/Badge/Badge';
-import {ContentCardProps} from '../../../components/ContentCard/ContentCard';
+import {useCallback, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
-import {useContent} from '../../../contexts/ContentContext';
+import {useAuth} from '../../../contexts/AuthContext';
+import useContentQueries from '../services/contentQueryFactory';
 
 const useContentHome = () => {
-  const {contents, categories, loadContents,loadCategories, isLoading, error} = useContent();
+  const {user} = useAuth();
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  useEffect(() => {
-    loadContents();
-    loadCategories();
-  }, [loadContents, loadCategories]);
+  const contentQueries = useContentQueries(['content']);
+  const {
+    data: contents = [],
+    isLoading: isLoadingContents,
+    error: contentsError,
+    refetch: refetchContents,
+  } = contentQueries.getList(user?.id.toString() || '', false);
+
+  const {
+    data: categories = [],
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = contentQueries.getCategories();
 
   const handleCardClick = useCallback(
     (contentId: string) => {
@@ -37,13 +45,16 @@ const useContentHome = () => {
 
   const contentCardList = useMemo(() => {
     return contents.map(content => ({
-      image: {uri: content.coverUrl},
-      badgeLabel: content.category.name,
+      image: {uri: content.cover?.url},
+      badgeLabel: content?.categories?.length > 0 ? content.categories[0] : 'Sem categoria',
       title: content.title,
       description: content.description,
       onClick: () => handleCardClick(content.id),
     }));
   }, [contents, handleCardClick]);
+
+  const isLoading = isLoadingContents || isLoadingCategories;
+  const error = contentsError?.message || categoriesError?.message;
 
   return {
     badgeList,
@@ -53,7 +64,7 @@ const useContentHome = () => {
     navigateToCreateContent,
     isLoading,
     error,
-    refreshContents: () => loadContents(),
+    refreshContents: refetchContents,
   };
 };
 

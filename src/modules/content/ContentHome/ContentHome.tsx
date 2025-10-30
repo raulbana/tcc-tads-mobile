@@ -30,7 +30,6 @@ const ContentHome = () => {
         <CarouselSection
           carouselData={{
             data: badgeList,
-            itemWidth: 64,
             renderItem: ({item}) => <Badge {...item} />,
           }}
           sectionTitle="Categorias"

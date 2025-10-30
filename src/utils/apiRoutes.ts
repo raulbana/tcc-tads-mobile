@@ -18,19 +18,25 @@ const apiRoutes = {
     create: '/content',
     update: (contentId: string) => `/content/${contentId}`,
     delete: (contentId: string) => `/content/${contentId}`,
-    like: (contentId: string) => `/content/${contentId}/like`,
-    repost: (contentId: string) => `/content/${contentId}/repost`,
+    like: (contentId: string) => `/content/${contentId}`,
+    repost: (contentId: string) => `/content/repost/${contentId}`,
     report: (contentId: string) => `/content/${contentId}/report`,
-    categories: '/content-categories',
-  },
-  comment: {
-    create: '/comment',
+    save: (contentId: string) => `/content/${contentId}/save`,
+    categories: '/content/category',
+    user: (userId: string) => `/content?userId=${userId}`,
+    saved: '/content/saved',
+    comments: (contentId: string) => `/content/comments/${contentId}`,
+    comment: (commentId: string) => `/content/comments/${commentId}`,
+    commentLike: (commentId: string) => `/content/comments/${commentId}`,
+    commentReplies: (commentId: string) =>
+      `/content/comments/${commentId}/replies`,
   },
   media: {
     upload: '/media/upload',
   },
   diary: {
     calendar: '/calendar',
+    report: '/report',
   },
   config: {
     contact: {

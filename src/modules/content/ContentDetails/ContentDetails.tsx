@@ -10,35 +10,36 @@ import useContentDetails from './useContentDetails';
 import ImageCard from '../../../components/ImageCard/ImageCard';
 import CommentSection from '../../../components/CommentSection/CommentSection';
 import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselModal';
-import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 
 const ContentDetails = () => {
   const {
-    isLiked,
-    toggleLike,
-    isReposted,
-    toggleRepost,
-    isLoading,
+    content,
     comments,
     commentText,
-    onChangeCommentText,
-    contentData,
-    onReplyComment,
-    onLikeCommentOrReply,
-    handleSend,
+    setCommentText,
     replyTo,
     replyText,
     setReplyText,
     setReplyTo,
     imageCarouselVisible,
-    setImageCarouselVisible,
     imageCarouselIndex,
+    isLoading,
+    handleToggleLike,
+    handleToggleRepost,
+    handleToggleSave,
+    handleSendComment,
+    handleLikeComment,
+    handleReplyToComment,
+    handleCancelReply,
+    handleCloseImageCarousel,
     setImageCarouselIndex,
+    handleImagePress,
   } = useContentDetails();
 
   const theme = useDynamicTheme();
-  
-  return isLoading || !contentData ? (
+
+  return isLoading || !content ? (
     <Loader overlay />
   ) : (
     <ScreenContainer
@@ -47,75 +48,80 @@ const ContentDetails = () => {
       scrollable
       header={
         <ContentDetailsHeader
-          image={contentData.video ?? contentData.coverUrl}
-          type={contentData.video ? 'video' : 'image'}
+          image={content.media?.[0]?.url ?? content.cover?.url}
+          type={
+            content.media?.[0]?.contentType?.startsWith('video/') === true
+              ? 'video'
+              : 'image'
+          }
         />
       }>
       <S.Wrapper>
         <Label
           typography={theme.typography.title.b3}
           color={theme.colors.gray_08}
-          text={contentData.title}
+          text={content.title}
         />
-        {contentData.description && (
+        {content.description && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={contentData.description}
+            text={content.description}
             textAlign="justify"
           />
         )}
 
         <CarouselSection
           carouselData={{
-            data: contentData?.images ?? [],
+            data:
+              content?.media?.filter(m =>
+                m?.contentType?.startsWith('image/'),
+              ) ?? [],
             itemWidth: 140,
-            renderItem: ({item}) => (
+            renderItem: ({item, index}) => (
               <ImageCard
-                image={item}
-                onClick={() => {
-                  setImageCarouselVisible(true);
-                  setImageCarouselIndex(
-                    typeof contentData?.images?.indexOf(item) === 'number' &&
-                      contentData?.images?.indexOf(item) !== -1
-                      ? contentData.images.indexOf(item)
-                      : 0,
-                  );
-                }}
+                image={item.url}
+                onClick={() => handleImagePress(index)}
               />
             ),
           }}
           sectionTitle={''}
         />
-        {contentData.subtitle && (
+        {content.subtitle && (
           <Label
             typography={theme.typography.paragraph.sb3}
             color={theme.colors.gray_08}
-            text={contentData.subtitle}
+            text={content.subtitle}
           />
         )}
-        {contentData.subcontent && (
+        {content.subcontent && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={contentData.subcontent}
+            text={content.subcontent}
             textAlign="justify"
           />
         )}
         <ActionsRow
-          isLiked={isLiked}
-          onLikePress={toggleLike}
-          isReposted={isReposted}
-          onRepostPress={toggleRepost}
-          category={contentData.category.name}
+          isLiked={content.isLiked}
+          onLikePress={handleToggleLike}
+          isReposted={content.isReposted}
+          onRepostPress={handleToggleRepost}
+          isSaved={content.isSaved}
+          onSavePress={handleToggleSave}
+          category={
+            content?.categories?.length > 0
+              ? content.categories[0]
+              : 'Sem categoria'
+          }
         />
         <CommentSection
           comments={comments}
-          onCommentSend={handleSend}
-          onCommentTextChange={onChangeCommentText}
+          onCommentSend={handleSendComment}
+          onCommentTextChange={setCommentText}
           commentText={commentText}
-          onPressLike={onLikeCommentOrReply}
-          onPressReply={onReplyComment}
+          onPressLike={handleLikeComment}
+          onPressReply={handleReplyToComment}
           disabled={false}
           loading={false}
           replyTo={replyTo}
@@ -125,11 +131,13 @@ const ContentDetails = () => {
         />
       </S.Wrapper>
       <ImageCarouselModal
-        images={contentData.images ?? []}
+        images={
+          content.media
+            ?.filter(media => media?.contentType?.startsWith('image/'))
+            .map(media => media.url) ?? []
+        }
         isVisible={imageCarouselVisible}
-        onClose={() => {
-          setImageCarouselVisible(false);
-        }}
+        onClose={handleCloseImageCarousel}
         currentIndex={imageCarouselIndex}
         onChangeIndex={setImageCarouselIndex}
       />

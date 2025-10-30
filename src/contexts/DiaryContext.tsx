@@ -4,6 +4,7 @@ import React, {
   useState,
   ReactNode,
   useCallback,
+  useRef,
 } from 'react';
 import {
   CalendarDayDTO,
@@ -12,6 +13,7 @@ import {
   UrinationDataDTO,
 } from '../types/diary';
 import diaryServices from '../modules/diary/services/diaryServices';
+import {useAuth} from './AuthContext';
 
 interface DiaryContextType {
   calendarData: CalendarRangeResponse | null;
@@ -36,6 +38,7 @@ interface DiaryContextType {
 
   clearError: () => void;
   getDayData: (date: string) => CalendarDayDTO | null;
+  setCalendarData: (data: CalendarRangeResponse | null) => void;
 }
 
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
@@ -45,6 +48,10 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
     useState<CalendarRangeResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const {user, isLoggedIn} = useAuth();
+
+  const authRef = useRef({user, isLoggedIn});
+  authRef.current = {user, isLoggedIn};
 
   const clearError = useCallback(() => {
     setError(null);
@@ -68,24 +75,30 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
     [],
   );
 
-  const loadCalendarEvents = useCallback(async (from?: string, to?: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const loadCalendarEvents = useCallback(
+    async (from?: string, to?: string) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const data = await diaryServices.getCalendarEvents(from, to);
-      setCalendarData(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : 'Erro ao carregar eventos do calendário';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        const userId = authRef.current.isLoggedIn
+          ? authRef.current.user?.id?.toString()
+          : undefined;
+        const data = await diaryServices.getCalendarEvents(from, to, userId);
+        setCalendarData(data);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : 'Erro ao carregar eventos do calendário';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [], // Dependências vazias para evitar recriação
+  );
 
   const saveCalendarEvent = useCallback(
     async (data: CalendarRequestDTO): Promise<CalendarDayDTO> => {
@@ -93,7 +106,8 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(true);
         setError(null);
 
-        const result = await diaryServices.setCalendarEvent(data);
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(data, userId);
 
         setCalendarData(prev => ({
           ...prev,
@@ -110,7 +124,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [],
+    [isLoggedIn, user?.id],
   );
 
   const updateCalendarData = useCallback(
@@ -130,26 +144,29 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setError(null);
 
         const currentDay = calendarData?.[date];
-       
 
         const updatedUrinationData = [
-          ...currentDay?.urinationData || [],
+          ...(currentDay?.urinationData || []),
           urinationData,
         ];
         const updatedDay = {
-          ...currentDay || {},
+          ...(currentDay || {}),
           urinationData: updatedUrinationData,
           eventsCount: (currentDay?.eventsCount || 0) + 1,
         };
 
         const newLeakageLevel = calculateLeakageLevel(updatedUrinationData);
 
-        const result = await diaryServices.setCalendarEvent({
-          date,
-          leakageLevel: newLeakageLevel,
-          notesPreview: updatedDay?.notesPreview || '',
-          urinationData: updatedUrinationData,
-        });
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(
+          {
+            date,
+            leakageLevel: newLeakageLevel,
+            notesPreview: updatedDay?.notesPreview || '',
+            urinationData: updatedUrinationData,
+          },
+          typeof userId === 'number' ? String(userId) : userId,
+        );
 
         setCalendarData(prev => ({
           ...prev,
@@ -164,7 +181,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [calendarData, calculateLeakageLevel],
+    [calendarData, calculateLeakageLevel, isLoggedIn, user?.id],
   );
 
   const editUrinationData = useCallback(
@@ -183,12 +200,16 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
 
         const newLeakageLevel = calculateLeakageLevel(updatedUrinationData);
 
-        const result = await diaryServices.setCalendarEvent({
-          date,
-          leakageLevel: newLeakageLevel,
-          notesPreview: currentDay.notesPreview,
-          urinationData: updatedUrinationData,
-        });
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(
+          {
+            date,
+            leakageLevel: newLeakageLevel,
+            notesPreview: currentDay.notesPreview,
+            urinationData: updatedUrinationData,
+          },
+          typeof userId === 'number' ? String(userId) : userId,
+        );
 
         setCalendarData(prev => ({
           ...prev,
@@ -203,7 +224,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [calendarData, calculateLeakageLevel],
+    [calendarData, calculateLeakageLevel, isLoggedIn, user?.id],
   );
 
   const deleteUrinationData = useCallback(
@@ -227,12 +248,16 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
           eventsCount: Math.max(0, currentDay.eventsCount - 1),
         };
 
-        const result = await diaryServices.setCalendarEvent({
-          date,
-          leakageLevel: updatedDay.leakageLevel,
-          notesPreview: updatedDay.notesPreview,
-          urinationData: updatedDay.urinationData,
-        });
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(
+          {
+            date,
+            leakageLevel: updatedDay.leakageLevel,
+            notesPreview: updatedDay.notesPreview,
+            urinationData: updatedDay.urinationData,
+          },
+          typeof userId === 'number' ? String(userId) : userId,
+        );
 
         setCalendarData(prev => ({
           ...prev,
@@ -247,7 +272,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [calendarData],
+    [calendarData, isLoggedIn, user?.id],
   );
 
   const updateLeakageLevel = useCallback(
@@ -266,15 +291,17 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
           leakageLevel: level,
         };
 
-        // Salvar no backend
-        const result = await diaryServices.setCalendarEvent({
-          date,
-          leakageLevel: level,
-          notesPreview: updatedDay.notesPreview,
-          urinationData: updatedDay.urinationData,
-        });
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(
+          {
+            date,
+            leakageLevel: level,
+            notesPreview: updatedDay.notesPreview,
+            urinationData: updatedDay.urinationData,
+          },
+          typeof userId === 'number' ? String(userId) : userId,
+        );
 
-        // Atualizar estado local
         setCalendarData(prev => ({
           ...prev,
           [date]: result,
@@ -290,7 +317,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [calendarData],
+    [calendarData, isLoggedIn, user?.id],
   );
 
   const updateNotes = useCallback(
@@ -309,15 +336,17 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
           notesPreview: notes,
         };
 
-        // Salvar no backend
-        const result = await diaryServices.setCalendarEvent({
-          date,
-          leakageLevel: updatedDay.leakageLevel,
-          notesPreview: notes,
-          urinationData: updatedDay.urinationData,
-        });
+        const userId = isLoggedIn ? user?.id?.toString() : undefined;
+        const result = await diaryServices.setCalendarEvent(
+          {
+            date,
+            leakageLevel: updatedDay.leakageLevel,
+            notesPreview: notes,
+            urinationData: updatedDay.urinationData,
+          },
+          typeof userId === 'number' ? String(userId) : userId,
+        );
 
-        // Atualizar estado local
         setCalendarData(prev => ({
           ...prev,
           [date]: result,
@@ -331,14 +360,14 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [calendarData],
+    [calendarData, isLoggedIn, user?.id],
   );
 
   const getDayData = useCallback(
     (date: string): CalendarDayDTO | null => {
       return calendarData?.[date] || null;
     },
-    [calendarData],
+    [calendarData, isLoggedIn, user?.id],
   );
 
   return (
@@ -357,6 +386,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         updateNotes,
         clearError,
         getDayData,
+        setCalendarData,
       }}>
       {children}
     </DiaryContext.Provider>

@@ -8,7 +8,7 @@ import Button from '../../../../components/Button/Button';
 import Label from '../../../../components/Label/Label';
 import moment from 'moment';
 import * as S from './styles';
-import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../hooks/useDynamicTheme';
 
 export interface DayRegisterModalProps {
   dayItem: CalendarDayDTO;
@@ -23,6 +23,29 @@ const amountLabel: Record<string, string> = {
   LOW: 'Baixo',
   MEDIUM: 'Médio',
   HIGH: 'Alto',
+};
+
+const formatTimeForDisplay = (time: string | string[]): string => {
+  if (Array.isArray(time)) {
+    return `${time[0]}:${time[1]}`;
+  }
+
+  if (typeof time === 'string') {
+    const formats = ['HH:mm:ss', 'HH:mm', 'YYYY-MM-DDTHH:mm:ss'];
+
+    for (const format of formats) {
+      const momentTime = moment(time, format);
+      if (momentTime.isValid()) {
+        return momentTime.format('HH:mm');
+      }
+    }
+
+    if (time.includes(':')) {
+      return time.substring(0, 5); 
+    }
+  }
+
+  return time; 
 };
 
 const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
@@ -60,11 +83,12 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
   ];
 
   const dateIsoString = useMemo(() => dayItem.date, [dayItem.date]);
+
   const rows: TableRow[] = useMemo(
     () =>
       records.map((r, idx) => ({
         id: `${dateIsoString}-${idx}`,
-        time: Array.isArray(r.time) ? `${r.time[0]}:${r.time[1]}` : r.time,
+        time: formatTimeForDisplay(r.time),
         amount: amountLabel[r.amount] ?? r.amount,
         urgency: r.urgency,
         leakage: r.leakage,
