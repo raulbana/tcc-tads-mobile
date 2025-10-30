@@ -6,6 +6,7 @@ import {
   CalendarRequestDTO,
   CalendarDayDTO,
   UrinationDataDTO,
+  ReportDTO,
 } from '../../../types/diary';
 import {MMKVStorage, DIARY_CALENDAR_KEY} from '../../../storage/mmkvStorage';
 
@@ -156,6 +157,24 @@ const diaryServices = {
       console.error('Erro ao sincronizar dados do calendário:', error);
       throw error;
     }
+  },
+
+  getReport: async (
+    from: string,
+    to: string,
+    userId?: string,
+  ): Promise<ReportDTO> => {
+    if (!userId) {
+      throw new Error('Usuário não autenticado');
+    }
+
+    const params = new URLSearchParams();
+    params.append('from', from);
+    params.append('to', to);
+
+    const url = `${apiRoutes.diary.report}?${params.toString()}`;
+    const res = await api.get(url, {headers: {'x-user-id': userId}});
+    return res.data as ReportDTO;
   },
 };
 

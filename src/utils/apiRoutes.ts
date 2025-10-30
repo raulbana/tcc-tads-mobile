@@ -36,6 +36,7 @@ const apiRoutes = {
   },
   diary: {
     calendar: '/calendar',
+    report: '/report',
   },
   config: {
     contact: {

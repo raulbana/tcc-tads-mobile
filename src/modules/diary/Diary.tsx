@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback} from 'react';
 import * as S from './styles';
 import Calendar from './components/Calendar/Calendar';
 import ScreenContainer from '../../components/ScreenContainer/ScreenContainer';
@@ -9,11 +9,30 @@ import {useAuth} from '../../contexts/AuthContext';
 import Loader from '../../components/Loader/Loader';
 import Toast from '../../components/Toast/Toast';
 import {useDynamicTheme} from '../../hooks/useDynamicTheme';
+import moment from 'moment';
+import {diaryQueryFactory} from './services/diaryQueryFactory';
+import {printReportPdf} from './utils/reportPdf';
 
 const Diary = () => {
   const {user, isLoggedIn} = useAuth();
   const {isLoading, error, clearError} = useDiary();
   const theme = useDynamicTheme();
+  const queries = diaryQueryFactory(['diary']);
+  const generateReportMutation = queries.useGenerateReport(
+    user?.id ? String(user.id) : undefined,
+  );
+
+  const handleGenerateReport = useCallback(async () => {
+    try {
+      const from = moment().startOf('month').format('YYYY-MM-DD');
+      const to = moment().endOf('month').format('YYYY-MM-DD');
+
+      const report = await generateReportMutation.mutateAsync({from, to});
+      await printReportPdf(report);
+    } catch (e) {
+      console.error('Erro ao gerar relatório:', e);
+    }
+  }, [generateReportMutation]);
 
   if (isLoading) {
     return <Loader overlay />;
@@ -28,7 +47,7 @@ const Diary = () => {
           text={'Diário Miccional'}
         />
         <Calendar />
-        <ReportCard onGenerateReport={() => {}} />
+        <ReportCard onGenerateReport={handleGenerateReport} />
 
         {error && (
           <Toast

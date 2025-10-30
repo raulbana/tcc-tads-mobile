@@ -30,8 +30,44 @@ const contentServices = {
       headers,
     });
 
-    contentCache.setContent(contentId, response.data);
-    return response.data;
+    const raw = response.data;
+    const mapped: Content = {
+      id: String(raw.id),
+      title: raw.title,
+      description: raw.description,
+      subtitle: raw.subtitle,
+      subcontent: raw.subcontent,
+      categories: raw.categories || [],
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      isLiked: !!raw.isLiked,
+      isReposted: !!raw.isReposted,
+      isSaved: !!raw.isSaved,
+      likesCount: raw.likesCount,
+      repostsCount: raw.repostsCount,
+      authorId: raw.author?.id ? String(raw.author.id) : '',
+      author: raw.author,
+      cover: raw.cover,
+      media: raw.media || [],
+      commentsCount: raw.commentsCount || 0,
+      comments: (raw.comments || []).map((c: any) => ({
+        id: String(c.id),
+        contentId: String(raw.id),
+        text: c.text,
+        authorId: c.author?.id ? String(c.author.id) : '',
+        authorName: c.author?.name || 'Usuário',
+        authorImage: '',
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+        likesCount: c.likesCount,
+        isLikedByCurrentUser: c.isLiked,
+        repliesCount: c.repliesCount,
+        replies: [],
+      })),
+    };
+
+    contentCache.setContent(contentId, mapped);
+    return mapped;
   },
 
   getAll: async (userId: string, profileMode?: boolean): Promise<Content[]> => {
@@ -53,7 +89,6 @@ const contentServices = {
     }
 
     return response.data;
-
   },
 
   getCategories: async (): Promise<ContentCategory[]> => {
@@ -74,7 +109,9 @@ const contentServices = {
       'x-user-id': userId,
     };
 
-    const response = await api.post(apiRoutes.content.create, contentData, {headers});
+    const response = await api.post(apiRoutes.content.create, contentData, {
+      headers,
+    });
     contentCache.invalidateAll();
 
     return response.data;
@@ -103,7 +140,6 @@ const contentServices = {
     });
     contentCache.invalidateContent(id);
 
-  
     return response.data;
   },
 
@@ -178,7 +214,10 @@ const contentServices = {
     userId: string,
     control: boolean,
   ): Promise<void> => {
-    await api.patch(apiRoutes.content.save(contentId), {control: control, userId: userId});
+    await api.patch(apiRoutes.content.save(contentId), {
+      control: control,
+      userId: userId,
+    });
   },
 
   getComments: async (
@@ -193,7 +232,9 @@ const contentServices = {
   },
 
   updateComment: async (commentId: string, text: string): Promise<Comment> => {
-    const response = await api.put(apiRoutes.content.comment(commentId), {text});
+    const response = await api.put(apiRoutes.content.comment(commentId), {
+      text,
+    });
     return response.data;
   },
 
@@ -210,9 +251,12 @@ const contentServices = {
     page?: number,
     size?: number,
   ): Promise<Comment[]> => {
-    const response = await api.get(apiRoutes.content.commentReplies(commentId), {
-      params: {page, size},
-    });
+    const response = await api.get(
+      apiRoutes.content.commentReplies(commentId),
+      {
+        params: {page, size},
+      },
+    );
     return response.data;
   },
 

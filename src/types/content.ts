@@ -5,6 +5,7 @@ export interface AuthorDTO {
 }
 
 export interface MediaDTO {
+  id?: number;
   url: string;
   contentType: string;
   contentSize: number;
@@ -51,8 +52,8 @@ export interface Comment {
   authorId: string;
   authorName: string;
   authorImage: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   likesCount?: number;
   isLikedByCurrentUser?: boolean;
   repliesCount?: number;
@@ -65,15 +66,17 @@ export interface Content {
   description: string;
   subtitle?: string;
   subcontent?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
+  author?: AuthorDTO;
   cover: {
+    id?: number;
     url: string;
     id: number;
     contentType: string;
     contentSize: number;
     altText: string;
-    createdAt: Date;
+    createdAt: string;
   };
   media: MediaDTO[];
   categories: string[];

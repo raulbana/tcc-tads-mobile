@@ -1406,6 +1406,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-print (0.11.0):
+    - React-Core
   - react-native-safe-area-context (5.6.0):
     - DoubleConversion
     - glog
@@ -2224,6 +2226,7 @@ DEPENDENCIES:
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
+  - react-native-print (from `../node_modules/react-native-print`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -2355,6 +2358,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
+  react-native-print:
+    :path: "../node_modules/react-native-print"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-video:
@@ -2479,6 +2484,7 @@ SPEC CHECKSUMS:
   react-native-date-picker: ffb59a0dd7d3a1e78795c738c8dea68b90b18389
   react-native-image-picker: c73e6edfdbc2bbc1c12b3fe9c2149441fa08f149
   react-native-mmkv: a5f4c22acb1d2f8d1008c07a986186d5fce147ac
+  react-native-print: f704aef52d931bfce6d1d84351dbb5232d7ecb89
   react-native-safe-area-context: 6863f9e225b541b481514b0f6d51be0867184c2c
   react-native-video: d989cd4af65e79789763c7ee5ad4e2f3174d7ee1
   React-NativeModulesApple: 28df2c2241d8e2be46db34179f86ad76a3663068

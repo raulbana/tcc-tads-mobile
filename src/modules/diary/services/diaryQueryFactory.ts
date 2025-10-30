@@ -23,6 +23,11 @@ export const diaryQueryFactory = (queryKey: QueryKey) => {
         mutationFn: (data: CalendarRequestDTO) =>
           diaryServices.setCalendarEvent(data, userId),
       }),
+
+    useGenerateReport: (userId?: string) =>
+      useMutation<any, Error, {from: string; to: string}>({
+        mutationFn: ({from, to}) => diaryServices.getReport(from, to, userId),
+      }),
   };
 };
 

@@ -21,6 +21,7 @@ const ContentDetails = () => {
     replyTo,
     replyText,
     setReplyText,
+    setReplyTo,
     imageCarouselVisible,
     imageCarouselIndex,
     isLoading,
@@ -33,6 +34,7 @@ const ContentDetails = () => {
     handleCancelReply,
     handleCloseImageCarousel,
     setImageCarouselIndex,
+    handleImagePress,
   } = useContentDetails();
 
   const theme = useDynamicTheme();
@@ -47,7 +49,11 @@ const ContentDetails = () => {
       header={
         <ContentDetailsHeader
           image={content.media?.[0]?.url ?? content.cover?.url}
-          type={content.media?.[0]?.contentType.startsWith('video/') ? 'video' : 'image'}
+          type={
+            content.media?.[0]?.contentType?.startsWith('video/') === true
+              ? 'video'
+              : 'image'
+          }
         />
       }>
       <S.Wrapper>
@@ -67,9 +73,17 @@ const ContentDetails = () => {
 
         <CarouselSection
           carouselData={{
-            data: content?.media.filter(media => media.contentType.startsWith('image/')) ?? [],
+            data:
+              content?.media?.filter(m =>
+                m?.contentType?.startsWith('image/'),
+              ) ?? [],
             itemWidth: 140,
-            renderItem: ({item}) => <ImageCard image={item.url} onClick={() => {}} />,
+            renderItem: ({item, index}) => (
+              <ImageCard
+                image={item.url}
+                onClick={() => handleImagePress(index)}
+              />
+            ),
           }}
           sectionTitle={''}
         />
@@ -95,7 +109,11 @@ const ContentDetails = () => {
           onRepostPress={handleToggleRepost}
           isSaved={content.isSaved}
           onSavePress={handleToggleSave}
-          category={content?.categories?.length > 0 ? content.categories[0] : 'Sem categoria'}
+          category={
+            content?.categories?.length > 0
+              ? content.categories[0]
+              : 'Sem categoria'
+          }
         />
         <CommentSection
           comments={comments}
@@ -109,13 +127,13 @@ const ContentDetails = () => {
           replyTo={replyTo}
           replyText={replyText}
           setReplyText={setReplyText}
-          setReplyTo={handleCancelReply}
+          setReplyTo={setReplyTo}
         />
       </S.Wrapper>
       <ImageCarouselModal
         images={
           content.media
-            .filter(media => media.contentType.startsWith('image/'))
+            ?.filter(media => media?.contentType?.startsWith('image/'))
             .map(media => media.url) ?? []
         }
         isVisible={imageCarouselVisible}

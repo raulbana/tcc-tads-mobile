@@ -219,6 +219,7 @@ const useContentDetails = () => {
     replyTo,
     replyText,
     setReplyText,
+    setReplyTo,
     imageCarouselVisible,
     imageCarouselIndex,
     isLoading:
