@@ -26,7 +26,6 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   const {selectedImage, error, pickImage, removeImage} =
     useProfileImageUpload();
 
-  // Usar a imagem selecionada ou a atual
   const displayImage = selectedImage?.uri || currentPicture;
   const hasProfilePicture = displayImage && displayImage.trim() !== '';
 

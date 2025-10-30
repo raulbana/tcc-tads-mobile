@@ -15,9 +15,6 @@ const Diary = () => {
   const {isLoading, error, clearError} = useDiary();
   const theme = useDynamicTheme();
 
-  // A busca inicial dos dados do calendário agora é feita automaticamente pelo componente Calendar
-  // quando o mês é carregado, então não precisamos mais desta lógica aqui
-
   if (isLoading) {
     return <Loader overlay />;
   }

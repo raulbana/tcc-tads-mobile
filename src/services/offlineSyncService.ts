@@ -16,7 +16,6 @@ export interface OfflineData {
 }
 
 class OfflineSyncService {
-  // Salvar dados de onboarding no MMKV
   saveOnboardingData(profile: PatientProfile): void {
     try {
       MMKVStorage.set(ONBOARDING_DATA_KEY, JSON.stringify(profile));
@@ -25,7 +24,6 @@ class OfflineSyncService {
     }
   }
 
-  // Obter dados de onboarding do MMKV
   getOnboardingData(): PatientProfile | null {
     try {
       const data = MMKVStorage.getString(ONBOARDING_DATA_KEY);
@@ -36,7 +34,6 @@ class OfflineSyncService {
     }
   }
 
-  // Salvar dados de exercícios no MMKV
   saveExercisesData(exercises: Exercise[]): void {
     try {
       MMKVStorage.set(EXERCISES_DATA_KEY, JSON.stringify(exercises));
@@ -45,7 +42,6 @@ class OfflineSyncService {
     }
   }
 
-  // Obter dados de exercícios do MMKV
   getExercisesData(): Exercise[] {
     try {
       const data = MMKVStorage.getString(EXERCISES_DATA_KEY);
@@ -56,7 +52,6 @@ class OfflineSyncService {
     }
   }
 
-  // Obter todos os dados offline
   getAllOfflineData(): OfflineData {
     return {
       diaryCalendar: this.getDiaryCalendarData(),
@@ -65,7 +60,6 @@ class OfflineSyncService {
     };
   }
 
-  // Obter dados do calendário do MMKV
   getDiaryCalendarData(): CalendarRangeResponse {
     try {
       const data = MMKVStorage.getString(DIARY_CALENDAR_KEY);
@@ -76,25 +70,9 @@ class OfflineSyncService {
     }
   }
 
-  // Sincronizar todos os dados offline com a API após login/cadastro
   async syncAllOfflineData(userId: string): Promise<void> {
     try {
-      // Sincronizar dados do calendário
       await diaryServices.syncOfflineData(userId);
-
-      // TODO: Implementar sincronização de exercícios quando a API estiver disponível
-      // const exercises = this.getExercisesData();
-      // if (exercises.length > 0) {
-      //   await exerciseServices.syncOfflineData(userId, exercises);
-      //   MMKVStorage.delete(EXERCISES_DATA_KEY);
-      // }
-
-      // TODO: Implementar sincronização de onboarding quando a API estiver disponível
-      // const onboarding = this.getOnboardingData();
-      // if (onboarding) {
-      //   await onboardingServices.syncOfflineData(userId, onboarding);
-      //   MMKVStorage.delete(ONBOARDING_DATA_KEY);
-      // }
 
       console.log('Sincronização de dados offline concluída');
     } catch (error) {
@@ -103,7 +81,6 @@ class OfflineSyncService {
     }
   }
 
-  // Limpar todos os dados offline
   clearAllOfflineData(): void {
     try {
       MMKVStorage.delete(DIARY_CALENDAR_KEY);
@@ -114,7 +91,6 @@ class OfflineSyncService {
     }
   }
 
-  // Verificar se há dados offline para sincronizar
   hasOfflineData(): boolean {
     return !!(
       MMKVStorage.getString(DIARY_CALENDAR_KEY) ||

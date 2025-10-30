@@ -93,7 +93,6 @@ const EditContent: React.FC = () => {
     );
   }
 
-  // Mostrar formulário de edição quando tiver conteúdo
   return (
     <ScreenContainer
       scrollable={true}

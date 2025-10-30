@@ -108,7 +108,6 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           };
           await savePreferences(updatedPreferences);
 
-          // If user is logged in, also save to API
           if (isLoggedIn) {
             try {
               await configServices.updateAccessibilityPreferences(

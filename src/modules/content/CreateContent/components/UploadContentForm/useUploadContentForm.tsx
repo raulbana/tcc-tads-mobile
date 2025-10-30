@@ -9,7 +9,7 @@ import {useCallback, useState} from 'react';
 import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
-import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 
 const useUploadContentForm = () => {
   const navigation = useNavigation<NavigationStackProp>();
@@ -170,7 +170,6 @@ const useUploadContentForm = () => {
         setValue('video', '');
       }
 
-      // Clear upload error when files are added
       if (files.length > 0) {
         setUploadError('');
       }

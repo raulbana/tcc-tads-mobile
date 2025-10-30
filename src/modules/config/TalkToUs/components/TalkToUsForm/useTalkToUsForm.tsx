@@ -10,7 +10,6 @@ const useTalkToUsForm = () => {
   const {user} = useAuth();
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // React Query hooks
   const configQueries = useConfigQueries(['config']);
   const sendContactEmailMutation = configQueries.useSendContactEmail();
 
@@ -47,7 +46,6 @@ const useTalkToUsForm = () => {
       setIsSuccess(true);
       reset();
 
-      // Hide success message after 3 seconds
       setTimeout(() => {
         setIsSuccess(false);
       }, 3000);

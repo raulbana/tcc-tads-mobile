@@ -57,7 +57,6 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export const ContentProvider = ({children}: {children: ReactNode}) => {
   const {user} = useAuth();
 
-  // React Query hooks
   const contentQueries = useContentQueries(['content']);
   const {
     data: contents = [],
@@ -80,13 +79,10 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
   const createCommentMutation = contentQueries.createComment();
   const reportContentMutation = contentQueries.reportContent();
 
-  // Estados combinados
   const isLoading = isLoadingContents || isLoadingCategories;
   const error = contentsError?.message || categoriesError?.message;
 
-  const clearError = useCallback(() => {
-    // React Query gerencia erros automaticamente
-  }, []);
+  const clearError = useCallback(() => {}, []);
 
   const loadContents = useCallback(
     async (profileMode?: boolean) => {
@@ -97,7 +93,6 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
 
   const loadContentById = useCallback(
     async (id: string) => {
-      // React Query gerencia isso automaticamente
       return contents.find(c => c.id === id) || null;
     },
     [contents],
@@ -173,7 +168,6 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
         text,
       });
 
-      // Mock comment para resposta imediata
       const mockComment: Comment = {
         id: Math.random().toString(36).substring(7),
         contentId,
@@ -196,27 +190,20 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
   );
 
   const updateComment = useCallback(async (commentId: string, text: string) => {
-    // TODO: Implementar quando API estiver disponível
     throw new Error('Not implemented yet');
   }, []);
 
   const deleteComment = useCallback(async (commentId: string) => {
-    // TODO: Implementar quando API estiver disponível
     throw new Error('Not implemented yet');
   }, []);
 
   const toggleLikeComment = useCallback(async (commentId: string) => {
-    // TODO: Implementar quando API estiver disponível
     throw new Error('Not implemented yet');
   }, []);
 
-  const loadCategories = useCallback(async () => {
-    // React Query gerencia isso automaticamente
-  }, []);
+  const loadCategories = useCallback(async () => {}, []);
 
-  const refreshContent = useCallback(async (id: string) => {
-    // React Query gerencia isso automaticamente
-  }, []);
+  const refreshContent = useCallback(async (id: string) => {}, []);
 
   const getContentById = useCallback(
     (id: string) => {
@@ -257,7 +244,6 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
   );
 
   const getContentStats = useCallback(async () => {
-    // TODO: Implementar quando API estiver disponível
     return {
       totalContents: contents.length,
       totalCategories: categories.length,

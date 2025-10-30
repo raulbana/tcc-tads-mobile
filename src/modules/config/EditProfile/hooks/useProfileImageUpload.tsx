@@ -33,7 +33,6 @@ export function useProfileImageUpload() {
       const asset = result.assets?.[0];
       if (!asset) return;
 
-      // Validação de tamanho (máximo 5MB para foto de perfil)
       const MAX_FILE_SIZE = 5 * 1024 * 1024;
       if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
@@ -43,7 +42,6 @@ export function useProfileImageUpload() {
         return;
       }
 
-      // Validação de tipo de arquivo
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (asset.type && !allowedTypes.includes(asset.type)) {
         const errorMsg = 'Formato não suportado. Use JPG ou PNG';

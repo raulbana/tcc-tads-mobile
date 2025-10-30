@@ -17,14 +17,12 @@ const useEditContent = () => {
   const contentQueries = useContentQueries(['content']);
   const contentId = (route.params as any)?.contentId;
 
-  // Buscar conteúdo específico se tiver contentId
   const {
     data: contentData,
     isLoading: isLoadingById,
     error: errorById,
   } = contentQueries.getById(contentId || '', user?.id.toString() || '');
 
-  // Buscar lista de conteúdos para desenvolvimento (quando não há contentId)
   const {
     data: contentsList = [],
     isLoading: isLoadingList,

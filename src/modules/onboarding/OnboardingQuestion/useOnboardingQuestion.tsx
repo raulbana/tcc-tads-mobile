@@ -131,7 +131,6 @@ const useOnboardingQuestion = () => {
         q4Score: answers.q6_when.length as number,
       };
 
-      // Se o usuário não está logado, salvar dados offline
       if (!isLoggedIn) {
         saveOfflineOnboardingData(profileData);
       } else {

@@ -153,7 +153,6 @@ const useMultiStepEvaluation = ({
   };
 
   return {
-    // Step management
     currentStep,
     currentStepIndex,
     totalSteps,
@@ -161,20 +160,16 @@ const useMultiStepEvaluation = ({
     handleNextStep,
     handlePreviousStep,
 
-    // Forms
     workoutForm,
     exerciseForm,
 
-    // Handlers
     handleWorkoutContinue,
     handleExerciseContinue,
 
-    // Options
     difficultyOptions,
     completionOptions,
     confidenceOptions,
 
-    // Exercise tracking
     currentExercise,
     currentExerciseIndex: currentExerciseEvaluationIndex + 1,
     totalExercises,

@@ -178,7 +178,11 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
       }),
 
     toggleSaveContent: () =>
-      useMutation<void, Error, {contentId: string; userId: string; control: boolean}>({
+      useMutation<
+        void,
+        Error,
+        {contentId: string; userId: string; control: boolean}
+      >({
         mutationFn: ({contentId, userId, control}) =>
           contentServices.toggleSaveContent(contentId, userId, control),
         onSuccess: () => {
@@ -249,7 +253,6 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
         enabled: !!commentId,
       }),
 
-    // Media
     uploadMedia: () =>
       useMutation<any, Error, FormData>({
         mutationFn: files => contentServices.uploadMedia(files),
