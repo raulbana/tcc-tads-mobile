@@ -4,7 +4,7 @@ import {
   uploadContentSchema,
 } from './schema/uploadContentSchema';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {UploadFile} from '../UploadBox/useUpload';
+import {UploadFile} from '../../../../../types/content';
 import {useCallback, useState} from 'react';
 import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
@@ -16,8 +16,7 @@ const useUploadContentForm = () => {
   const navigation = useNavigation<NavigationStackProp>();
   const {user} = useAuth();
   const queries = useContentQueries(['content']);
-  const uploadMediaMutation = queries.uploadMedia();
-  const createContentMutation = queries.createContent();
+  const createContentWithFilesMutation = queries.createContentWithFiles();
 
   const {
     control,
@@ -44,13 +43,11 @@ const useUploadContentForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
 
-  const contentQueries = useContentQueries(['content']);
-
   const {
     data: categories = [],
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = contentQueries.getCategories();
+  } = queries.getCategories();
 
   const title = watch('title');
   const description = watch('description');
@@ -60,7 +57,8 @@ const useUploadContentForm = () => {
   const categoriesList = useCallback(() => {
     return categories.map(c => ({
       content: c.name,
-      isActive: selectedCategories.includes(c.name),
+      categoryId: c.id,
+      isActive: selectedCategories.includes(c.id),
     }));
   }, [categories, selectedCategories]);
 
@@ -77,40 +75,12 @@ const useUploadContentForm = () => {
         return;
       }
 
-      const formData = new FormData();
-      filesList.forEach((file, index) => {
-        formData.append('files', {
-          uri: file.uri,
-          name: file.fileName || `upload_${index}`,
-          type: file.type.startsWith('video') ? 'video/mp4' : 'image/jpeg',
-        });
-      });
-
-      const uploadRes: any = await uploadMediaMutation.mutateAsync(formData);
-
-      const uploadedMedia: any[] = Array.isArray(uploadRes?.media)
-        ? uploadRes.media
-        : Array.isArray(uploadRes)
-        ? uploadRes
-        : [];
-
-      const uploadedImageUrls = uploadedMedia
-        .filter(m => (m.contentType || m.type || '').startsWith('image'))
-        .map(m => m.url)
-        .filter(Boolean);
-
-      const uploadedVideoUrl = (
-        uploadedMedia.find(m =>
-          (m.contentType || m.type || '').startsWith('video'),
-        ) || {}
-      ).url;
-
       const userId = user?.id ? String(user.id) : '';
       if (!userId) {
         throw new Error('Usuário não autenticado');
       }
 
-      await createContentMutation.mutateAsync({
+      await createContentWithFilesMutation.mutateAsync({
         userId,
         contentData: {
           title: data.title,
@@ -118,8 +88,7 @@ const useUploadContentForm = () => {
           subtitle: data.subtitle || undefined,
           subcontent: data.subcontent || undefined,
           categories: data.categories,
-          images: uploadedImageUrls.length ? uploadedImageUrls : data.images,
-          video: uploadedVideoUrl || data.video || undefined,
+          files: filesList,
         },
       });
 
@@ -143,17 +112,17 @@ const useUploadContentForm = () => {
     }
   };
 
-  const onSelectCategory = (category: string) => {
+  const onSelectCategory = (categoryId: number) => {
     const currentCategories = watch('categories');
-    const isAlreadySelected = currentCategories.includes(category);
+    const isAlreadySelected = currentCategories.includes(categoryId);
 
     if (isAlreadySelected) {
       setValue(
         'categories',
-        currentCategories.filter(c => c !== category),
+        currentCategories.filter(c => c !== categoryId),
       );
     } else {
-      setValue('categories', [...currentCategories, category]);
+      setValue('categories', [...currentCategories, categoryId]);
     }
   };
 
