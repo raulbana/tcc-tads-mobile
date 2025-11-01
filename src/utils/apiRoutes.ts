@@ -45,6 +45,7 @@ const apiRoutes = {
     getWorkoutById: (id: string) => `/exercise/workout/${id}`,
     listWorkoutPlans: '/exercise/workout/plan',
     getWorkoutPlanById: (id: string) => `/exercise/workout/plan/${id}`,
+    getUserWorkoutPlan: '/users/workout/plan',
     submitWorkoutFeedback: '/users/workout/feedback',
     submitWorkoutCompletion: '/users/workout/completion',
   },

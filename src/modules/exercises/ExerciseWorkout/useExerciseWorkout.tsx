@@ -32,7 +32,7 @@ const formatLocalDateTime = (date: Date): string => {
 const useExerciseWorkout = () => {
   const route = useRoute<ExerciseWorkoutRouteProp>();
   const {workout: workoutFromRoute} = route.params;
-  const {submitWorkoutCompletion} = useExercises();
+  const {submitWorkoutCompletion, checkUserWorkoutPlan} = useExercises();
   const {user} = useAuth();
   const scrollRef = useRef<any>(null);
   const workoutStartTimeRef = useRef<Date | null>(null);
@@ -60,13 +60,23 @@ const useExerciseWorkout = () => {
     }
   }, [workoutWithMedia]);
 
-  const onStartWorkout = () => {
-    setStep('EXERCISE');
+  const onStartWorkout = async () => {
     if (!workout) return;
-    workoutStartTimeRef.current = new Date();
-    const first = workout.exercises[0];
-    setCurrentExercise({...first, status: 'IN_PROGRESS'});
-    setWorkout({...workout, status: 'IN_PROGRESS'});
+    
+    try {
+      await checkUserWorkoutPlan();
+      setStep('EXERCISE');
+      workoutStartTimeRef.current = new Date();
+      const first = workout.exercises[0];
+      setCurrentExercise({...first, status: 'IN_PROGRESS'});
+      setWorkout({...workout, status: 'IN_PROGRESS'});
+    } catch (error: any) {
+      console.error('Erro ao verificar plano de treino:', error);
+      // Mostrar mensagem de erro ao usuário - não permite iniciar o treino sem plano ativo
+      alert(error.message || 'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.');
+      // Não prossegue com o início do treino se não houver plano ativo
+      return;
+    }
   };
 
   const onLeaveWorkout = () => {
@@ -135,14 +145,20 @@ const useExerciseWorkout = () => {
         
         if (!isNaN(workoutId)) {
           try {
+            // Verifica novamente se o plano de treino está ativo antes de submeter a conclusão
+            await checkUserWorkoutPlan();
             await submitWorkoutCompletion([
               {
                 workoutId,
                 completedAt: formatLocalDateTime(completedAt),
               },
             ]);
-          } catch (error) {
+          } catch (error: any) {
             console.error('Erro ao enviar completion do treino:', error);
+            // Mostra mensagem de erro ao usuário
+            const errorMessage = error.message || 'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
+            alert(errorMessage);
+            // Ainda permite prosseguir para avaliação mesmo se houver erro
           }
         } else {
           console.error('Workout ID inválido:', workout.id);

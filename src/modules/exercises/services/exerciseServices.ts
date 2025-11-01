@@ -7,6 +7,7 @@ import {
   WorkoutPlan,
   UserWorkoutFeedbackDTO,
   UserWorkoutCompletionDTO,
+  UserWorkoutPlanDTO,
 } from '../../../types/exercise';
 
 const api = apiFactory(BASE_URL);
@@ -173,6 +174,60 @@ const exerciseServices = {
     payload: import('../../../types/exercise').WorkoutCompletionDTO[],
   ): Promise<void> => {
     await api.post(apiRoutes.exercises.submitWorkoutCompletion, payload);
+  },
+
+  getUserWorkoutPlan: async (): Promise<UserWorkoutPlanDTO | null> => {
+    try {
+      const res = await api.get(apiRoutes.exercises.getUserWorkoutPlan);
+      if (res.status === 204) {
+        return null;
+      }
+      const raw = res.data;
+      const workoutsSource = raw.plan?.workouts;
+      const workoutsArray: any[] = Array.isArray(workoutsSource)
+        ? workoutsSource
+        : workoutsSource && typeof workoutsSource === 'object'
+        ? Object.values(workoutsSource)
+        : [];
+      
+      const difficultyLevel = raw.plan.difficultyLevel || raw.plan.difficulty;
+      const difficulty: WorkoutPlan['difficulty'] =
+        difficultyLevel === 'BEGINNER'
+          ? 'EASY'
+          : difficultyLevel === 'MODERATE'
+          ? 'MODERATE'
+          : difficultyLevel === 'HARD'
+          ? 'HARD'
+          : 'EASY';
+
+      const mappedPlan: WorkoutPlan = {
+        id: String(raw.plan.id),
+        name: raw.plan.name || raw.plan.title || '',
+        description: raw.plan.description || '',
+        difficulty,
+        workouts: workoutsArray.map(mapWorkoutDTO),
+        createdAt: new Date(raw.plan.createdAt || Date.now()),
+        updatedAt: new Date(raw.plan.updatedAt || Date.now()),
+      };
+
+      return {
+        id: raw.id,
+        plan: mappedPlan,
+        startDate: raw.startDate,
+        endDate: raw.endDate,
+        totalProgress: raw.totalProgress,
+        weekProgress: raw.weekProgress,
+        currentWeek: raw.currentWeek,
+        nextWorkout: raw.nextWorkout,
+        lastWorkoutDate: raw.lastWorkoutDate,
+        completed: raw.completed,
+      };
+    } catch (error: any) {
+      if (error.response?.status === 204 || error.response?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
   },
 };
 

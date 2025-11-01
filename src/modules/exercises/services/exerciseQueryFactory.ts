@@ -6,6 +6,7 @@ import {
   WorkoutPlan,
   UserWorkoutCompletionDTO,
   UserWorkoutFeedbackDTO,
+  UserWorkoutPlanDTO,
 } from '../../../types/exercise';
 
 export const exerciseQueryFactory = (baseKey: QueryKey) => {
@@ -82,6 +83,16 @@ export const exerciseQueryFactory = (baseKey: QueryKey) => {
       useMutation<void, Error, import('../../../types/exercise').WorkoutCompletionDTO[]>({
         mutationFn: payload =>
           exerciseServices.submitWorkoutCompletion(payload),
+      }),
+
+    getUserWorkoutPlan: () =>
+      useQuery<UserWorkoutPlanDTO | null>({
+        queryKey: [...baseKey, 'userWorkoutPlan'],
+        queryFn: () => exerciseServices.getUserWorkoutPlan(),
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 5,
+        retry: 1,
+        refetchOnWindowFocus: false,
       }),
   };
 };

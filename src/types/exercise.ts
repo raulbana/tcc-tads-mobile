@@ -133,3 +133,16 @@ export interface UserWorkoutCompletionDTO {
   completedAt: string;
   duration?: string;
 }
+
+export interface UserWorkoutPlanDTO {
+  id: number;
+  plan: WorkoutPlan;
+  startDate: string;
+  endDate?: string;
+  totalProgress: number;
+  weekProgress: number;
+  currentWeek: number;
+  nextWorkout?: number;
+  lastWorkoutDate?: string;
+  completed: boolean;
+}

@@ -12,6 +12,7 @@ import {
   WorkoutPlan,
   ExerciseFeedbackCreatorDTO,
   WorkoutCompletionDTO,
+  UserWorkoutPlanDTO,
 } from '../types/exercise';
 
 interface ExerciseContextType {
@@ -24,6 +25,7 @@ interface ExerciseContextType {
   submitWorkoutFeedback: (data: ExerciseFeedbackCreatorDTO[]) => Promise<void>;
   submitWorkoutCompletion: (data: WorkoutCompletionDTO[]) => Promise<void>;
   getWorkoutById: (id: string) => Promise<Workout | undefined>;
+  checkUserWorkoutPlan: () => Promise<void>;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(
@@ -50,6 +52,11 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
 
   const feedbackMutation = exerciseQueries.submitWorkoutFeedback();
   const completionMutation = exerciseQueries.submitWorkoutCompletion();
+
+  const {
+    data: userWorkoutPlan,
+    refetch: refetchUserWorkoutPlan,
+  } = exerciseQueries.getUserWorkoutPlan();
 
   const isLoading = isLoadingWorkouts || isLoadingPlan;
   const error = workoutsError?.message || planError?.message || null;
@@ -83,6 +90,13 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
     [workouts],
   );
 
+  const checkUserWorkoutPlan = useCallback(async () => {
+    const result = await refetchUserWorkoutPlan();
+    if (!result.data) {
+      throw new Error('Usuário não possui um plano de treino ativo. Por favor, complete o onboarding para iniciar um plano de treino.');
+    }
+  }, [refetchUserWorkoutPlan]);
+
   const value = useMemo(
     () => ({
       workouts,
@@ -94,6 +108,7 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
       submitWorkoutFeedback,
       submitWorkoutCompletion,
       getWorkoutById,
+      checkUserWorkoutPlan,
     }),
     [
       workouts,
@@ -105,6 +120,7 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
       submitWorkoutFeedback,
       submitWorkoutCompletion,
       getWorkoutById,
+      checkUserWorkoutPlan,
     ],
   );
 
