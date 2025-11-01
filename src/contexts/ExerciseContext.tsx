@@ -54,7 +54,6 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
   const completionMutation = exerciseQueries.submitWorkoutCompletion();
 
   const {
-    data: userWorkoutPlan,
     refetch: refetchUserWorkoutPlan,
   } = exerciseQueries.getUserWorkoutPlan();
 
