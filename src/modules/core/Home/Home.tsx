@@ -13,7 +13,6 @@ const Home = () => {
     user,
     handleNavigateToDiary,
     handleNavigateToTrainingDetails,
-    isLoading,
     hasDiaryEntriesToday,
     hasTrainingData,
     workoutPlan,
