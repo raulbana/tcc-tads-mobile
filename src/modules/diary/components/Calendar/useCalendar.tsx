@@ -64,7 +64,7 @@ export function useCalendar() {
           endOfMonth.format('YYYY-MM-DD'),
           userId,
         );
-        
+
         setCalendarData(prevData => ({
           ...prevData,
           ...data,
@@ -157,13 +157,10 @@ export function useCalendar() {
     });
   }, [matrix, calendarData, monthRef]);
 
-  const setMonth = useCallback(
-    (year: number, monthIndex0Based: number) => {
-      const newMonth = moment({year, month: monthIndex0Based, date: 1});
-      setMonthRef(newMonth);
-    },
-    [],
-  );
+  const setMonth = useCallback((year: number, monthIndex0Based: number) => {
+    const newMonth = moment({year, month: monthIndex0Based, date: 1});
+    setMonthRef(newMonth);
+  }, []);
 
   const {width: screenWidth} = useWindowDimensions();
   const tileWidth = Math.floor(
