@@ -4,13 +4,18 @@ import Label from '../../../../../components/Label/Label';
 import {TouchableOpacity} from 'react-native';
 import ExerciseCard from '../../../../../components/ExerciseCard/ExerciseCard';
 import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import { Exercise } from '../../../../../types/exercise';
 
 interface TrainingSectionProps {
   onRedirectToTrainingDetails: () => void;
+  onRedirectToAllExercises: () => void;
+  exercise: Exercise;
 }
 
 const TrainingSection: React.FC<TrainingSectionProps> = ({
   onRedirectToTrainingDetails,
+  onRedirectToAllExercises,
+  exercise,
 }) => {
   const theme = useDynamicTheme();
 
@@ -22,7 +27,7 @@ const TrainingSection: React.FC<TrainingSectionProps> = ({
           color={theme.colors.gray_08}
           text={`Treino do dia`}
         />
-        <TouchableOpacity onPress={onRedirectToTrainingDetails}>
+        <TouchableOpacity onPress={onRedirectToAllExercises}>
           <Label
             typography={theme.typography.paragraph.m2}
             color={theme.colors.purple_04}
@@ -32,23 +37,8 @@ const TrainingSection: React.FC<TrainingSectionProps> = ({
       </S.Row>
       <ExerciseCard
         typeCard={'default'}
-        exercise={{
-          id: '1',
-          title: 'Treino de Assoalho Pélvico',
-          description:
-            'lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-          status: 'PENDING',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          duration: '30 min',
-          repetitions: 12,
-          sets: 3,
-          dueDate: new Date(),
-          category: 'Força',
-          completedAt: new Date(),
-        }}
-        onPressPrimaryAction={() => {}}
-        onPressSecondaryAction={() => {}}
+        exercise={exercise}
+        onPressPrimaryAction={onRedirectToTrainingDetails}
       />
     </S.Wrapper>
   );

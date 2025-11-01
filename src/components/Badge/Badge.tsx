@@ -4,7 +4,7 @@ import Label from '../Label/Label';
 import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export interface BadgeProps {
-  content: string | React.FC;
+  content: string;
   backgroundColor?: string;
   borderColor?: string;
   textColor?: string;
@@ -34,16 +34,12 @@ const Badge: React.FC<BadgeProps> = props => {
       disabled={disabled}
       isActive={isActive}
       backgroundColor={isActive ? theme.colors.purple_02 : backgroundColor}>
-      {typeof content === 'string' ? (
-        <Label
-          color={textColor || theme.colors.gray_08}
-          typography={theme.typography.paragraph.m0}
-          text={content}
-          ellipsizeMode={ellipsizeMode}
-        />
-      ) : (
-        React.createElement(content)
-      )}
+      <Label
+        color={textColor || theme.colors.gray_08}
+        typography={theme.typography.paragraph.m0}
+        text={content}
+        ellipsizeMode={ellipsizeMode}
+      />
     </S.BadgeContainer>
   );
 };

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import {z} from 'zod';
 
 export const uploadContentSchema = z.object({
   title: z.string().min(1, 'Título é obrigatório'),
@@ -7,7 +7,7 @@ export const uploadContentSchema = z.object({
   subcontent: z.string().optional(),
   images: z.array(z.string()).min(1, 'No mínimo 1 imagem é obrigatória'),
   video: z.string().optional(),
-  categories: z.array(z.string()).min(1, 'No mínimo 1 categoria é obrigatória'),
+  categories: z.array(z.number()).min(1, 'No mínimo 1 categoria é obrigatória'),
 });
 
 export type UploadContentSchema = z.infer<typeof uploadContentSchema>;

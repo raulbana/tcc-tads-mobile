@@ -38,7 +38,12 @@ interface DiaryContextType {
 
   clearError: () => void;
   getDayData: (date: string) => CalendarDayDTO | null;
-  setCalendarData: (data: CalendarRangeResponse | null) => void;
+  setCalendarData: (
+    data:
+      | CalendarRangeResponse
+      | null
+      | ((prev: CalendarRangeResponse | null) => CalendarRangeResponse | null),
+  ) => void;
 }
 
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
@@ -97,7 +102,7 @@ export const DiaryProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [], // Dependências vazias para evitar recriação
+    [],
   );
 
   const saveCalendarEvent = useCallback(

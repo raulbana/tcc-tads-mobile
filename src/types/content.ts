@@ -40,7 +40,7 @@ export interface ContentCategoryDTO {
 }
 
 export interface ContentCategory {
-  id: string;
+  id: number;
   name: string;
   auditable: boolean;
 }
@@ -72,7 +72,6 @@ export interface Content {
   cover: {
     id?: number;
     url: string;
-    id: number;
     contentType: string;
     contentSize: number;
     altText: string;
@@ -116,14 +115,31 @@ export interface ToggleDTO {
   control: boolean;
 }
 
+export interface UploadFile {
+  id: string;
+  uri: string;
+  type: string;
+  fileName: string;
+  fileSize: number;
+}
+
 export interface CreateContentRequest {
   title: string;
   description: string;
   subtitle?: string;
   subcontent?: string;
-  categories: string[];
+  categories: number[];
   images?: string[];
   video?: string;
+}
+
+export interface CreateContentWithFilesRequest {
+  title: string;
+  description: string;
+  subtitle?: string;
+  subcontent?: string;
+  categories: number[];
+  files?: UploadFile[];
 }
 
 export interface UpdateContentRequest {

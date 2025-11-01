@@ -7,7 +7,7 @@ import Badge from '../../../../../components/Badge/Badge';
 import CarouselSection from '../../../../../components/CarouselSection.tsx/CarouselSection';
 import UploadBox from '../UploadBox/UploadBox';
 import Button from '../../../../../components/Button/Button';
-import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 
 interface UploadContentFormProps {
   parentScrollRef?: any;
@@ -34,7 +34,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
   } = useUploadContentForm();
 
   const theme = useDynamicTheme();
-  
+
   return (
     <S.Container>
       <S.FieldGroup>
@@ -127,7 +127,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
               renderItem: ({item}) => (
                 <Badge
                   {...item}
-                  onPress={() => onSelectCategory(item.content)}
+                  onPress={() => onSelectCategory(item.categoryId)}
                 />
               ),
             }}

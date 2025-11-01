@@ -9,6 +9,15 @@ import {
   WorkoutEvaluationAnswers,
   ExerciseSpecificEvaluationAnswers,
 } from './schema/exerciseEvaluation';
+import {useExercises} from '../../../../../contexts/ExerciseContext';
+import {useAuth} from '../../../../../contexts/AuthContext';
+
+const formatLocalDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 type EvaluationStep = 'WORKOUT_EVALUATION' | 'EXERCISE_EVALUATION';
 
@@ -22,13 +31,17 @@ interface UseMultiStepEvaluationProps {
       evaluation: ExerciseSpecificEvaluationAnswers;
     }>;
   }) => void;
+  scrollToTop?: () => void;
 }
 
 const useMultiStepEvaluation = ({
   workout,
   currentExercise: _currentExercise,
   onComplete,
+  scrollToTop,
 }: UseMultiStepEvaluationProps) => {
+  const {submitWorkoutFeedback} = useExercises();
+  const {user} = useAuth();
   const [currentStep, setCurrentStep] =
     useState<EvaluationStep>('WORKOUT_EVALUATION');
   const [workoutEvaluationData, setWorkoutEvaluationData] =
@@ -126,11 +139,14 @@ const useMultiStepEvaluation = ({
   const handleWorkoutContinue = () => {
     workoutForm.handleSubmit(data => {
       handleNextStep();
+      if (scrollToTop) {
+        setTimeout(() => scrollToTop(), 100);
+      }
     })();
   };
 
-  const handleExerciseContinue = () => {
-    exerciseForm.handleSubmit(data => {
+  const handleExerciseContinue = async () => {
+    exerciseForm.handleSubmit(async data => {
       const newEvaluation = {
         exerciseId: currentExercise.id,
         evaluation: data,
@@ -141,7 +157,87 @@ const useMultiStepEvaluation = ({
 
       if (!isLastExercise) {
         setCurrentExerciseEvaluationIndex(currentExerciseEvaluationIndex + 1);
+        if (scrollToTop) {
+          setTimeout(() => scrollToTop(), 100);
+        }
       } else {
+        if (workoutEvaluationData && user && updatedEvaluations.length > 0) {
+          try {
+            // Constantes para mapeamento de completion para rating
+            // Rating escala: 1 = Fácil, 2 = Com dificuldade, 3 = Não conseguiu completar
+            const RATING_EASILY = 1;
+            const RATING_WITH_DIFFICULTY = 2;
+            const RATING_COULD_NOT_COMPLETE = 3;
+
+            const completionToRating: Record<string, number> = {
+              EASILY: RATING_EASILY,
+              WITH_DIFFICULTY: RATING_WITH_DIFFICULTY,
+              COULD_NOT_COMPLETE: RATING_COULD_NOT_COMPLETE,
+            };
+
+            const feedbackArray = updatedEvaluations
+              .map(evalData => {
+                const exercise = workout.exercises.find(
+                  ex => ex.id === evalData.exerciseId,
+                );
+                const rating =
+                  completionToRating[evalData.evaluation.completion] || RATING_COULD_NOT_COMPLETE;
+                
+                const exerciseId = Number(evalData.exerciseId);
+                const workoutId = Number(workout.id);
+
+                if (isNaN(exerciseId) || isNaN(workoutId)) {
+                  console.error('IDs inválidos:', {
+                    exerciseId: evalData.exerciseId,
+                    workoutId: workout.id,
+                  });
+                  return null;
+                }
+
+                // Garante que evaluation está presente e é uma string válida
+                if (!workoutEvaluationData?.difficulty) {
+                  console.error('Dificuldade do treino não definida');
+                  return null;
+                }
+
+                // Sempre envia uma data válida - usa completedAt do exercício ou data atual
+                const completedAt = exercise?.completedAt
+                  ? formatLocalDate(new Date(exercise.completedAt))
+                  : formatLocalDate(new Date());
+
+                // Não inclui comments se for undefined para evitar enviar null
+                const feedbackItem: {
+                  exerciseId: number;
+                  workoutId: number;
+                  rating: number;
+                  evaluation: string;
+                  completedAt: string;
+                  comments?: string;
+                } = {
+                  exerciseId,
+                  workoutId,
+                  rating,
+                  evaluation: workoutEvaluationData.difficulty,
+                  completedAt,
+                };
+
+                // Só adiciona comments se tiver valor
+                // (comentários são opcionais no backend, então podemos omitir)
+
+                return feedbackItem;
+              })
+              .filter((item): item is NonNullable<typeof item> => item !== null);
+
+            if (feedbackArray.length > 0) {
+              await submitWorkoutFeedback(feedbackArray);
+            } else {
+              console.warn('Nenhum feedback válido para enviar');
+            }
+          } catch (error) {
+            console.error('Erro ao enviar feedback do treino:', error);
+          }
+        }
+
         if (workoutEvaluationData) {
           onComplete({
             workoutEvaluation: workoutEvaluationData,

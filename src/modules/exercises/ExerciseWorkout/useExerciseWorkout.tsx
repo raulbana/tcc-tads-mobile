@@ -1,74 +1,12 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo, useRef} from 'react';
 import {Exercise, Workout} from '../../../types/exercise';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {ExercisesParamList, RootParamList} from '../../../navigation/routes';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useExercises} from '../../../contexts/ExerciseContext';
+import {useAuth} from '../../../contexts/AuthContext';
 
-const mockWorkout: Workout = {
-  id: '1',
-  name: 'Treino XYZ',
-  exercises: [
-    {
-      id: '1',
-      title: 'Exercício 1',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 3,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-    {
-      id: '2',
-      title: 'Exercício 2',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 0,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-    {
-      id: '3',
-      title: 'Exercício 3',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      status: 'PENDING',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      duration: '30h',
-      repetitions: 12,
-      sets: 0,
-      category: 'lorem',
-      media: {
-        videos: ['https://www.w3schools.com/html/mov_bbb.mp4'],
-        images: ['https://picsum.photos/300/300'],
-      },
-    },
-  ],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  status: 'IN_PROGRESS',
-  difficulty: 'EASY',
-  duration: '1:30h',
-  description:
-    'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-  category: 'Pelvis',
-};
+const fallbackVideo = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
 type ExerciseWorkoutStep =
   | 'START_WORKOUT'
@@ -81,36 +19,84 @@ type ExerciseWorkoutRouteProp = RouteProp<
   'ExerciseWorkout'
 >;
 
+const formatLocalDateTime = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
+
 const useExerciseWorkout = () => {
   const route = useRoute<ExerciseWorkoutRouteProp>();
-  const {exerciseId} = route.params;
+  const {workout: workoutFromRoute} = route.params;
+  const {submitWorkoutCompletion, checkUserWorkoutPlan} = useExercises();
+  const {user} = useAuth();
+  const scrollRef = useRef<any>(null);
+  const workoutStartTimeRef = useRef<Date | null>(null);
 
   const [workout, setWorkout] = useState<Workout>();
   const [currentExercise, setCurrentExercise] = useState<Exercise>();
   const [step, setStep] = useState<ExerciseWorkoutStep>('START_WORKOUT');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isToastOpen, setIsToastOpen] = useState<boolean>(false);
   const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
-  useEffect(() => {
-    setWorkout(mockWorkout);
-    setCurrentExercise(mockWorkout.exercises[0]);
-  }, []);
 
-  const onStartWorkout = () => {
-    setStep('EXERCISE');
-    setCurrentExercise(mockWorkout.exercises[0]);
-    setWorkout({...mockWorkout, status: 'IN_PROGRESS'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'IN_PROGRESS'});
+  const workoutWithMedia = useMemo<Workout | undefined>(() => {
+    if (!workoutFromRoute) return undefined;
+    return {
+      ...workoutFromRoute,
+      exercises: (workoutFromRoute.exercises || []).map(e => ({
+        ...e,
+        media: e.media || {videos: [fallbackVideo], images: []},
+      })),
+    };
+  }, [workoutFromRoute]);
+
+  useEffect(() => {
+    if (workoutWithMedia) {
+      setWorkout(workoutWithMedia);
+      setCurrentExercise(workoutWithMedia.exercises[0]);
+    }
+  }, [workoutWithMedia]);
+
+  const onStartWorkout = async () => {
+    if (!workout) return;
+
+    try {
+      await checkUserWorkoutPlan();
+      setStep('EXERCISE');
+      workoutStartTimeRef.current = new Date();
+      const first = workout.exercises[0];
+      setCurrentExercise({...first, status: 'IN_PROGRESS'});
+      setWorkout({...workout, status: 'IN_PROGRESS'});
+    } catch (error: any) {
+      console.error('Erro ao verificar plano de treino:', error);
+      const errorMsg =
+        error.message ||
+        'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.';
+      setErrorMessage(errorMsg);
+      setIsToastOpen(true);
+      return;
+    }
   };
 
   const onLeaveWorkout = () => {
     setStep('START_WORKOUT');
-    setWorkout({...mockWorkout, status: 'PAUSED'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'PENDING'});
+    if (!workout) return;
+    const first = workout.exercises[0];
+    setWorkout({...workout, status: 'PAUSED'});
+    setCurrentExercise({...first, status: 'PENDING'});
   };
 
   const onFinishWorkout = () => {
     setStep('FINISH_WORKOUT');
-    setWorkout({...mockWorkout, status: 'COMPLETED'});
-    setCurrentExercise({...mockWorkout.exercises[0], status: 'COMPLETED'});
+    if (!workout) return;
+    const first = workout.exercises[0];
+    setWorkout({...workout, status: 'COMPLETED'});
+    setCurrentExercise({...first, status: 'COMPLETED'});
   };
 
   const handleNextStep = () => {
@@ -126,11 +112,11 @@ const useExerciseWorkout = () => {
   };
 
   const onEvaluate = () => {
-    setWorkout({...mockWorkout, status: 'COMPLETED'});
+    if (workout) setWorkout({...workout, status: 'COMPLETED'});
     navigation.navigate(`Exercises`, {screen: 'ExercisesHome'});
   };
 
-  const onNextExercise = () => {
+  const onNextExercise = async () => {
     if (!workout || !workout.exercises || !currentExercise) return;
     const currentIndex = workout.exercises.findIndex(
       exercise => exercise.id === currentExercise.id,
@@ -157,6 +143,31 @@ const useExerciseWorkout = () => {
         }),
       }));
     } else {
+      if (user && workout && workoutStartTimeRef.current) {
+        const completedAt = new Date();
+        const workoutId = Number(workout.id);
+
+        if (!isNaN(workoutId)) {
+          try {
+            await checkUserWorkoutPlan();
+            await submitWorkoutCompletion([
+              {
+                workoutId,
+                completedAt: formatLocalDateTime(completedAt),
+              },
+            ]);
+          } catch (error: any) {
+            console.error('Erro ao enviar completion do treino:', error);
+            const errorMsg =
+              error.message ||
+              'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
+            setErrorMessage(errorMsg);
+            setIsToastOpen(true);
+          }
+        } else {
+          console.error('Workout ID inválido:', workout.id);
+        }
+      }
       setStep('EVALUATE');
     }
   };
@@ -171,11 +182,24 @@ const useExerciseWorkout = () => {
     }
   };
 
+  const scrollToTop = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({y: 0, animated: true});
+    }
+  };
+
+  const onCloseToast = () => {
+    setIsToastOpen(false);
+    setErrorMessage('');
+  };
+
   return {
     workout,
     exercises: workout?.exercises,
     currentExercise,
     step,
+    scrollRef,
+    scrollToTop,
     setWorkout,
     setCurrentExercise,
     setStep,
@@ -188,6 +212,9 @@ const useExerciseWorkout = () => {
     onEvaluate,
     onNextExercise,
     onPreviousExercise,
+    errorMessage,
+    isToastOpen,
+    onCloseToast,
   };
 };
 

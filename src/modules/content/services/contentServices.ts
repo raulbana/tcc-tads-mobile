@@ -5,6 +5,8 @@ import {
   Content,
   ContentCategory,
   CreateContentRequest,
+  CreateContentWithFilesRequest,
+  UploadFile,
   UpdateContentRequest,
   ToggleDTO,
   CommentCreatorDTO,
@@ -30,44 +32,8 @@ const contentServices = {
       headers,
     });
 
-    const raw = response.data;
-    const mapped: Content = {
-      id: String(raw.id),
-      title: raw.title,
-      description: raw.description,
-      subtitle: raw.subtitle,
-      subcontent: raw.subcontent,
-      categories: raw.categories || [],
-      createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt,
-      isLiked: !!raw.isLiked,
-      isReposted: !!raw.isReposted,
-      isSaved: !!raw.isSaved,
-      likesCount: raw.likesCount,
-      repostsCount: raw.repostsCount,
-      authorId: raw.author?.id ? String(raw.author.id) : '',
-      author: raw.author,
-      cover: raw.cover,
-      media: raw.media || [],
-      commentsCount: raw.commentsCount || 0,
-      comments: (raw.comments || []).map((c: any) => ({
-        id: String(c.id),
-        contentId: String(raw.id),
-        text: c.text,
-        authorId: c.author?.id ? String(c.author.id) : '',
-        authorName: c.author?.name || 'Usuário',
-        authorImage: '',
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-        likesCount: c.likesCount,
-        isLikedByCurrentUser: c.isLiked,
-        repliesCount: c.repliesCount,
-        replies: [],
-      })),
-    };
-
-    contentCache.setContent(contentId, mapped);
-    return mapped;
+    contentCache.setContent(contentId, response.data);
+    return response.data;
   },
 
   getAll: async (userId: string, profileMode?: boolean): Promise<Content[]> => {
@@ -110,6 +76,61 @@ const contentServices = {
     };
 
     const response = await api.post(apiRoutes.content.create, contentData, {
+      headers,
+    });
+    contentCache.invalidateAll();
+
+    return response.data;
+  },
+
+  createContentWithFiles: async (
+    contentData: CreateContentWithFilesRequest,
+    userId: string,
+  ): Promise<Content> => {
+    const headers = {
+      'x-user-id': userId,
+    };
+
+    let uploadedMedia: any[] = [];
+
+    if (contentData.files && contentData.files.length > 0) {
+      const formData = new FormData();
+      contentData.files.forEach((file, index) => {
+        formData.append('files', {
+          uri: file.uri,
+          name: file.fileName || `upload_${index}`,
+          type: file.type.startsWith('video') ? 'video/mp4' : 'image/jpeg',
+        } as any);
+      });
+
+      const uploadRes: any = await contentServices.uploadMedia(formData);
+
+      uploadedMedia = Array.isArray(uploadRes?.media)
+        ? uploadRes.media
+        : Array.isArray(uploadRes)
+        ? uploadRes
+        : [];
+    }
+
+    // Build media array with altText for API
+    const mediaArray = uploadedMedia.map(m => ({
+      url: m.url,
+      contentType: m.contentType || m.type,
+      contentSize: m.contentSize || 0,
+      altText: m.altText || contentData.title,
+    }));
+
+    const createRequest = {
+      title: contentData.title,
+      description: contentData.description,
+      subtitle: contentData.subtitle,
+      subcontent: contentData.subcontent,
+      categoryIds: contentData.categories,
+      authorId: parseInt(userId),
+      media: mediaArray,
+    };
+
+    const response = await api.post(apiRoutes.content.create, createRequest, {
       headers,
     });
     contentCache.invalidateAll();
@@ -260,10 +281,11 @@ const contentServices = {
     return response.data;
   },
 
-  uploadMedia: async (files: FormData): Promise<any> => {
-    const response = await api.post(apiRoutes.media.upload, files, {
-      headers: {'Content-Type': 'multipart/form-data'},
-    });
+  uploadMedia: async (files: FormData | File[]): Promise<any> => {
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+    };
+    const response = await api.post(apiRoutes.media.upload, files, {headers});
     return response.data;
   },
 };

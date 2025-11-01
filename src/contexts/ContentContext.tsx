@@ -86,7 +86,7 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
 
   const loadContents = useCallback(
     async (profileMode?: boolean) => {
-      return refetchContents();
+      await refetchContents();
     },
     [refetchContents],
   );
@@ -306,7 +306,9 @@ export const ContentProvider = ({children}: {children: ReactNode}) => {
   );
 
   return (
-    <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
+    <ContentContext.Provider value={{...value, error: value.error ?? null}}>
+      {children}
+    </ContentContext.Provider>
   );
 };
 

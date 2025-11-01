@@ -4,14 +4,20 @@ import RecommendationCard from './components/RecomendationCard/RecommendationCar
 import Label from '../../../components/Label/Label';
 import TrainingSection from './components/TrainingSection/TrainingSection';
 import CalendarRow from '../../../components/Calendar/components/CalendarRow/CalendarRow';
-import { useAuth } from '../../../contexts/AuthContext';
-import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
+import useHome from './useHome';
 
 const Home = () => {
-
-  const {user} = useAuth();
   const theme = useDynamicTheme();
-
+  const {
+    user,
+    handleNavigateToDiary,
+    handleNavigateToTrainingDetails,
+    hasDiaryEntriesToday,
+    hasTrainingData,
+    workoutPlan,
+    handleNavigateToAllExercises,
+  } = useHome();
   return (
     <ScreenContainer>
       <S.Container>
@@ -21,13 +27,21 @@ const Home = () => {
           text={`Olá, ${user?.name}!`}
         />
         <CalendarRow />
-        <RecommendationCard
-          onButtonClick={() => {}}
-          title="Recomendações"
-          description="Verificamos os seus hábitos e sugerimos melhorias."
-          buttonLabel="Ver Mais"
-        />
-        <TrainingSection onRedirectToTrainingDetails={() => {}} />
+        {!hasDiaryEntriesToday && (
+          <RecommendationCard
+            onButtonClick={handleNavigateToDiary}
+            title="Recomendações"
+            description="Não realizou anotações em seu diário hoje? Revise as suas anotações para manter o controle de sua saúde."
+            buttonLabel="Meu diário"
+          />
+        )}
+        {hasTrainingData && (
+          <TrainingSection
+            onRedirectToAllExercises={handleNavigateToAllExercises}
+            exercise={workoutPlan[0]?.workouts?.[0]?.exercises?.[0]}
+            onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
+          />
+        )}
       </S.Container>
     </ScreenContainer>
   );

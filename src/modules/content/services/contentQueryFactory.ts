@@ -9,6 +9,7 @@ import {
   Content,
   ContentCategory,
   CreateContentRequest,
+  CreateContentWithFilesRequest,
   UpdateContentRequest,
   Comment,
 } from '../../../types/content';
@@ -57,6 +58,21 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
       >({
         mutationFn: ({contentData, userId}) =>
           contentServices.createContent(contentData, userId),
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [...baseKey, 'contentList'],
+          });
+        },
+      }),
+
+    createContentWithFiles: () =>
+      useMutation<
+        Content,
+        Error,
+        {contentData: CreateContentWithFilesRequest; userId: string}
+      >({
+        mutationFn: ({contentData, userId}) =>
+          contentServices.createContentWithFiles(contentData, userId),
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: [...baseKey, 'contentList'],

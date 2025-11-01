@@ -1,82 +1,46 @@
-import {useState, useCallback} from 'react';
-import {Exercise} from '../../../types/exercise';
+import {useCallback, useMemo} from 'react';
+import {Exercise, Workout} from '../../../types/exercise';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ExercisesParamList} from '../../../navigation/routes';
+import useExerciseQueries from '../services/exerciseQueryFactory';
 
 const useExerciseHome = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
 
-  const [workouts] = useState<Exercise[]>([
-    {
-      id: '1',
-      title: 'Treino xyz',
-      duration: '1:30h',
-      category: 'lorem',
-      status: 'PENDING',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      repetitions: 10,
-      sets: 3,
-      dueDate: new Date(),
-    },
-    {
-      id: '2',
-      title: 'Treino xyz',
-      duration: '1:30h',
-      category: 'lorem',
-      status: 'PENDING',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat. Lorem ipsum dolor sit amet consectetur adipiscing elit.',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      repetitions: 10,
-      sets: 3,
-      dueDate: new Date(),
-    },
-    {
-      id: '3',
-      title: 'Treino xyz',
-      duration: '1:30h',
-      category: 'lorem',
-      status: 'PENDING',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      repetitions: 10,
-      sets: 3,
-      dueDate: new Date(),
-    },
-    {
-      id: '4',
-      title: 'Treino xyz',
-      duration: '1:30h',
-      category: 'lorem',
-      status: 'PENDING',
-      description:
-        'Lorem ipsum dolor sit amet consectetur. Ac nunc lacus vel lacinia sodales consequat.',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      repetitions: 10,
-      sets: 3,
-      dueDate: new Date(),
-    },
-  ]);
+  const queries = useExerciseQueries(['exercises']);
+  const {data: workoutsApi = [], isLoading, error} = queries.listWorkouts();
+  console.log('ExerciseHome:listWorkouts', {
+    isLoading,
+    error: error?.message,
+    workoutsApiLength: workoutsApi?.length,
+  });
+  const workouts = useMemo<Exercise[]>(() => {
+    if (workoutsApi.length > 0) {
+      return workoutsApi.flatMap((w): Exercise[] => w.exercises || []);
+    }
+    return [];
+  }, [workoutsApi]);
+  console.log('ExerciseHome:workoutsFlattened', {length: workouts.length});
 
   const handleWorkoutPress = useCallback(
-    (workoutId: string) => {
-      navigation.navigate('ExerciseDetails', {exerciseId: workoutId});
+    (exerciseId: string) => {
+      const workout = workoutsApi.find((w: Workout) =>
+        w.exercises.some((e: Exercise) => e.id === exerciseId),
+      );
+      if (workout) {
+        navigation.navigate('ExerciseDetails', {workout});
+      }
     },
-    [navigation],
+    [navigation, workoutsApi],
   );
 
   return {
     workouts,
     handleWorkoutPress,
+    isLoading,
+    error,
   };
 };
 

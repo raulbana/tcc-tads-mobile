@@ -41,7 +41,6 @@ export function useCalendar() {
   const PADDING_H = horizontalScale(16);
 
   const [monthRef, setMonthRef] = useState<Moment>(moment());
-  const loadedMonthsRef = useRef<Set<string>>(new Set());
 
   const matrix = useMemo(() => buildMonthMatrix(monthRef), [monthRef]);
 
@@ -53,16 +52,8 @@ export function useCalendar() {
 
   const loadMonthData = useCallback(
     async (month: Moment) => {
-      const monthKey = month.format('YYYY-MM');
-
-      if (loadedMonthsRef.current.has(monthKey)) {
-        return;
-      }
-
       const startOfMonth = month.clone().startOf('month');
       const endOfMonth = month.clone().endOf('month');
-
-      loadedMonthsRef.current.add(monthKey);
 
       try {
         const userId = authRef.current.isLoggedIn
@@ -73,10 +64,13 @@ export function useCalendar() {
           endOfMonth.format('YYYY-MM-DD'),
           userId,
         );
-        setCalendarData(data);
+
+        setCalendarData(prevData => ({
+          ...prevData,
+          ...data,
+        }));
       } catch (err) {
         console.error('Erro ao carregar eventos do calendário:', err);
-        loadedMonthsRef.current.delete(monthKey);
       }
     },
     [setCalendarData],
@@ -84,19 +78,17 @@ export function useCalendar() {
 
   useEffect(() => {
     loadMonthData(monthRef);
-  }, []);
+  }, [monthRef, loadMonthData]);
 
   const goPrevMonth = useCallback(() => {
     const newMonth = monthRef.clone().subtract(1, 'month');
     setMonthRef(newMonth);
-    loadMonthData(newMonth);
-  }, [monthRef, loadMonthData]);
+  }, [monthRef]);
 
   const goNextMonth = useCallback(() => {
     const newMonth = monthRef.clone().add(1, 'month');
     setMonthRef(newMonth);
-    loadMonthData(newMonth);
-  }, [monthRef, loadMonthData]);
+  }, [monthRef]);
 
   const onEditRegister = useCallback(
     (register: UrinationDataDTO) => {
@@ -165,14 +157,10 @@ export function useCalendar() {
     });
   }, [matrix, calendarData, monthRef]);
 
-  const setMonth = useCallback(
-    (year: number, monthIndex0Based: number) => {
-      const newMonth = moment({year, month: monthIndex0Based, date: 1});
-      setMonthRef(newMonth);
-      loadMonthData(newMonth);
-    },
-    [loadMonthData],
-  );
+  const setMonth = useCallback((year: number, monthIndex0Based: number) => {
+    const newMonth = moment({year, month: monthIndex0Based, date: 1});
+    setMonthRef(newMonth);
+  }, []);
 
   const {width: screenWidth} = useWindowDimensions();
   const tileWidth = Math.floor(
