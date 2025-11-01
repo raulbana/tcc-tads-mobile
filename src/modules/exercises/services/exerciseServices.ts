@@ -5,8 +5,6 @@ import {
   Exercise,
   Workout,
   WorkoutPlan,
-  UserWorkoutFeedbackDTO,
-  UserWorkoutCompletionDTO,
   UserWorkoutPlanDTO,
 } from '../../../types/exercise';
 
