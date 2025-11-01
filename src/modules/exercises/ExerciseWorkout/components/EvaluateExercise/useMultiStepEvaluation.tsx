@@ -188,16 +188,37 @@ const useMultiStepEvaluation = ({
                   return null;
                 }
 
-                return {
+                // Garante que evaluation está presente e é uma string válida
+                if (!workoutEvaluationData?.difficulty) {
+                  console.error('Dificuldade do treino não definida');
+                  return null;
+                }
+
+                // Sempre envia uma data válida - usa completedAt do exercício ou data atual
+                const completedAt = exercise?.completedAt
+                  ? formatLocalDate(new Date(exercise.completedAt))
+                  : formatLocalDate(new Date());
+
+                // Não inclui comments se for undefined para evitar enviar null
+                const feedbackItem: {
+                  exerciseId: number;
+                  workoutId: number;
+                  rating: number;
+                  evaluation: string;
+                  completedAt: string;
+                  comments?: string;
+                } = {
                   exerciseId,
                   workoutId,
                   rating,
                   evaluation: workoutEvaluationData.difficulty,
-                  comments: undefined,
-                  completedAt: exercise?.completedAt
-                    ? formatLocalDate(new Date(exercise.completedAt))
-                    : undefined,
+                  completedAt,
                 };
+
+                // Só adiciona comments se tiver valor
+                // (comentários são opcionais no backend, então podemos omitir)
+
+                return feedbackItem;
               })
               .filter((item): item is NonNullable<typeof item> => item !== null);
 
