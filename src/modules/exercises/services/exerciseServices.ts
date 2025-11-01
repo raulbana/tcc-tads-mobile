@@ -130,11 +130,22 @@ const exerciseServices = {
         : workoutsSource && typeof workoutsSource === 'object'
         ? Object.values(workoutsSource)
         : [];
+      
+      const difficultyLevel = raw.difficultyLevel || raw.difficulty;
+      const difficulty: WorkoutPlan['difficulty'] =
+        difficultyLevel === 'BEGINNER'
+          ? 'EASY'
+          : difficultyLevel === 'MODERATE'
+          ? 'MODERATE'
+          : difficultyLevel === 'HARD'
+          ? 'HARD'
+          : 'EASY';
+      
       return {
         id: String(raw.id),
         name: raw.name || raw.title || '',
         description: raw.description || '',
-        difficulty: 'EASY',
+        difficulty,
         workouts: workoutsArray.map(mapWorkoutDTO),
         createdAt: new Date(raw.createdAt || Date.now()),
         updatedAt: new Date(raw.updatedAt || Date.now()),
@@ -151,11 +162,22 @@ const exerciseServices = {
       : workoutsSource && typeof workoutsSource === 'object'
       ? Object.values(workoutsSource)
       : [];
+    
+    const difficultyLevel = raw.difficultyLevel || raw.difficulty;
+    const difficulty: WorkoutPlan['difficulty'] =
+      difficultyLevel === 'BEGINNER'
+        ? 'EASY'
+        : difficultyLevel === 'MODERATE'
+        ? 'MODERATE'
+        : difficultyLevel === 'HARD'
+        ? 'HARD'
+        : 'EASY';
+    
     return {
       id: String(raw.id),
       name: raw.name || raw.title || '',
       description: raw.description || '',
-      difficulty: 'EASY',
+      difficulty,
       workouts: workoutsArray.map(mapWorkoutDTO),
       createdAt: new Date(raw.createdAt || Date.now()),
       updatedAt: new Date(raw.updatedAt || Date.now()),

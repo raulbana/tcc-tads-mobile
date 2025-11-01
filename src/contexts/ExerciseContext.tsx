@@ -5,14 +5,12 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
-import {useAuth} from './AuthContext';
 import useExerciseQueries from '../modules/exercises/services/exerciseQueryFactory';
 import {
   Workout,
   WorkoutPlan,
   ExerciseFeedbackCreatorDTO,
   WorkoutCompletionDTO,
-  UserWorkoutPlanDTO,
 } from '../types/exercise';
 
 interface ExerciseContextType {
@@ -33,7 +31,6 @@ const ExerciseContext = createContext<ExerciseContextType | undefined>(
 );
 
 export const ExerciseProvider = ({children}: {children: ReactNode}) => {
-  const {user} = useAuth();
   const exerciseQueries = useExerciseQueries(['exercises']);
 
   const {
@@ -69,14 +66,14 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
   }, [refetchPlan]);
 
   const submitWorkoutFeedback = useCallback(
-    async (data: UserWorkoutFeedbackDTO) => {
+    async (data: ExerciseFeedbackCreatorDTO[]) => {
       await feedbackMutation.mutateAsync(data);
     },
     [feedbackMutation],
   );
 
   const submitWorkoutCompletion = useCallback(
-    async (data: UserWorkoutCompletionDTO) => {
+    async (data: WorkoutCompletionDTO[]) => {
       await completionMutation.mutateAsync(data);
     },
     [completionMutation],

@@ -40,8 +40,10 @@ const useExerciseWorkout = () => {
   const [workout, setWorkout] = useState<Workout>();
   const [currentExercise, setCurrentExercise] = useState<Exercise>();
   const [step, setStep] = useState<ExerciseWorkoutStep>('START_WORKOUT');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isToastOpen, setIsToastOpen] = useState<boolean>(false);
   const navigation = useNavigation<NativeStackNavigationProp<RootParamList>>();
-  
+
   const workoutWithMedia = useMemo<Workout | undefined>(() => {
     if (!workoutFromRoute) return undefined;
     return {
@@ -62,7 +64,7 @@ const useExerciseWorkout = () => {
 
   const onStartWorkout = async () => {
     if (!workout) return;
-    
+
     try {
       await checkUserWorkoutPlan();
       setStep('EXERCISE');
@@ -72,9 +74,11 @@ const useExerciseWorkout = () => {
       setWorkout({...workout, status: 'IN_PROGRESS'});
     } catch (error: any) {
       console.error('Erro ao verificar plano de treino:', error);
-      // Mostrar mensagem de erro ao usuário - não permite iniciar o treino sem plano ativo
-      alert(error.message || 'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.');
-      // Não prossegue com o início do treino se não houver plano ativo
+      const errorMsg =
+        error.message ||
+        'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.';
+      setErrorMessage(errorMsg);
+      setIsToastOpen(true);
       return;
     }
   };
@@ -142,10 +146,9 @@ const useExerciseWorkout = () => {
       if (user && workout && workoutStartTimeRef.current) {
         const completedAt = new Date();
         const workoutId = Number(workout.id);
-        
+
         if (!isNaN(workoutId)) {
           try {
-            // Verifica novamente se o plano de treino está ativo antes de submeter a conclusão
             await checkUserWorkoutPlan();
             await submitWorkoutCompletion([
               {
@@ -155,10 +158,11 @@ const useExerciseWorkout = () => {
             ]);
           } catch (error: any) {
             console.error('Erro ao enviar completion do treino:', error);
-            // Mostra mensagem de erro ao usuário
-            const errorMessage = error.message || 'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
-            alert(errorMessage);
-            // Ainda permite prosseguir para avaliação mesmo se houver erro
+            const errorMsg =
+              error.message ||
+              'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
+            setErrorMessage(errorMsg);
+            setIsToastOpen(true);
           }
         } else {
           console.error('Workout ID inválido:', workout.id);
@@ -184,6 +188,11 @@ const useExerciseWorkout = () => {
     }
   };
 
+  const onCloseToast = () => {
+    setIsToastOpen(false);
+    setErrorMessage('');
+  };
+
   return {
     workout,
     exercises: workout?.exercises,
@@ -203,6 +212,9 @@ const useExerciseWorkout = () => {
     onEvaluate,
     onNextExercise,
     onPreviousExercise,
+    errorMessage,
+    isToastOpen,
+    onCloseToast,
   };
 };
 

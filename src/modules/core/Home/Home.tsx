@@ -38,7 +38,7 @@ const Home = () => {
         {hasTrainingData && (
           <TrainingSection
             onRedirectToAllExercises={handleNavigateToAllExercises}
-            exercise={workoutPlan[0].workouts[0].exercises[0]}
+            exercise={workoutPlan[0]?.workouts?.[0]?.exercises?.[0]}
             onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
           />
         )}

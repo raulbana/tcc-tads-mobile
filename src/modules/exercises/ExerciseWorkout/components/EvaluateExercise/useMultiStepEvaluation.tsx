@@ -163,10 +163,16 @@ const useMultiStepEvaluation = ({
       } else {
         if (workoutEvaluationData && user && updatedEvaluations.length > 0) {
           try {
+            // Constantes para mapeamento de completion para rating
+            // Rating escala: 1 = Fácil, 2 = Com dificuldade, 3 = Não conseguiu completar
+            const RATING_EASILY = 1;
+            const RATING_WITH_DIFFICULTY = 2;
+            const RATING_COULD_NOT_COMPLETE = 3;
+
             const completionToRating: Record<string, number> = {
-              EASILY: 1,
-              WITH_DIFFICULTY: 2,
-              COULD_NOT_COMPLETE: 3,
+              EASILY: RATING_EASILY,
+              WITH_DIFFICULTY: RATING_WITH_DIFFICULTY,
+              COULD_NOT_COMPLETE: RATING_COULD_NOT_COMPLETE,
             };
 
             const feedbackArray = updatedEvaluations
@@ -175,7 +181,7 @@ const useMultiStepEvaluation = ({
                   ex => ex.id === evalData.exerciseId,
                 );
                 const rating =
-                  completionToRating[evalData.evaluation.completion] || 3;
+                  completionToRating[evalData.evaluation.completion] || RATING_COULD_NOT_COMPLETE;
                 
                 const exerciseId = Number(evalData.exerciseId);
                 const workoutId = Number(workout.id);

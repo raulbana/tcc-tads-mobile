@@ -13,14 +13,25 @@ const useHome = () => {
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
 
   const hasDiaryEntriesToday = Object.values(calendarData || {}).some(day => day.isToday);
-  const hasTrainingData = workoutPlan.length > 0;
+  const hasTrainingData = Array.isArray(workoutPlan) && workoutPlan.length > 0;
 
   const handleNavigateToDiary = () => {
     navigate('MainTabs', {screen: 'Diary'});
   };
 
   const handleNavigateToTrainingDetails = () => {
-    navigate('Exercises', {screen: 'ExerciseDetails', params: {workout: workoutPlan[0].workouts[0]}});
+    const firstWorkout =
+      Array.isArray(workoutPlan) &&
+      workoutPlan.length > 0 &&
+      workoutPlan[0] &&
+      Array.isArray(workoutPlan[0].workouts) &&
+      workoutPlan[0].workouts.length > 0
+        ? workoutPlan[0].workouts[0]
+        : undefined;
+
+    if (firstWorkout) {
+      navigate('Exercises', {screen: 'ExerciseDetails', params: {workout: firstWorkout}});
+    }
   };
 
   const handleNavigateToAllExercises = () => {
