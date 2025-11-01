@@ -9,6 +9,15 @@ import {
   WorkoutEvaluationAnswers,
   ExerciseSpecificEvaluationAnswers,
 } from './schema/exerciseEvaluation';
+import {useExercises} from '../../../../../contexts/ExerciseContext';
+import {useAuth} from '../../../../../contexts/AuthContext';
+
+const formatLocalDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 type EvaluationStep = 'WORKOUT_EVALUATION' | 'EXERCISE_EVALUATION';
 
@@ -22,13 +31,17 @@ interface UseMultiStepEvaluationProps {
       evaluation: ExerciseSpecificEvaluationAnswers;
     }>;
   }) => void;
+  scrollToTop?: () => void;
 }
 
 const useMultiStepEvaluation = ({
   workout,
   currentExercise: _currentExercise,
   onComplete,
+  scrollToTop,
 }: UseMultiStepEvaluationProps) => {
+  const {submitWorkoutFeedback} = useExercises();
+  const {user} = useAuth();
   const [currentStep, setCurrentStep] =
     useState<EvaluationStep>('WORKOUT_EVALUATION');
   const [workoutEvaluationData, setWorkoutEvaluationData] =
@@ -126,11 +139,14 @@ const useMultiStepEvaluation = ({
   const handleWorkoutContinue = () => {
     workoutForm.handleSubmit(data => {
       handleNextStep();
+      if (scrollToTop) {
+        setTimeout(() => scrollToTop(), 100);
+      }
     })();
   };
 
-  const handleExerciseContinue = () => {
-    exerciseForm.handleSubmit(data => {
+  const handleExerciseContinue = async () => {
+    exerciseForm.handleSubmit(async data => {
       const newEvaluation = {
         exerciseId: currentExercise.id,
         evaluation: data,
@@ -141,7 +157,60 @@ const useMultiStepEvaluation = ({
 
       if (!isLastExercise) {
         setCurrentExerciseEvaluationIndex(currentExerciseEvaluationIndex + 1);
+        if (scrollToTop) {
+          setTimeout(() => scrollToTop(), 100);
+        }
       } else {
+        if (workoutEvaluationData && user && updatedEvaluations.length > 0) {
+          try {
+            const completionToRating: Record<string, number> = {
+              EASILY: 1,
+              WITH_DIFFICULTY: 2,
+              COULD_NOT_COMPLETE: 3,
+            };
+
+            const feedbackArray = updatedEvaluations
+              .map(evalData => {
+                const exercise = workout.exercises.find(
+                  ex => ex.id === evalData.exerciseId,
+                );
+                const rating =
+                  completionToRating[evalData.evaluation.completion] || 3;
+                
+                const exerciseId = Number(evalData.exerciseId);
+                const workoutId = Number(workout.id);
+
+                if (isNaN(exerciseId) || isNaN(workoutId)) {
+                  console.error('IDs inválidos:', {
+                    exerciseId: evalData.exerciseId,
+                    workoutId: workout.id,
+                  });
+                  return null;
+                }
+
+                return {
+                  exerciseId,
+                  workoutId,
+                  rating,
+                  evaluation: workoutEvaluationData.difficulty,
+                  comments: undefined,
+                  completedAt: exercise?.completedAt
+                    ? formatLocalDate(new Date(exercise.completedAt))
+                    : undefined,
+                };
+              })
+              .filter((item): item is NonNullable<typeof item> => item !== null);
+
+            if (feedbackArray.length > 0) {
+              await submitWorkoutFeedback(feedbackArray);
+            } else {
+              console.warn('Nenhum feedback válido para enviar');
+            }
+          } catch (error) {
+            console.error('Erro ao enviar feedback do treino:', error);
+          }
+        }
+
         if (workoutEvaluationData) {
           onComplete({
             workoutEvaluation: workoutEvaluationData,

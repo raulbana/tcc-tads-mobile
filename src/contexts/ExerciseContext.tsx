@@ -10,8 +10,8 @@ import useExerciseQueries from '../modules/exercises/services/exerciseQueryFacto
 import {
   Workout,
   WorkoutPlan,
-  UserWorkoutFeedbackDTO,
-  UserWorkoutCompletionDTO,
+  ExerciseFeedbackCreatorDTO,
+  WorkoutCompletionDTO,
 } from '../types/exercise';
 
 interface ExerciseContextType {
@@ -21,8 +21,8 @@ interface ExerciseContextType {
   error: string | null;
   loadWorkouts: () => Promise<void>;
   loadUserWorkoutPlan: () => Promise<void>;
-  submitWorkoutFeedback: (data: UserWorkoutFeedbackDTO) => Promise<void>;
-  submitWorkoutCompletion: (data: UserWorkoutCompletionDTO) => Promise<void>;
+  submitWorkoutFeedback: (data: ExerciseFeedbackCreatorDTO[]) => Promise<void>;
+  submitWorkoutCompletion: (data: WorkoutCompletionDTO[]) => Promise<void>;
   getWorkoutById: (id: string) => Promise<Workout | undefined>;
 }
 

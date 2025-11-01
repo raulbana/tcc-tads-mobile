@@ -14,6 +14,7 @@ import ConfigStack from './Config/configStack';
 import ContentStack from './Content/contentStack';
 import AuthStack from './Auth/authStack';
 import ExercisesStack from './Exercises/exercisesStack';
+import {Workout} from '../types/exercise';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -52,9 +53,9 @@ export type AuthParamList = {
 
 export type ExercisesParamList = {
   ExercisesHome: undefined;
-  ExerciseDetails: {exerciseId: string};
+  ExerciseDetails: {workout: Workout};
   EvaluateExercise: {exerciseId: string};
-  ExerciseWorkout: {exerciseId: string};
+  ExerciseWorkout: {workout: Workout};
 };
 
 export type RootParamList = {

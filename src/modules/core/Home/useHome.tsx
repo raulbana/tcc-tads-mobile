@@ -20,7 +20,7 @@ const useHome = () => {
   };
 
   const handleNavigateToTrainingDetails = () => {
-    navigate('Exercises', {screen: 'ExerciseDetails', params: {exerciseId: workoutPlan[0].workouts[0].exercises[0].id}});
+    navigate('Exercises', {screen: 'ExerciseDetails', params: {workout: workoutPlan[0].workouts[0]}});
   };
 
   const handleNavigateToAllExercises = () => {

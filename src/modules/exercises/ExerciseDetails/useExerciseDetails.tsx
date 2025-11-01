@@ -3,7 +3,6 @@ import {useRoute, RouteProp, useNavigation} from '@react-navigation/native';
 import {ExercisesParamList} from '../../../navigation/routes';
 import {Workout} from '../../../types/exercise';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import useExerciseQueries from '../services/exerciseQueryFactory';
 type ExerciseDetailsRouteProp = RouteProp<
   ExercisesParamList,
   'ExerciseDetails'
@@ -11,15 +10,16 @@ type ExerciseDetailsRouteProp = RouteProp<
 
 export const useExerciseDetails = () => {
   const route = useRoute<ExerciseDetailsRouteProp>();
-  const {exerciseId} = route.params;
+  const {workout: workoutFromRoute} = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
   const [activeMediaTab, setActiveMediaTab] = useState<'videos' | 'images'>(
     'videos',
   );
-  const queries = useExerciseQueries(['exercises']);
-  const {data: workoutApi} = queries.getWorkoutById(exerciseId);
-  const workout = useMemo<Workout | undefined>(() => workoutApi, [workoutApi]);
+  const workout = useMemo<Workout | undefined>(
+    () => workoutFromRoute,
+    [workoutFromRoute],
+  );
 
   const handleVideosPress = useCallback(() => {
     setActiveMediaTab('videos');
@@ -30,8 +30,10 @@ export const useExerciseDetails = () => {
   }, []);
 
   const handleStartWorkout = useCallback(() => {
-    navigation.navigate('ExerciseWorkout', {exerciseId});
-  }, [exerciseId, navigation]);
+    if (workout) {
+      navigation.navigate('ExerciseWorkout', {workout});
+    }
+  }, [workout, navigation]);
 
   const getWorkoutCategory = () => {
     return workout?.exercises[0]?.category;

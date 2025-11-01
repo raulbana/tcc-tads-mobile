@@ -164,13 +164,13 @@ const exerciseServices = {
   },
 
   submitWorkoutFeedback: async (
-    payload: UserWorkoutFeedbackDTO,
+    payload: import('../../../types/exercise').ExerciseFeedbackCreatorDTO[],
   ): Promise<void> => {
     await api.post(apiRoutes.exercises.submitWorkoutFeedback, payload);
   },
 
   submitWorkoutCompletion: async (
-    payload: UserWorkoutCompletionDTO,
+    payload: import('../../../types/exercise').WorkoutCompletionDTO[],
   ): Promise<void> => {
     await api.post(apiRoutes.exercises.submitWorkoutCompletion, payload);
   },

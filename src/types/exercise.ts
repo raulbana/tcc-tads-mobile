@@ -105,6 +105,20 @@ export interface WorkoutPlan {
   updatedAt: Date;
 }
 
+export interface ExerciseFeedbackCreatorDTO {
+  exerciseId: number;
+  workoutId: number;
+  rating: number;
+  evaluation: string;
+  comments?: string;
+  completedAt?: string;
+}
+
+export interface WorkoutCompletionDTO {
+  workoutId: number;
+  completedAt: string;
+}
+
 export interface UserWorkoutFeedbackDTO {
   userId: string;
   workoutId: string;

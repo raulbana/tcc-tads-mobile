@@ -11,12 +11,14 @@ interface EvaluateExerciseProps {
   workout: Workout;
   currentExercise: Exercise;
   onContinue: () => void;
+  scrollToTop?: () => void;
 }
 
 const EvaluateExercise: React.FC<EvaluateExerciseProps> = ({
   workout,
   currentExercise,
   onContinue,
+  scrollToTop,
 }) => {
   const {
     currentStep,
@@ -41,6 +43,7 @@ const EvaluateExercise: React.FC<EvaluateExerciseProps> = ({
     onComplete: data => {
       onContinue();
     },
+    scrollToTop,
   });
 
   const renderCurrentStep = () => {

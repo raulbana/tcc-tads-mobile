@@ -74,12 +74,12 @@ export const exerciseQueryFactory = (baseKey: QueryKey) => {
       }),
 
     submitWorkoutFeedback: () =>
-      useMutation<void, Error, UserWorkoutFeedbackDTO>({
+      useMutation<void, Error, import('../../../types/exercise').ExerciseFeedbackCreatorDTO[]>({
         mutationFn: payload => exerciseServices.submitWorkoutFeedback(payload),
       }),
 
     submitWorkoutCompletion: () =>
-      useMutation<void, Error, UserWorkoutCompletionDTO>({
+      useMutation<void, Error, import('../../../types/exercise').WorkoutCompletionDTO[]>({
         mutationFn: payload =>
           exerciseServices.submitWorkoutCompletion(payload),
       }),

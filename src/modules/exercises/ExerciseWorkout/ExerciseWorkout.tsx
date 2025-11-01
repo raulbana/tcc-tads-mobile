@@ -11,6 +11,8 @@ const ExerciseWorkout = () => {
     step,
     workout,
     currentExercise,
+    scrollRef,
+    scrollToTop,
     onStartWorkout,
     onLeaveWorkout,
     onEvaluate,
@@ -18,7 +20,7 @@ const ExerciseWorkout = () => {
     onPreviousExercise,
   } = useExerciseWorkout();
   return (
-    <ScreenContainer scrollable={step !== 'EXERCISE'}>
+    <ScreenContainer scrollable={step !== 'EXERCISE'} ref={scrollRef}>
       {step === 'START_WORKOUT' && workout && (
         <StartWorkout workout={workout} onStartWorkout={onStartWorkout} />
       )}
@@ -36,6 +38,7 @@ const ExerciseWorkout = () => {
           workout={workout}
           currentExercise={currentExercise}
           onContinue={onEvaluate}
+          scrollToTop={scrollToTop}
         />
       )}
     </ScreenContainer>

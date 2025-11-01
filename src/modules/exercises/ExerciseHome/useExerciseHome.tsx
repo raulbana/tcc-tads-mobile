@@ -1,5 +1,5 @@
 import {useCallback, useMemo} from 'react';
-import {Exercise} from '../../../types/exercise';
+import {Exercise, Workout} from '../../../types/exercise';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {ExercisesParamList} from '../../../navigation/routes';
@@ -25,10 +25,15 @@ const useExerciseHome = () => {
   console.log('ExerciseHome:workoutsFlattened', {length: workouts.length});
 
   const handleWorkoutPress = useCallback(
-    (workoutId: string) => {
-      navigation.navigate('ExerciseDetails', {exerciseId: workoutId});
+    (exerciseId: string) => {
+      const workout = workoutsApi.find((w: Workout) =>
+        w.exercises.some((e: Exercise) => e.id === exerciseId),
+      );
+      if (workout) {
+        navigation.navigate('ExerciseDetails', {workout});
+      }
     },
-    [navigation],
+    [navigation, workoutsApi],
   );
 
   return {
