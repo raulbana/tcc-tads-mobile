@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useMemo} from 'react';
 import {AccessibilityProvider} from '../../contexts/AccessibilityContext';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {DiaryProvider} from '../../contexts/DiaryContext';
@@ -11,7 +11,7 @@ interface UnauthenticatedProvidersProps {
 const UnauthenticatedProviders: React.FC<UnauthenticatedProvidersProps> = ({
   children,
 }) => {
-  const queryClient = new QueryClient();
+  const queryClient = useMemo(() => new QueryClient(), []);
   return (
     <AccessibilityProvider>
       <QueryClientProvider client={queryClient}>

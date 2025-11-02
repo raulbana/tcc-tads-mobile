@@ -83,7 +83,6 @@ const useOnboardingQuestion = () => {
 
   const onSubmitAnswer = useCallback(async () => {
     const submitForm = handleSubmit(async (answers: ICIQAnswers) => {
-
       const formatDateForAPI = (dateString: string): string => {
         const date = new Date(dateString);
         const year = date.getFullYear();
@@ -116,7 +115,7 @@ const useOnboardingQuestion = () => {
           q1Score: answers.q3_frequency,
           q2Score: answers.q4_amount,
           q3Score: answers.q5_interference,
-          q4Score: answers.q6_when.length as number,
+          q4Score: answers.q6_when.length,
         };
       };
 
@@ -146,9 +145,7 @@ const useOnboardingQuestion = () => {
       } catch (error) {
         console.error('Error submitting onboarding:', error);
         const errorMsg =
-          error instanceof Error
-            ? error.message
-            : 'Erro ao enviar respostas. Os dados foram salvos localmente.';
+          error instanceof Error ? error.message : 'Erro ao enviar respostas.';
         setErrorMessage(errorMsg);
         setIsToastOpen(true);
 
