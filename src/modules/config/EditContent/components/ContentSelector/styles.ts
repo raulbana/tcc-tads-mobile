@@ -16,7 +16,7 @@ export const CardContainer = styled.View`
   background-color: ${({theme}) => theme.colors.gray_02};
   border-radius: ${moderateScale(12)}px;
   overflow: hidden;
-  border: 1px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(1)}px solid ${({theme}) => theme.colors.gray_04};
 `;
 
 export const Thumbnail = styled.Image`

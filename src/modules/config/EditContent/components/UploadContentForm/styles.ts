@@ -1,5 +1,9 @@
 import styled from 'styled-components/native';
-import {verticalScale, horizontalScale} from '../../../../../utils/scales';
+import {
+  verticalScale,
+  horizontalScale,
+  moderateScale,
+} from '../../../../../utils/scales';
 
 export const Container = styled.View`
   flex: 1;
@@ -16,9 +20,9 @@ export const InputContainer = styled.View`
 
 export const ErrorContainer = styled.View`
   padding: ${verticalScale(12)}px;
-  background-color: ${({theme}) => theme.colors.error_light};
+  background-color: ${({theme}) => theme.colors.error_02};
   border-radius: ${horizontalScale(8)}px;
-  border-left-width: 4px;
+  border-left-width: ${moderateScale(4)}px;
   border-left-color: ${({theme}) => theme.colors.error};
 `;
 

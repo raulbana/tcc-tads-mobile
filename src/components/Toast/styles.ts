@@ -25,7 +25,7 @@ export const AnimatedToastContainer = styled(Animated.View)<ToastProps>`
   flex-direction: row;
   align-items: center;
   background-color: ${({backgroundColor}) => backgroundColor};
-  border: 2px solid ${({borderColor}) => borderColor};
+  border: ${moderateScale(2)}px solid ${({borderColor}) => borderColor};
   shadow-color: #000;
   shadow-opacity: 0.1;
   shadow-radius: ${moderateScale(8)}px;

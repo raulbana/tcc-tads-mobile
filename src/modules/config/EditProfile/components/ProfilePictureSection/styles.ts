@@ -16,7 +16,7 @@ export const AvatarContainer = styled.View`
   border-radius: ${moderateScale(50)}px;
   align-items: center;
   justify-content: center;
-  border: 3px solid ${({theme}) => theme.colors.purple_02};
+  border: ${moderateScale(3)}px solid ${({theme}) => theme.colors.purple_02};
 `;
 
 export const ActionsContainer = styled.View`

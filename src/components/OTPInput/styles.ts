@@ -26,7 +26,7 @@ export const Input = styled(TextInput)<{
   width: ${horizontalScale(36)}px;
   height: ${verticalScale(36)}px;
   border-radius: ${moderateScale(10)}px;
-  border: 2px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(2)}px solid ${({theme}) => theme.colors.gray_04};
   border-color: ${({$isFocused, $hasError, theme}) =>
     $hasError
       ? theme.colors.error

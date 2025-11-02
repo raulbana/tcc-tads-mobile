@@ -163,8 +163,6 @@ const useMultiStepEvaluation = ({
       } else {
         if (workoutEvaluationData && user && updatedEvaluations.length > 0) {
           try {
-            // Constantes para mapeamento de completion para rating
-            // Rating escala: 1 = Fácil, 2 = Com dificuldade, 3 = Não conseguiu completar
             const RATING_EASILY = 1;
             const RATING_WITH_DIFFICULTY = 2;
             const RATING_COULD_NOT_COMPLETE = 3;
@@ -194,18 +192,15 @@ const useMultiStepEvaluation = ({
                   return null;
                 }
 
-                // Garante que evaluation está presente e é uma string válida
                 if (!workoutEvaluationData?.difficulty) {
                   console.error('Dificuldade do treino não definida');
                   return null;
                 }
 
-                // Sempre envia uma data válida - usa completedAt do exercício ou data atual
                 const completedAt = exercise?.completedAt
                   ? formatLocalDate(new Date(exercise.completedAt))
                   : formatLocalDate(new Date());
 
-                // Não inclui comments se for undefined para evitar enviar null
                 const feedbackItem: {
                   exerciseId: number;
                   workoutId: number;
@@ -220,9 +215,6 @@ const useMultiStepEvaluation = ({
                   evaluation: workoutEvaluationData.difficulty,
                   completedAt,
                 };
-
-                // Só adiciona comments se tiver valor
-                // (comentários são opcionais no backend, então podemos omitir)
 
                 return feedbackItem;
               })

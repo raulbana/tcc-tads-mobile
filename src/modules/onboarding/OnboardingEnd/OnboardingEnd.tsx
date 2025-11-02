@@ -21,7 +21,6 @@ const OnboardingEnd: React.FC = () => {
             textAlign="center"
           />
         </S.Header>
-
         <S.DescriptionContainer>
           <Label
             typography={theme.typography.paragraph.r2}
@@ -30,7 +29,6 @@ const OnboardingEnd: React.FC = () => {
             textAlign="center"
           />
         </S.DescriptionContainer>
-
         <S.CardContainer>
           <S.Card>
             <S.CardHeader>

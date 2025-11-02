@@ -13,7 +13,8 @@ export const Wrapper = styled.View`
 `;
 
 export const Container = styled.TouchableOpacity<{hasError?: boolean}>`
-  border: 1px dashed ${({hasError, theme}) => (hasError ? theme.colors.error : '#cbd5e1')};
+  border: ${moderateScale(1)}px dashed
+    ${({hasError, theme}) => (hasError ? theme.colors.error : '#cbd5e1')};
   border-radius: ${moderateScale(12)}px;
   padding: ${verticalScale(20)}px;
   align-items: center;
@@ -40,12 +41,16 @@ export const DraggableItem = styled.TouchableOpacity<{
   transform: ${({isActive}) => (isActive ? 'scale(1.02)' : 'scale(1)')};
   elevation: ${({isActive}) => (isActive ? 8 : 2)};
   shadow-color: ${({isActive}) => (isActive ? '#000' : 'transparent')};
-  shadow-offset: ${({isActive}) => (isActive ? '0px 4px' : '0px 0px')};
+  shadow-offset: ${({isActive}) =>
+    isActive ? `0px ${moderateScale(4)}px` : '0px 0px'};
   shadow-opacity: ${({isActive}) => (isActive ? 0.3 : 0)};
-  shadow-radius: ${({isActive}) => (isActive ? '6px' : '0px')};
+  shadow-radius: ${({isActive}) =>
+    isActive ? `${moderateScale(6)}px` : '0px'};
   z-index: ${({isActive}) => (isActive ? 1000 : 1)};
-  background-color: ${({isActive}) => (isActive ? 'rgba(255, 255, 255, 0.95)' : 'transparent')};
-  border-radius: ${({isActive}) => (isActive ? '8px' : '0px')};
+  background-color: ${({isActive}) =>
+    isActive ? 'rgba(255, 255, 255, 0.95)' : 'transparent'};
+  border-radius: ${({isActive}) =>
+    isActive ? `${moderateScale(8)}px` : '0px'};
   overflow: ${({isActive}) => (isActive ? 'visible' : 'hidden')};
 `;
 
@@ -58,7 +63,7 @@ export const CardContainer = styled.View`
   padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
   border-radius: ${moderateScale(12)}px;
   background-color: ${({theme}) => theme.colors.gray_02};
-  border: 1px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(1)}px solid ${({theme}) => theme.colors.gray_04};
   overflow: visible;
 `;
 

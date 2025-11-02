@@ -1,5 +1,9 @@
-import styled from "styled-components/native";
-import { horizontalScale, verticalScale } from "../../../utils/scales";
+import styled from 'styled-components/native';
+import {
+  horizontalScale,
+  verticalScale,
+  moderateScale,
+} from '../../../utils/scales';
 
 export const Outer = styled.View`
   flex: 1;
@@ -8,8 +12,6 @@ export const Outer = styled.View`
   padding-horizontal: ${horizontalScale(16)}px;
   background-color: ${({theme}) => theme.colors.white};
 `;
-
-
 
 export const LogoWrapper = styled.View`
   align-items: center;
@@ -29,6 +31,6 @@ export const SeparatorRow = styled.View`
 
 export const Line = styled.View`
   flex: 1;
-  height: 1px;
+  height: ${moderateScale(1)}px;
   background-color: ${({theme}) => theme.colors.gray_04};
 `;
