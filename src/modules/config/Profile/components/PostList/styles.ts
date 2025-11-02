@@ -1,9 +1,5 @@
 import styled from 'styled-components/native';
-import {
-  verticalScale,
-  moderateScale,
-} from '../../../../../utils/scales';
-import Label from '../../../../../components/Label/Label';
+import { verticalScale } from '../../../../../utils/scales';
 
 export const Container = styled.View`
   flex: 1;
