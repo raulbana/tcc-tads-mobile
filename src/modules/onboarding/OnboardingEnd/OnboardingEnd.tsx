@@ -2,12 +2,12 @@ import React from 'react';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import Label from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
-import useCadastroOuAnonimo from './useCadastroOuAnonimo';
+import useOnboardingEnd from './useOnboardingEnd';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import * as S from './styles';
 
-const CadastroOuAnonimo: React.FC = () => {
-  const {handleGoToRegister, handleContinueAnonymous} = useCadastroOuAnonimo();
+const OnboardingEnd: React.FC = () => {
+  const {handleGoToRegister, handleContinueAnonymous} = useOnboardingEnd();
   const theme = useDynamicTheme();
 
   return (
@@ -133,5 +133,5 @@ const CadastroOuAnonimo: React.FC = () => {
   );
 };
 
-export default CadastroOuAnonimo;
+export default OnboardingEnd;
 

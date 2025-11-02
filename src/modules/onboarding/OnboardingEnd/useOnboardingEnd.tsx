@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
 
-const useCadastroOuAnonimo = () => {
+const useOnboardingEnd = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
   const {setAnonymousMode} = useAuth();
 
@@ -22,5 +22,5 @@ const useCadastroOuAnonimo = () => {
   };
 };
 
-export default useCadastroOuAnonimo;
+export default useOnboardingEnd;
 

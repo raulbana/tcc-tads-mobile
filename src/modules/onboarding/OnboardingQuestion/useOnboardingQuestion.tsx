@@ -143,7 +143,7 @@ const useOnboardingQuestion = () => {
           await savePatientProfile(result.profile);
         }
 
-        navigate('Onboarding', {screen: 'CadastroOuAnonimo'});
+        navigate('Onboarding', {screen: 'OnboardingEnd'});
       } catch (error) {
         console.error('Error submitting onboarding:', error);
         const errorMsg =
@@ -156,7 +156,7 @@ const useOnboardingQuestion = () => {
         const profileData = createProfileData();
         await saveOfflineOnboardingData(profileData);
 
-        navigate('Onboarding', {screen: 'CadastroOuAnonimo'});
+        navigate('Onboarding', {screen: 'OnboardingEnd'});
       }
     });
 
