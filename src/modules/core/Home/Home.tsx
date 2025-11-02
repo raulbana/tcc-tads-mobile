@@ -10,7 +10,6 @@ import useHome from './useHome';
 const Home = () => {
   const theme = useDynamicTheme();
   const {
-    user,
     handleNavigateToDiary,
     handleNavigateToTrainingDetails,
     hasDiaryEntriesToday,

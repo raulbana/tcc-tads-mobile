@@ -135,22 +135,15 @@ const useOnboardingQuestion = () => {
 
         const result = await submitAnswersMutation.mutateAsync(submitData);
 
-        if (result.profile) {
-          if (isLoggedIn) {
-            await savePatientProfile(result.profile);
-          } else {
-            await saveOfflineOnboardingData(result.profile);
-          }
-        } else {
-          const profileData = createProfileData();
-          if (isLoggedIn) {
-            await savePatientProfile(profileData);
-          } else {
-            await saveOfflineOnboardingData(profileData);
-          }
+        const profileData = result.profile || createProfileData();
+
+        await saveOfflineOnboardingData(profileData);
+
+        if (result.profile && isLoggedIn) {
+          await savePatientProfile(result.profile);
         }
 
-        navigate('MainTabs');
+        navigate('Onboarding', {screen: 'CadastroOuAnonimo'});
       } catch (error) {
         console.error('Error submitting onboarding:', error);
         const errorMsg =
@@ -161,13 +154,9 @@ const useOnboardingQuestion = () => {
         setIsToastOpen(true);
 
         const profileData = createProfileData();
-        if (isLoggedIn) {
-          await savePatientProfile(profileData);
-        } else {
-          await saveOfflineOnboardingData(profileData);
-        }
+        await saveOfflineOnboardingData(profileData);
 
-        navigate('MainTabs');
+        navigate('Onboarding', {screen: 'CadastroOuAnonimo'});
       }
     });
 

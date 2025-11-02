@@ -25,12 +25,14 @@ import {NavigationStackProp} from '../navigation/routes';
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
 const TEMP_USER_KEY = 'temp_user_v1';
+const IS_ANONYMOUS_KEY = 'is_anonymous_v1';
 
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   isInitializing: boolean;
+  isAnonymous: boolean;
   error: string | null;
   login: (credentials: loginRequest) => Promise<void>;
   register: (userData: registerRequest) => Promise<void>;
@@ -44,6 +46,7 @@ interface AuthContextType {
   savePatientProfile: (profile: PatientProfile) => Promise<void>;
   savePreferences: (preferences: Preferences) => Promise<void>;
   saveOfflineOnboardingData: (profile: PatientProfile) => Promise<void>;
+  setAnonymousMode: (isAnonymous: boolean) => Promise<void>;
   hasOnboardingData: () => boolean;
   validateToken: () => Promise<boolean>;
   clearError: () => void;
@@ -57,6 +60,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const {navigate} = useNavigation<NavigationStackProp>();
 
@@ -173,11 +177,15 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     const loadTempUser = async () => {
       try {
         const tempUser = MMKVStorage.getString(TEMP_USER_KEY);
+        const anonymousStatus = MMKVStorage.getString(IS_ANONYMOUS_KEY);
         if (tempUser) {
           const parsedUser = JSON.parse(tempUser) as User;
           if (!mounted) return;
           setUser(parsedUser);
           setIsLoggedIn(false);
+        }
+        if (anonymousStatus === 'true' && mounted) {
+          setIsAnonymous(true);
         }
       } catch (error) {
         console.error('Error loading temp user:', error);
@@ -398,19 +406,35 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     async (profile: PatientProfile) => {
       try {
         MMKVStorage.set(ONBOARDING_DATA_KEY, JSON.stringify(profile));
-        if (user && !isLoggedIn) {
+        if (user) {
           const updatedUser = {
             ...user,
             profile,
           };
           await updateUser(updatedUser);
+        } else {
+          const tempUser: User = {
+            id: 0,
+            name: '',
+            email: '',
+            profile,
+            preferences: {
+              highContrast: false,
+              bigFont: false,
+              reminderCalendar: false,
+              reminderWorkout: false,
+              encouragingMessages: false,
+              workoutMediaType: 'video',
+            },
+          };
+          await saveTempUser(tempUser);
         }
       } catch (error) {
         console.error('Save offline onboarding data error:', error);
         throw new Error('Erro ao salvar dados de onboarding');
       }
     },
-    [user, isLoggedIn, updateUser],
+    [user, updateUser, saveTempUser],
   );
 
   const hasOnboardingData = useCallback((): boolean => {
@@ -433,6 +457,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return validateToken();
   }, [user, validateToken]);
 
+  const setAnonymousMode = useCallback(async (anonymous: boolean) => {
+    try {
+      MMKVStorage.set(IS_ANONYMOUS_KEY, anonymous.toString());
+      setIsAnonymous(anonymous);
+    } catch (error) {
+      console.error('Error setting anonymous mode:', error);
+      throw new Error('Erro ao definir modo anônimo');
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -440,6 +474,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         isLoggedIn,
         isLoading,
         isInitializing,
+        isAnonymous,
         error,
         login,
         register,
@@ -453,6 +488,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         savePatientProfile,
         savePreferences,
         saveOfflineOnboardingData,
+        setAnonymousMode,
         hasOnboardingData,
         validateToken: validateTokenExposed,
         clearError,

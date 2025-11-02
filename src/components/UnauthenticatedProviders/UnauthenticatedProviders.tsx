@@ -1,9 +1,6 @@
 import React, {ReactNode} from 'react';
 import {AccessibilityProvider} from '../../contexts/AccessibilityContext';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {AuthProvider} from '../../contexts/AuthContext';
-import {ThemeProvider} from 'styled-components';
-import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 import {DiaryProvider} from '../../contexts/DiaryContext';
 import {ExerciseProvider} from '../../contexts/ExerciseContext';
 
@@ -19,9 +16,7 @@ const UnauthenticatedProviders: React.FC<UnauthenticatedProvidersProps> = ({
     <AccessibilityProvider>
       <QueryClientProvider client={queryClient}>
         <ExerciseProvider>
-          <DiaryProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </DiaryProvider>
+          <DiaryProvider>{children}</DiaryProvider>
         </ExerciseProvider>
       </QueryClientProvider>
     </AccessibilityProvider>

@@ -27,6 +27,7 @@ export type MainTabParamList = {
 export type OnboardingParamList = {
   OnboardingHome: undefined;
   OnboardingQuestion: undefined;
+  CadastroOuAnonimo: undefined;
 };
 
 export type ConfigParamList = {

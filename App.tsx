@@ -19,6 +19,7 @@ const AppContent = () => {
 
   const getProvider = () => {
     if (isInitializing) {
+      console.log('isInitializing');
       return (
         <AuthenticatedProviders>
           <Navigator />
@@ -27,6 +28,7 @@ const AppContent = () => {
     }
 
     if (!hasOnboardingData()) {
+      console.log('hasOnboardingData');
       return (
         <FirstAccessProviders>
           <Navigator />
@@ -35,6 +37,7 @@ const AppContent = () => {
     }
 
     if (!isLoggedIn) {
+      console.log('!isLoggedIn');
       return (
         <UnauthenticatedProviders>
           <Navigator />
@@ -42,6 +45,7 @@ const AppContent = () => {
       );
     }
 
+    console.log('AuthenticatedProviders');
     return (
       <AuthenticatedProviders>
         <Navigator />

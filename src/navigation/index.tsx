@@ -10,12 +10,12 @@ const Navigator: React.FC = () => {
   const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();
 
   const initialRouteName = useMemo(() => {
-    if (!hasOnboardingData()) {
-      return 'Onboarding';
-    }
-
     if (isInitializing) {
       return 'Auth';
+    }
+    
+    if (!hasOnboardingData()) {
+      return 'Onboarding';
     }
 
     if (!isLoggedIn) {

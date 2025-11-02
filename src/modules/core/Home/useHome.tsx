@@ -3,17 +3,19 @@ import {useAuth} from '../../../contexts/AuthContext';
 import {useExercises} from '../../../contexts/ExerciseContext';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useDiary} from '../../../contexts/DiaryContext';
-import { useMemo } from 'react';
+import {useMemo} from 'react';
 
 const useHome = () => {
-  const {user, isLoading: isAuthLoading} = useAuth();
+  const {user, isAnonymous, isLoading: isAuthLoading} = useAuth();
   const {workoutPlan, isLoading: isExercisesLoading} = useExercises();
   const {calendarData, isLoading: isDiaryLoading} = useDiary();
   const {navigate} = useNavigation<NavigationStackProp>();
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
 
-  const hasDiaryEntriesToday = Object.values(calendarData || {}).some(day => day.isToday);
+  const hasDiaryEntriesToday = Object.values(calendarData || {}).some(
+    day => day.isToday,
+  );
   const hasTrainingData = Array.isArray(workoutPlan) && workoutPlan.length > 0;
 
   const handleNavigateToDiary = () => {
@@ -31,7 +33,10 @@ const useHome = () => {
         : undefined;
 
     if (firstWorkout) {
-      navigate('Exercises', {screen: 'ExerciseDetails', params: {workout: firstWorkout}});
+      navigate('Exercises', {
+        screen: 'ExerciseDetails',
+        params: {workout: firstWorkout},
+      });
     }
   };
 
@@ -40,8 +45,8 @@ const useHome = () => {
   };
 
   const titleText = useMemo(() => {
-    return user ? `Olá, ${user?.name}!` : 'Olá! usuário anônimo';
-  }, [user]);
+    return user && !isAnonymous ? `Olá, ${user.name}!` : 'Bem vindo (a) ao DailyIU!';
+  }, [user, isAnonymous]);
 
   return {
     user,
