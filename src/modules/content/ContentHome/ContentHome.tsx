@@ -7,12 +7,20 @@ import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSec
 import ContentCard from '../../../components/ContentCard/ContentCard';
 import useContentHome from './useContentHome';
 import Icon from '../../../components/Icon/Icon';
-import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
+import {useAuth} from '../../../contexts/AuthContext';
+import RestrictedAccess from '../RestrictedAccess/RestrictedAccess';
 
 const ContentHome = () => {
-  const {badgeList, contentCardList, navigateToCreateContent} = useContentHome();
+  const {isLoggedIn} = useAuth();
+  const {badgeList, contentCardList, navigateToCreateContent} =
+    useContentHome();
 
   const theme = useDynamicTheme();
+
+  if (!isLoggedIn) {
+    return <RestrictedAccess />;
+  }
 
   return (
     <ScreenContainer scrollable>

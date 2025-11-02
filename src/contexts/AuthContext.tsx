@@ -13,7 +13,11 @@ import {
   loginRequest,
   registerRequest,
 } from '../types/auth';
-import {MMKVStorage, REMEMBER_ME_KEY} from '../storage/mmkvStorage';
+import {
+  MMKVStorage,
+  REMEMBER_ME_KEY,
+  ONBOARDING_DATA_KEY,
+} from '../storage/mmkvStorage';
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
@@ -39,6 +43,9 @@ interface AuthContextType {
   getProfilePictureUrl: () => string;
   savePatientProfile: (profile: PatientProfile) => Promise<void>;
   savePreferences: (preferences: Preferences) => Promise<void>;
+  saveOfflineOnboardingData: (profile: PatientProfile) => Promise<void>;
+  hasOnboardingData: () => boolean;
+  validateToken: () => Promise<boolean>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -78,6 +85,37 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, [clearAuthData]);
 
+  const validateToken = useCallback(
+    async (userId?: number): Promise<boolean> => {
+      try {
+        const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
+        if (!token) {
+          return false;
+        }
+
+        try {
+          if (userId) {
+            await authServices.getUserById(userId);
+            return true;
+          }
+          return true;
+        } catch (error) {
+          if (
+            error instanceof Error &&
+            (error.message.includes('401') || error.message.includes('403'))
+          ) {
+            return false;
+          }
+          return true;
+        }
+      } catch (error) {
+        console.error('Token validation error:', error);
+        return false;
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     let mounted = true;
 
@@ -104,9 +142,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           if (!mounted) return;
 
           try {
-            setUser(parsedUser);
-            setIsLoggedIn(true);
-            navigate('MainTabs');
+            const isValid = await validateToken(parsedUser.id);
+            if (isValid) {
+              setUser(parsedUser);
+              setIsLoggedIn(true);
+              navigate('MainTabs');
+            } else {
+              await clearAuthData();
+              await loadTempUser();
+              navigate('Auth', {screen: 'Login'});
+            }
           } catch (error) {
             await clearAuthData();
             await loadTempUser();
@@ -143,7 +188,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return () => {
       mounted = false;
     };
-  }, [clearAuthData, navigate]);
+  }, [clearAuthData, navigate, validateToken]);
 
   const saveLoggedUser = useCallback(
     async (userObj: User, token: string, remember: boolean = true) => {
@@ -349,6 +394,45 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [user, updateUser],
   );
 
+  const saveOfflineOnboardingData = useCallback(
+    async (profile: PatientProfile) => {
+      try {
+        MMKVStorage.set(ONBOARDING_DATA_KEY, JSON.stringify(profile));
+        if (user && !isLoggedIn) {
+          const updatedUser = {
+            ...user,
+            profile,
+          };
+          await updateUser(updatedUser);
+        }
+      } catch (error) {
+        console.error('Save offline onboarding data error:', error);
+        throw new Error('Erro ao salvar dados de onboarding');
+      }
+    },
+    [user, isLoggedIn, updateUser],
+  );
+
+  const hasOnboardingData = useCallback((): boolean => {
+    try {
+      if (user?.profile?.id) {
+        return true;
+      }
+      const onboardingData = MMKVStorage.getString(ONBOARDING_DATA_KEY);
+      return !!onboardingData;
+    } catch (error) {
+      console.error('Error checking onboarding data:', error);
+      return false;
+    }
+  }, [user]);
+
+  const validateTokenExposed = useCallback(async (): Promise<boolean> => {
+    if (user) {
+      return validateToken(user.id);
+    }
+    return validateToken();
+  }, [user, validateToken]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -368,6 +452,9 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         getProfilePictureUrl,
         savePatientProfile,
         savePreferences,
+        saveOfflineOnboardingData,
+        hasOnboardingData,
+        validateToken: validateTokenExposed,
         clearError,
         refreshUser,
       }}>

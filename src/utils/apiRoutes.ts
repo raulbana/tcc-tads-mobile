@@ -10,6 +10,7 @@ const apiRoutes = {
   onboarding: {
     questions: {
       onboarding: '/questions/onboard',
+      submit: '/questions/onboard',
     },
   },
   content: {

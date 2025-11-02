@@ -17,6 +17,7 @@ const Home = () => {
     hasTrainingData,
     workoutPlan,
     handleNavigateToAllExercises,
+    titleText,
   } = useHome();
   return (
     <ScreenContainer>
@@ -24,7 +25,7 @@ const Home = () => {
         <Label
           typography={theme.typography.title.sb3}
           color={theme.colors.gray_08}
-          text={`Olá, ${user?.name}!`}
+          text={titleText}
         />
         <CalendarRow />
         {!hasDiaryEntriesToday && (

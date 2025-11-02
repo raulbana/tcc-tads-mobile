@@ -9,7 +9,8 @@ import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer
 import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 
 const Login: React.FC = () => {
-  const {handleGoToRegister, handleGoToForgotPassword} = useLogin();
+  const {handleGoToRegister, handleGoToForgotPassword, handleSkipLogin} =
+    useLogin();
 
   const theme = useDynamicTheme();
 
@@ -51,6 +52,15 @@ const Login: React.FC = () => {
           <TouchableOpacity onPress={handleGoToForgotPassword}>
             <Label
               text="Esqueceu a senha?"
+              color={theme.colors.purple_04}
+              typography={theme.typography.paragraph.sm3}
+            />
+          </TouchableOpacity>
+        </S.FooterRow>
+        <S.FooterRow>
+          <TouchableOpacity onPress={handleSkipLogin}>
+            <Label
+              text="Seguir sem login"
               color={theme.colors.purple_04}
               typography={theme.typography.paragraph.sm3}
             />

@@ -1,8 +1,16 @@
 import onboardingServices from '../services/onboardingServices';
-import { useQuery, QueryKey } from '@tanstack/react-query';
-import { Question } from '../../../types/question';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryKey,
+} from '@tanstack/react-query';
+import {Question} from '../../../types/question';
+import {OnboardSubmitDTO, OnboardCompleteDTO} from '../../../types/onboarding';
 
-export const onboardingQueryFactory = (queryKey: QueryKey) => {
+const useOnboardingQueries = (queryKey: QueryKey) => {
+  const queryClient = useQueryClient();
+
   return {
     getQuestions: () =>
       useQuery<Question[]>({
@@ -13,12 +21,15 @@ export const onboardingQueryFactory = (queryKey: QueryKey) => {
         retry: 1,
         refetchOnWindowFocus: false,
       }),
+    submitAnswers: () =>
+      useMutation<OnboardCompleteDTO, Error, OnboardSubmitDTO>({
+        mutationFn: (data: OnboardSubmitDTO) =>
+          onboardingServices.submitAnswers(data),
+        onSuccess: () => {
+          queryClient.invalidateQueries({queryKey});
+        },
+      }),
   };
-};
-
-const useOnboardingQueries = (queryKey: QueryKey) => {
-  const queries = onboardingQueryFactory(queryKey);
-  return { ...queries };
 };
 
 export default useOnboardingQueries;

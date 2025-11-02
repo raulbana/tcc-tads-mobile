@@ -12,7 +12,11 @@ const useLogin = () => {
     navigate('Auth', {screen: 'ForgotPassword'});
   };
 
-  return {handleGoToRegister, handleGoToForgotPassword};
+  const handleSkipLogin = () => {
+    navigate('MainTabs');
+  };
+
+  return {handleGoToRegister, handleGoToForgotPassword, handleSkipLogin};
 };
 
 export default useLogin;

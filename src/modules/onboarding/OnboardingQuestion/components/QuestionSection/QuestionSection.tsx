@@ -76,7 +76,7 @@ const QuestionSection: React.FC<QuestionProps> = ({
         return (
           <RadioButtonGroup
             options={options || []}
-            value={localValue as string}
+            value={localValue}
             onChange={handleRadioChange}
           />
         );
@@ -114,7 +114,7 @@ const QuestionSection: React.FC<QuestionProps> = ({
     <S.Wrapper>
       <S.QuestionContainer>
         <Label
-          typography={theme.typography.title.h4}
+          typography={theme.typography.title.h5}
           color={theme.colors.gray_08}
           text={questionText}
         />

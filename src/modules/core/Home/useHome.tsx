@@ -3,6 +3,7 @@ import {useAuth} from '../../../contexts/AuthContext';
 import {useExercises} from '../../../contexts/ExerciseContext';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useDiary} from '../../../contexts/DiaryContext';
+import { useMemo } from 'react';
 
 const useHome = () => {
   const {user, isLoading: isAuthLoading} = useAuth();
@@ -38,6 +39,10 @@ const useHome = () => {
     navigate('Exercises', {screen: 'ExercisesHome'});
   };
 
+  const titleText = useMemo(() => {
+    return user ? `Olá, ${user?.name}!` : 'Olá! usuário anônimo';
+  }, [user]);
+
   return {
     user,
     workoutPlan,
@@ -47,6 +52,7 @@ const useHome = () => {
     isLoading,
     hasDiaryEntriesToday,
     hasTrainingData,
+    titleText,
   };
 };
 

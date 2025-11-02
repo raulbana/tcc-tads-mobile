@@ -2,6 +2,7 @@ import React, {ReactNode} from 'react';
 import {ContentProvider} from '../../contexts/ContentContext';
 import {DiaryProvider} from '../../contexts/DiaryContext';
 import {ExerciseProvider} from '../../contexts/ExerciseContext';
+import {AccessibilityProvider} from '../../contexts/AccessibilityContext';
 import {useAuth} from '../../contexts/AuthContext';
 
 interface AuthenticatedProvidersProps {
@@ -14,15 +15,17 @@ const AuthenticatedProviders: React.FC<AuthenticatedProvidersProps> = ({
   const {isLoggedIn} = useAuth();
 
   if (!isLoggedIn) {
-    return <>{children}</>;
+    return <AccessibilityProvider>{children}</AccessibilityProvider>;
   }
 
   return (
-    <ContentProvider>
-      <DiaryProvider>
-        <ExerciseProvider>{children}</ExerciseProvider>
-      </DiaryProvider>
-    </ContentProvider>
+    <AccessibilityProvider>
+      <ContentProvider>
+        <DiaryProvider>
+          <ExerciseProvider>{children}</ExerciseProvider>
+        </DiaryProvider>
+      </ContentProvider>
+    </AccessibilityProvider>
   );
 };
 

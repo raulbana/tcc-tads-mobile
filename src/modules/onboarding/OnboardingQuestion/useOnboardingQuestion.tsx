@@ -1,4 +1,4 @@
-import {useState, useCallback, useEffect} from 'react';
+import {useState, useCallback, useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 import {ICIQAnswers, iciqSchema} from './schema/questionnaire';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -22,6 +22,12 @@ const useOnboardingQuestion = () => {
     isLoading,
     error,
   } = onboardingQueries.getQuestions();
+
+  const submitAnswersMutation = onboardingQueries.submitAnswers();
+
+  const limitedQuestionList = useMemo(() => {
+    return questionList.slice(0, 6);
+  }, [questionList]);
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
@@ -55,7 +61,8 @@ const useOnboardingQuestion = () => {
     },
   });
 
-  const {savePatientProfile, saveOfflineOnboardingData, isLoggedIn} = useAuth();
+  const {savePatientProfile, saveOfflineOnboardingData, isLoggedIn, user} =
+    useAuth();
 
   const getDefaultValueForQuestion = (question: Question) => {
     switch (question.type) {
@@ -74,27 +81,140 @@ const useOnboardingQuestion = () => {
     }
   };
 
+  const onSubmitAnswer = useCallback(async () => {
+    const submitForm = handleSubmit(async (answers: ICIQAnswers) => {
+      console.log('Submitting onboarding answers:', answers);
+
+      const formatDateForAPI = (dateString: string): string => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+
+      const formatAnswersForAPI = (): Record<string, string> => {
+        const apiAnswers: Record<string, string> = {
+          birthdate: formatDateForAPI(answers.birthdate),
+          gender: answers.gender,
+          q3_frequency: String(answers.q3_frequency),
+          q4_amount: String(answers.q4_amount),
+          q5_interference: String(answers.q5_interference),
+        };
+
+        if (Array.isArray(answers.q6_when) && answers.q6_when.length > 0) {
+          apiAnswers.q6_when = answers.q6_when.join(',');
+        }
+
+        return apiAnswers;
+      };
+
+      const createProfileData = (): PatientProfile => {
+        return {
+          id: uuidv7(),
+          birthDate: answers.birthdate,
+          gender: answers.gender as Gender,
+          q1Score: answers.q3_frequency,
+          q2Score: answers.q4_amount,
+          q3Score: answers.q5_interference,
+          q4Score: answers.q6_when.length as number,
+        };
+      };
+
+      try {
+        const submitData: {
+          userId?: number;
+          answers: Record<string, string>;
+        } = {
+          answers: formatAnswersForAPI(),
+        };
+
+        if (isLoggedIn && user) {
+          submitData.userId = user.id;
+        }
+
+        const result = await submitAnswersMutation.mutateAsync(submitData);
+
+        if (result.profile) {
+          if (isLoggedIn) {
+            await savePatientProfile(result.profile);
+          } else {
+            await saveOfflineOnboardingData(result.profile);
+          }
+        } else {
+          const profileData = createProfileData();
+          if (isLoggedIn) {
+            await savePatientProfile(profileData);
+          } else {
+            await saveOfflineOnboardingData(profileData);
+          }
+        }
+
+        navigate('MainTabs');
+      } catch (error) {
+        console.error('Error submitting onboarding:', error);
+        const errorMsg =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao enviar respostas. Os dados foram salvos localmente.';
+        setErrorMessage(errorMsg);
+        setIsToastOpen(true);
+
+        const profileData = createProfileData();
+        if (isLoggedIn) {
+          await savePatientProfile(profileData);
+        } else {
+          await saveOfflineOnboardingData(profileData);
+        }
+
+        navigate('MainTabs');
+      }
+    });
+
+    await submitForm();
+  }, [
+    handleSubmit,
+    isLoggedIn,
+    user,
+    submitAnswersMutation,
+    savePatientProfile,
+    saveOfflineOnboardingData,
+    navigate,
+  ]);
+
   const onContinue = useCallback(
     async (field: keyof ICIQAnswers) => {
       const isFieldValid = await trigger(field);
 
       if (isFieldValid) {
-        setCurrentQuestionIndex(prevIndex => {
-          const nextIndex = prevIndex + 1;
-          if (nextIndex < questionList.length) {
-            const nextQuestion = questionList[nextIndex];
-            const nextField = nextQuestion.id as keyof ICIQAnswers;
-            const defaultValue = getDefaultValueForQuestion(nextQuestion);
-            setValue(nextField, defaultValue);
-            return nextIndex;
-          } else {
-            onSubmitAnswer();
-            return prevIndex;
-          }
-        });
+        const nextIndex = currentQuestionIndex + 1;
 
-        if (errorMessage) {
-          setErrorMessage('');
+        if (nextIndex < limitedQuestionList.length) {
+          const nextQuestion = limitedQuestionList[nextIndex];
+          const nextField = nextQuestion.id as keyof ICIQAnswers;
+          const defaultValue = getDefaultValueForQuestion(nextQuestion);
+          setValue(nextField, defaultValue);
+          setCurrentQuestionIndex(nextIndex);
+
+          if (errorMessage) {
+            setErrorMessage('');
+          }
+        } else {
+          const isFormValid = await trigger();
+          if (isFormValid) {
+            await onSubmitAnswer();
+          } else {
+            const allErrors = Object.keys(errors);
+            if (allErrors.length > 0) {
+              const firstErrorField = allErrors[0] as keyof ICIQAnswers;
+              const {error} = getFieldState(firstErrorField);
+              setErrorMessage(
+                error?.message ??
+                  'Por favor, preencha todos os campos corretamente',
+              );
+              setIsToastOpen(true);
+            }
+          }
         }
       } else {
         const {error} = getFieldState(field);
@@ -103,12 +223,14 @@ const useOnboardingQuestion = () => {
       }
     },
     [
-      getValues,
       trigger,
-      questionList.length,
+      currentQuestionIndex,
+      limitedQuestionList,
       getFieldState,
       setValue,
       errorMessage,
+      errors,
+      onSubmitAnswer,
     ],
   );
 
@@ -116,35 +238,6 @@ const useOnboardingQuestion = () => {
     setIsToastOpen(false);
     setErrorMessage('');
   };
-
-  const onSubmitAnswer = useCallback(() => {
-    handleSubmit(() => {
-      const answers = getValues();
-
-      const profileData: PatientProfile = {
-        id: uuidv7(),
-        birthDate: answers.birthdate,
-        gender: answers.gender as Gender,
-        q1Score: answers.q3_frequency,
-        q2Score: answers.q4_amount,
-        q3Score: answers.q5_interference,
-        q4Score: answers.q6_when.length as number,
-      };
-
-      if (!isLoggedIn) {
-        saveOfflineOnboardingData(profileData);
-      } else {
-        savePatientProfile(profileData);
-      }
-    });
-  }, [
-    getValues,
-    handleSubmit,
-    isValid,
-    isLoggedIn,
-    saveOfflineOnboardingData,
-    savePatientProfile,
-  ]);
 
   const navigateBack = () => {
     if (currentQuestionIndex === 0) {
@@ -154,7 +247,7 @@ const useOnboardingQuestion = () => {
     }
   };
 
-  const questionInputs: QuestionProps[] = questionList.map(question => ({
+  const questionInputs: QuestionProps[] = limitedQuestionList.map(question => ({
     question,
     control: control,
     onContinue: () => onContinue(question.id as keyof ICIQAnswers),
@@ -168,8 +261,8 @@ const useOnboardingQuestion = () => {
   };
 
   return {
-    currentQuestion: questionList[currentQuestionIndex],
-    isLoading,
+    currentQuestion: limitedQuestionList[currentQuestionIndex],
+    isLoading: isLoading || submitAnswersMutation.isPending,
     isValid,
     onContinue,
     handleSubmit,

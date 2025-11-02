@@ -10,6 +10,24 @@ export interface UseQuestionSectionProps {
   setValue: (name: keyof ICIQAnswers, value: any) => void;
 }
 
+const isNumericField = (fieldId: string): boolean => {
+  return ['q3_frequency', 'q4_amount', 'q5_interference'].includes(fieldId);
+};
+
+const convertToNumberIfNeeded = (
+  value: string | number,
+  fieldId: string,
+): string | number => {
+  if (isNumericField(fieldId)) {
+    if (typeof value === 'string') {
+      const num = Number(value);
+      return isNaN(num) ? value : num;
+    }
+    return value;
+  }
+  return value;
+};
+
 export const useQuestionSection = ({
   question,
   onContinue,
@@ -17,42 +35,29 @@ export const useQuestionSection = ({
 }: UseQuestionSectionProps) => {
   const {id, type, min} = question;
 
+  const getInitialValue = () => {
+    switch (type) {
+      case 'text':
+        return '';
+      case 'date':
+        return new Date().toISOString();
+      case 'slider':
+        return min || 0;
+      case 'radio':
+        return isNumericField(id) ? 0 : '';
+      case 'checkbox':
+        return [];
+      default:
+        return '';
+    }
+  };
+
   const [localValue, setLocalValue] = useState<string | number | string[]>(
-    () => {
-      switch (type) {
-        case 'text':
-          return '';
-        case 'date':
-          return new Date().toISOString();
-        case 'slider':
-          return min || 0;
-        case 'radio':
-          return '';
-        case 'checkbox':
-          return [];
-        default:
-          return '';
-      }
-    },
+    getInitialValue(),
   );
 
   useEffect(() => {
-    setLocalValue(() => {
-      switch (type) {
-        case 'text':
-          return '';
-        case 'date':
-          return new Date().toISOString();
-        case 'slider':
-          return min || 0;
-        case 'radio':
-          return '';
-        case 'checkbox':
-          return [];
-        default:
-          return '';
-      }
-    });
+    setLocalValue(getInitialValue());
   }, [id, type, min]);
 
   const validDate = (value?: string | number | string[] | Date) => {
@@ -72,6 +77,8 @@ export const useQuestionSection = ({
 
   const handleContinue = () => {
     setValue(id as keyof ICIQAnswers, localValue);
+    console.log('localValue', localValue);
+    console.log('id', id);
     onContinue(id as keyof ICIQAnswers);
   };
 
@@ -86,9 +93,10 @@ export const useQuestionSection = ({
     setValue(id as keyof ICIQAnswers, dateValue);
   };
 
-  const handleRadioChange = (value: string) => {
-    setLocalValue(value);
-    setValue(id as keyof ICIQAnswers, value);
+  const handleRadioChange = (value: string | number) => {
+    const convertedValue = convertToNumberIfNeeded(value, id);
+    setLocalValue(convertedValue);
+    setValue(id as keyof ICIQAnswers, convertedValue);
   };
 
   const handleSliderChange = (value: number) => {
