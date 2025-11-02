@@ -1,97 +1,341 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# DailyIU
 
-# Getting Started
+Aplicativo mobile desenvolvido em React Native para gestão de bem-estar, exercícios e conteúdo relacionado à saúde.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🇬🇧 English
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+**DailyIU** is a mobile application developed with React Native for wellness management, exercises, and health-related content.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### About
 
-```sh
-# Using npm
-npm start
+DailyIU is a mobile app that provides a complete platform for users to manage their daily wellness, including personal diary features, workouts and exercises, plus an educational and interactive content area.
 
-# OR using Yarn
+### Key Features
+
+- **📅 Diary**: Daily activity tracking and monitoring
+- **💪 Exercises**: Exercise catalog, personalized workouts and training plans
+- **📚 Content**: Educational content feed with likes, comments and save system
+- **👤 Authentication**: Complete login, registration and password recovery system
+- **🎯 Onboarding**: Customized initial flow for new users
+- **⚙️ Settings**: Profile management, accessibility preferences and notifications
+
+### Tech Stack
+
+**Core Technologies:**
+
+- React Native 0.79.3
+- React 19.0.0
+- TypeScript 5.0.4
+- React Navigation 7.x
+- React Query (TanStack Query) 5.x
+- Styled Components 6.x
+- React Hook Form 7.x
+- Zod 3.x (validation)
+
+**Storage:**
+
+- MMKV (fast local storage)
+- AsyncStorage (async storage)
+
+### Getting Started
+
+**Prerequisites:**
+
+- Node.js >= 18
+- Yarn
+- React Native CLI
+- For iOS: Xcode, CocoaPods
+- For Android: Android Studio, JDK
+
+**Installation:**
+
+1. Clone the repository
+2. Install dependencies: `yarn install`
+3. For iOS: Run `bundle install` and `bundle exec pod install --project-directory=ios`
+4. Configure environment variables in `.env` file
+
+**Running:**
+
+- Start Metro: `yarn start`
+- Run Android: `yarn android`
+- Run iOS: `yarn ios`
+
+### Project Structure
+
+The project follows a modular structure with separated concerns:
+
+- `/src/components` - Reusable components
+- `/src/modules` - Feature modules (auth, exercises, content, diary, etc.)
+- `/src/contexts` - React contexts
+- `/src/services` - API services and offline sync
+- `/src/navigation` - Navigation configuration
+- `/src/theme` - Theme and styling system
+
+### Available Scripts
+
+- `yarn start` - Start Metro bundler
+- `yarn android` - Run on Android
+- `yarn ios` - Run on iOS
+- `yarn test` - Run tests
+- `yarn lint` - Run linter
+- `yarn make:icon` - Generate app icon
+
+### Features
+
+**Authentication:** Login, registration, password recovery, session management
+
+**Diary:** Calendar view, daily activity logging, report generation
+
+**Exercises:** Exercise listings, workout creation and execution, personalized training plans, exercise evaluation and feedback
+
+**Content:** Content feed, likes and comments system, save favorite content, create own content, categorization
+
+**Onboarding:** Initial questionnaire, user experience personalization
+
+**Accessibility:** Full support for light/dark themes, accessibility settings, accessible typography and colors
+
+**Offline Sync:** Offline synchronization service allows users to continue using the app without internet connection, syncing data when connection is restored
+
+### Development
+
+The app uses Reactotron for debugging in development mode. Environment variables should be configured in a `.env` file at the project root.
+
+### License
+
+This project is licensed under the terms specified in the `LICENSE` file.
+
+### Support
+
+For support, contact through the "Talk to Us" feature within the app or open an issue in the repository.
+
+---
+
+## 🇧🇷 Português
+
+## 📱 Sobre o Projeto
+
+O DailyIU é um aplicativo móvel que oferece uma plataforma completa para usuários gerenciarem seu bem-estar diário, incluindo funcionalidades de diário pessoal, treinos e exercícios, além de uma área de conteúdo educacional e interativa.
+
+### Principais Funcionalidades
+
+- **📅 Diário**: Registro e acompanhamento de atividades diárias
+- **💪 Exercícios**: Catálogo de exercícios, treinos personalizados e planos de treino
+- **📚 Conteúdos**: Feed de conteúdo educacional com sistema de likes, comentários e salvamento
+- **👤 Autenticação**: Sistema completo de login, registro e recuperação de senha
+- **🎯 Onboarding**: Fluxo inicial personalizado para novos usuários
+- **⚙️ Configurações**: Gerenciamento de perfil, preferências de acessibilidade e notificações
+
+## 🛠️ Tecnologias Utilizadas
+
+### Principais
+
+- **React Native** 0.79.3
+- **React** 19.0.0
+- **TypeScript** 5.0.4
+- **React Navigation** 7.x
+- **React Query (TanStack Query)** 5.x
+- **Styled Components** 6.x
+- **React Hook Form** 7.x
+- **Zod** 3.x (validação)
+
+### Armazenamento
+
+- **MMKV** (armazenamento local rápido)
+- **AsyncStorage** (armazenamento assíncrono)
+
+### Outras Bibliotecas
+
+- **Axios** (cliente HTTP)
+- **Moment.js** (manipulação de datas)
+- **React Native Reanimated** (animações)
+- **React Native Gesture Handler** (gestos)
+- **React Native Video** (reprodução de vídeo)
+- **React Native Image Picker** (seleção de imagens)
+- **Phosphor React Native** (ícones)
+
+## 📋 Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+- **Node.js** >= 18
+- **Yarn**
+- **React Native CLI**
+- Para **iOS**: Xcode, CocoaPods
+- Para **Android**: Android Studio, JDK
+
+> **Nota**: Siga o guia oficial de [Configuração do Ambiente React Native](https://reactnative.dev/docs/set-up-your-environment) para mais detalhes.
+
+## 🚀 Instalação
+
+1. **Clone o repositório**:
+
+```bash
+git clone <url-do-repositorio>
+cd tcc-tads-mobile
+```
+
+2. **Instale as dependências**:
+
+```bash
+yarn install
+```
+
+3. **Instale as dependências nativas (iOS)**:
+
+```bash
+# Primeira vez ou após atualizar dependências nativas
+bundle install
+bundle exec pod install --project-directory=ios
+```
+
+4. **Configure variáveis de ambiente**:
+   Crie um arquivo `.env` na raiz do projeto com as variáveis necessárias (consulte `.env.example` se disponível).
+
+## 🏃 Executando o Projeto
+
+### Metro Bundler
+
+Inicie o servidor Metro (JavaScript bundler):
+
+```bash
 yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
 ### Android
 
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
+```bash
 yarn android
 ```
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
+```bash
 yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 📁 Estrutura do Projeto
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```
+src/
+├── assets/           # Recursos estáticos (fontes, imagens, ilustrações)
+├── components/       # Componentes reutilizáveis
+├── contexts/         # Contextos React (Auth, Diary, Exercise, Content, etc.)
+├── hooks/            # Custom hooks
+├── modules/          # Módulos de funcionalidades
+│   ├── auth/         # Autenticação
+│   ├── config/       # Configurações
+│   ├── content/      # Sistema de conteúdos
+│   ├── core/         # Componentes core (Home)
+│   ├── diary/        # Diário
+│   ├── exercises/    # Exercícios e treinos
+│   └── onboarding/   # Fluxo de onboarding
+├── navigation/       # Configuração de navegação
+├── services/         # Serviços (API, sincronização offline)
+├── storage/          # Gerenciamento de armazenamento local
+├── theme/            # Sistema de temas e estilos
+├── types/            # Definições de tipos TypeScript
+└── utils/            # Utilitários e helpers
+```
 
-## Step 3: Modify your app
+## 🔧 Scripts Disponíveis
 
-Now that you have successfully run the app, let's make changes!
+- `yarn start` - Inicia o Metro bundler
+- `yarn android` - Executa o app no Android
+- `yarn ios` - Executa o app no iOS
+- `yarn test` - Executa os testes
+- `yarn lint` - Executa o linter
+- `yarn make:icon` - Gera o ícone do aplicativo
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## 🧪 Testes
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+```bash
+yarn test
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 🔐 Variáveis de Ambiente
 
-## Congratulations! :tada:
+Certifique-se de configurar as seguintes variáveis de ambiente (arquivo `.env`):
 
-You've successfully run and modified your React Native App. :partying_face:
+```env
+API_BASE_URL=sua-url-da-api
+# Adicione outras variáveis conforme necessário
+```
 
-### Now what?
+## 📱 Funcionalidades Principais
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### Autenticação
 
-# Troubleshooting
+- Login e registro de usuários
+- Recuperação de senha
+- Gerenciamento de sessão
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### Diário
 
-# Learn More
+- Visualização em calendário
+- Registro de atividades diárias
+- Geração de relatórios
 
-To learn more about React Native, take a look at the following resources:
+### Exercícios
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- Listagem de exercícios disponíveis
+- Criação e execução de treinos
+- Planos de treino personalizados
+- Avaliação e feedback de exercícios
+
+### Conteúdos
+
+- Feed de conteúdos
+- Sistema de likes e comentários
+- Salvamento de conteúdos favoritos
+- Criação de conteúdos próprios
+- Categorização
+
+### Onboarding
+
+- Questionário inicial
+- Personalização da experiência do usuário
+
+## 🎨 Temas e Acessibilidade
+
+O aplicativo possui suporte completo a:
+
+- Temas claro/escuro
+- Configurações de acessibilidade
+- Tipografia e cores acessíveis
+
+## 🔄 Sincronização Offline
+
+O aplicativo inclui um serviço de sincronização offline que permite que os usuários continuem utilizando o app mesmo sem conexão à internet, sincronizando dados quando a conexão for restabelecida.
+
+## 🐛 Debugging
+
+Em desenvolvimento, o app utiliza Reactotron para debugging:
+
+```javascript
+// Disponível apenas em modo desenvolvimento
+if (__DEV__) {
+  require('./ReactotronConfig');
+}
+```
+
+## 📄 Licença
+
+Este projeto está sob a licença especificada no arquivo `LICENSE`.
+
+## 👥 Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📞 Suporte
+
+Para suporte, entre em contato através da funcionalidade "Fale Conosco" dentro do aplicativo ou abra uma issue no repositório.
+
+---
+
+Desenvolvido com ❤️ usando React Native
