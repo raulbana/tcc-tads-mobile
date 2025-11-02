@@ -14,7 +14,7 @@ export const Container = styled.TouchableOpacity`
   padding: ${verticalScale(8)}px ${horizontalScale(8)}px;
   border-radius: ${moderateScale(12)}px;
   background-color: ${({theme}) => theme.colors.gray_02};
-  border: 1px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(1)}px solid ${({theme}) => theme.colors.gray_04};
 `;
 
 export const IconWrapper = styled.View`

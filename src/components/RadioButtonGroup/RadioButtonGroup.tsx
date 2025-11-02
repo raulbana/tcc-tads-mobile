@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import {QuestionOptions} from '../../types/question';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 type RadioButtonGroupProps = {
   options: QuestionOptions[];
@@ -11,13 +11,27 @@ type RadioButtonGroupProps = {
   multiSelect?: boolean;
 };
 
+const areValuesEqual = (
+  val1: string | number,
+  val2: string | number,
+): boolean => {
+  if (val1 === val2) return true;
+  if (typeof val1 === 'number' && typeof val2 === 'string') {
+    return val1 === Number(val2);
+  }
+  if (typeof val1 === 'string' && typeof val2 === 'number') {
+    return Number(val1) === val2;
+  }
+  return false;
+};
+
 const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({
   options,
   value,
   onChange,
   multiSelect = false,
 }) => {
-  const handleSingleSelect = (optionValue: string) => {
+  const handleSingleSelect = (optionValue: string | number) => {
     onChange(optionValue);
   };
 
@@ -37,7 +51,7 @@ const RadioButtonGroup: React.FC<RadioButtonGroupProps> = ({
       {options.map(option => {
         const selected = multiSelect
           ? Array.isArray(value) && value.includes(option.value)
-          : value === option.value;
+          : areValuesEqual(value, option.value);
         return (
           <S.OptionButton
             key={option.value}

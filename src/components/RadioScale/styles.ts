@@ -24,8 +24,8 @@ export const ScaleItem = styled.TouchableOpacity`
 export const Circle = styled.View<{selected: boolean}>`
   width: ${moderateScale(24)}px;
   height: ${moderateScale(24)}px;
-  border-radius: 12px;
-  border-width: 2px;
+  border-radius: ${moderateScale(12)}px;
+  border-width: ${moderateScale(2)}px;
   border-color: ${({theme, selected}) =>
     selected ? theme.colors.purple_04 : theme.colors.gray_05};
   align-items: center;
@@ -36,6 +36,6 @@ export const Circle = styled.View<{selected: boolean}>`
 export const FilledCircle = styled.View`
   width: ${moderateScale(12)}px;
   height: ${moderateScale(12)}px;
-  border-radius: 6px;
+  border-radius: ${moderateScale(6)}px;
   background-color: ${({theme}) => theme.colors.purple_04};
 `;

@@ -112,7 +112,6 @@ const contentServices = {
         : [];
     }
 
-    // Build media array with altText for API
     const mediaArray = uploadedMedia.map(m => ({
       url: m.url,
       contentType: m.contentType || m.type,

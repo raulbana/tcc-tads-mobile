@@ -1,5 +1,9 @@
 import styled from 'styled-components/native';
-import {horizontalScale, verticalScale} from '../../utils/scales';
+import {
+  horizontalScale,
+  verticalScale,
+  moderateScale,
+} from '../../utils/scales';
 import Animated from 'react-native-reanimated';
 
 export const Container = styled.TouchableOpacity`
@@ -38,9 +42,10 @@ export const Thumb = styled(Animated.View)<{
       : $checked
       ? theme.colors.purple_03
       : theme.colors.gray_04};
-  border-width: 2px;
+  border-width: ${moderateScale(2)}px;
   border-color: ${({$checked, theme}) =>
     $checked ? theme.colors.purple_03 : theme.colors.gray_04};
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px ${moderateScale(2)}px ${moderateScale(4)}px
+    rgba(0, 0, 0, 0.08);
   transition: left 200ms, background-color 200ms;
 `;

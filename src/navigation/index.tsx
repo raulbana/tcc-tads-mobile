@@ -7,19 +7,31 @@ const Stack = createNativeStackNavigator<RootParamList>();
 export type StackScreenProps = React.ComponentProps<typeof Stack.Screen>;
 
 const Navigator: React.FC = () => {
-  useAuth();
+  const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();
 
   const initialRouteName = useMemo(() => {
-    return 'Auth';
-  }, []);
+    if (isInitializing) {
+      return 'Auth';
+    }
+    
+    if (!hasOnboardingData()) {
+      return 'Onboarding';
+    }
+
+    if (!isLoggedIn) {
+      return 'MainTabs';
+    }
+
+    return 'MainTabs';
+  }, [isLoggedIn, isInitializing, hasOnboardingData]);
 
   return (
     <Stack.Navigator
-      initialRouteName={initialRouteName}
+      initialRouteName={initialRouteName as keyof RootParamList}
       screenOptions={{headerShown: false}}>
       {routes.map(route => (
         <Stack.Screen
-          key={route.name as keyof RootParamList}
+          key={route.name}
           name={route.name as keyof RootParamList}
           component={route.component}
           options={route.options}

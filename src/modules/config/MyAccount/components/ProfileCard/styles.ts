@@ -1,11 +1,15 @@
 import styled from 'styled-components/native';
-import { horizontalScale, moderateScale, verticalScale } from '../../../../../utils/scales';
+import {
+  horizontalScale,
+  moderateScale,
+  verticalScale,
+} from '../../../../../utils/scales';
 
 export const Container = styled.View`
   background-color: ${({theme}) => theme.colors.gray_02};
   border-radius: ${moderateScale(16)}px;
   padding: ${moderateScale(12)}px;
-  border: 1px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(1)}px solid ${({theme}) => theme.colors.gray_04};
 `;
 
 export const Section = styled.View`

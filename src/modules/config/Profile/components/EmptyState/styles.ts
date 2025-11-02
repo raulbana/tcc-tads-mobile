@@ -1,5 +1,9 @@
 import styled from 'styled-components/native';
-import {verticalScale, horizontalScale} from '../../../../../utils/scales';
+import {
+  verticalScale,
+  horizontalScale,
+  moderateScale,
+} from '../../../../../utils/scales';
 
 export const Container = styled.View`
   flex: 1;
@@ -10,9 +14,9 @@ export const Container = styled.View`
 `;
 
 export const IconContainer = styled.View`
-  width: 80px;
-  height: 80px;
-  border-radius: 40px;
+  width: ${moderateScale(80)}px;
+  height: ${moderateScale(80)}px;
+  border-radius: ${moderateScale(40)}px;
   background-color: ${({theme}) => theme.colors.gray_03};
   justify-content: center;
   align-items: center;
@@ -26,5 +30,5 @@ export const TextContainer = styled.View`
 export const ActionsContainer = styled.View`
   gap: ${verticalScale(12)}px;
   width: 100%;
-  max-width: 280px;
+  max-width: ${horizontalScale(280)}px;
 `;

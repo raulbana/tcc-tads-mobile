@@ -1,5 +1,9 @@
 import styled from 'styled-components/native';
-import {horizontalScale, verticalScale} from '../../../../../utils/scales';
+import {
+  horizontalScale,
+  verticalScale,
+  moderateScale,
+} from '../../../../../utils/scales';
 
 export const FormContainer = styled.View`
   padding-vertical: ${verticalScale(16)}px;
@@ -24,8 +28,8 @@ export const ButtonContainer = styled.View`
 
 export const SuccessMessage = styled.View`
   background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  border-radius: 8px;
+  border: ${moderateScale(1)}px solid #b7eb8f;
+  border-radius: ${moderateScale(8)}px;
   padding: ${verticalScale(12)}px ${horizontalScale(16)}px;
   margin-bottom: ${verticalScale(16)}px;
 `;

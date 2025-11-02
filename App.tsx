@@ -4,9 +4,10 @@ import Navigator from './src/navigation';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import moment from 'moment';
 import 'moment/locale/pt-br';
-import {AuthProvider} from './src/contexts/AuthContext';
-import {AccessibilityProvider} from './src/contexts/AccessibilityContext';
+import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import AuthenticatedProviders from './src/components/AuthenticatedProviders/AuthenticatedProviders';
+import UnauthenticatedProviders from './src/components/UnauthenticatedProviders/UnauthenticatedProviders';
+import FirstAccessProviders from './src/components/FirstAccessProviders/FirstAccessProviders';
 
 if (__DEV__) {
   require('./ReactotronConfig');
@@ -14,7 +15,41 @@ if (__DEV__) {
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  return <Navigator />;
+  const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();
+
+  const getProvider = () => {
+    if (isInitializing) {
+      return (
+        <AuthenticatedProviders>
+          <Navigator />
+        </AuthenticatedProviders>
+      );
+    }
+
+    if (!hasOnboardingData()) {
+      return (
+        <FirstAccessProviders>
+          <Navigator />
+        </FirstAccessProviders>
+      );
+    }
+
+    if (!isLoggedIn) {
+      return (
+        <UnauthenticatedProviders>
+          <Navigator />
+        </UnauthenticatedProviders>
+      );
+    }
+
+    return (
+      <AuthenticatedProviders>
+        <Navigator />
+      </AuthenticatedProviders>
+    );
+  };
+
+  return getProvider();
 };
 
 function App(): React.ReactElement {
@@ -24,11 +59,7 @@ function App(): React.ReactElement {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AccessibilityProvider>
-            <AuthenticatedProviders>
-              <AppContent />
-            </AuthenticatedProviders>
-          </AccessibilityProvider>
+          <AppContent />
         </AuthProvider>
       </QueryClientProvider>
     </NavigationContainer>

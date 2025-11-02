@@ -1,10 +1,10 @@
 import Video from 'react-native-video';
 import styled from 'styled-components/native';
-import {verticalScale} from '../../utils/scales';
+import {verticalScale, moderateScale} from '../../utils/scales';
 
 export const Container = styled.TouchableOpacity`
   width: 100%;
-  height: 250px;
+  height: ${verticalScale(250)}px;
   background-color: black;
   justify-content: center;
   align-items: center;
@@ -24,7 +24,7 @@ export const Overlay = styled.View`
 
 export const PlayButton = styled.Text`
   position: absolute;
-  font-size: 50px;
+  font-size: ${moderateScale(50)}px;
   color: white;
   opacity: 0.8;
 `;

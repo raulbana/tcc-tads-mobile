@@ -8,7 +8,7 @@ import {
 export const Container = styled.View`
   width: 100%;
   padding: ${moderateScale(12)}px;
-  border: 1px solid ${({theme}) => theme.colors.gray_04};
+  border: ${moderateScale(1)}px solid ${({theme}) => theme.colors.gray_04};
   gap: ${verticalScale(16)}px;
   border-radius: ${moderateScale(16)}px;
   background-color: ${({theme}) => theme.colors.white};

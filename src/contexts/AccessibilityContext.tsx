@@ -57,7 +57,6 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
   const loadAccessibilityPreferences = useCallback(async () => {
     try {
-      console.log('Loading accessibility preferences, isSaving:', isSaving);
       setIsLoading(true);
       setError(null);
 
@@ -96,7 +95,6 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
         setIsSaving(true);
         setError(null);
 
-        console.log('Setting preferences:', preferences);
         setHighContrast(preferences.isHighContrast);
         setBigFont(preferences.isBigFont);
 
@@ -146,11 +144,6 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
   useEffect(() => {
     const newThemeKey = `theme-${highContrast}-${bigFont}`;
     setThemeKey(newThemeKey);
-    console.log('Theme updated:', {
-      highContrast,
-      bigFont,
-      themeKey: newThemeKey,
-    });
   }, [highContrast, bigFont]);
 
   const value = {
