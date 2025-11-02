@@ -77,8 +77,6 @@ export const useQuestionSection = ({
 
   const handleContinue = () => {
     setValue(id as keyof ICIQAnswers, localValue);
-    console.log('localValue', localValue);
-    console.log('id', id);
     onContinue(id as keyof ICIQAnswers);
   };
 

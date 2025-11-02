@@ -10,18 +10,9 @@ import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 
 const ExerciseHome = () => {
   const {workouts, handleWorkoutPress, isLoading, error} = useExerciseHome();
-  console.log('ExerciseHome:render', {
-    isLoading,
-    error: error?.message,
-    workoutsLength: workouts?.length,
-  });
 
   const renderWorkoutCard = ({item}: {item: Exercise}) => {
-    console.log('ExerciseHome:renderWorkoutCard', {
-      id: item.id,
-      title: item.title,
-      category: item.category,
-    });
+
     const statusLabel = ExerciseStatusLabels[item.status];
     return (
       <WorkoutCard

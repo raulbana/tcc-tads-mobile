@@ -22,8 +22,6 @@ const useCreateContent = () => {
           contentData,
           userId: user?.id.toString() || '',
         });
-        console.log(contentData);
-        console.log('Content created successfully');
       } catch (error) {
         console.error('Error creating content:', error);
         throw error;

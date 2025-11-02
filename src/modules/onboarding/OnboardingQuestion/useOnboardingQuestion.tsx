@@ -83,7 +83,6 @@ const useOnboardingQuestion = () => {
 
   const onSubmitAnswer = useCallback(async () => {
     const submitForm = handleSubmit(async (answers: ICIQAnswers) => {
-      console.log('Submitting onboarding answers:', answers);
 
       const formatDateForAPI = (dateString: string): string => {
         const date = new Date(dateString);

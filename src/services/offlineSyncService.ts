@@ -73,8 +73,6 @@ class OfflineSyncService {
   async syncAllOfflineData(userId: string): Promise<void> {
     try {
       await diaryServices.syncOfflineData(userId);
-
-      console.log('Sincronização de dados offline concluída');
     } catch (error) {
       console.error('Erro ao sincronizar dados offline:', error);
       throw error;
