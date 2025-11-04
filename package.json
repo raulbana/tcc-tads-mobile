@@ -8,7 +8,12 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "make:icon": "npx @bam.tech/react-native-make icon --path ./src/assets/logo/daily-iu-app-icon.png"
+    "make:icon": "npx @bam.tech/react-native-make icon --path ./src/assets/logo/daily-iu-app-icon.png",
+    "android:build:debug": "cd android && ./gradlew assembleDebug",
+    "android:build:release": "cd android && ./gradlew assembleRelease",
+    "android:build:bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res --sourcemap-output android/app/src/main/assets/index.android.bundle.map",
+    "android:build:standalone": "npm run android:build:bundle && cd android && ./gradlew assembleRelease",
+    "android:clean": "cd android && ./gradlew clean"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",

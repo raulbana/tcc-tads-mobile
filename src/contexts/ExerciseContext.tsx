@@ -12,6 +12,7 @@ import {
   ExerciseFeedbackCreatorDTO,
   WorkoutCompletionDTO,
 } from '../types/exercise';
+import {useAuth} from './AuthContext';
 
 interface ExerciseContextType {
   workouts: Workout[];
@@ -31,7 +32,8 @@ const ExerciseContext = createContext<ExerciseContextType | undefined>(
 );
 
 export const ExerciseProvider = ({children}: {children: ReactNode}) => {
-  const exerciseQueries = useExerciseQueries(['exercises']);
+  const {isLoggedIn} = useAuth();
+  const exerciseQueries = useExerciseQueries(['exercises'], isLoggedIn);
 
   const {
     data: workouts = [],

@@ -18,7 +18,7 @@ import {Workout} from '../types/exercise';
 
 export type MainTabParamList = {
   Home: undefined;
-  Diary: undefined;
+  Diary: {selectedDate?: string} | undefined;
   Exercises: undefined;
   Contents: undefined;
   MyAccount: undefined;
