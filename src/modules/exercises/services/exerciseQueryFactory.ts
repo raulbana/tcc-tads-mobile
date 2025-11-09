@@ -7,7 +7,10 @@ import {
   UserWorkoutPlanDTO,
 } from '../../../types/exercise';
 
-export const exerciseQueryFactory = (baseKey: QueryKey) => {
+export const exerciseQueryFactory = (
+  baseKey: QueryKey,
+  isLoggedIn?: boolean,
+) => {
   return {
     listExercises: () =>
       useQuery<Exercise[]>({
@@ -95,6 +98,7 @@ export const exerciseQueryFactory = (baseKey: QueryKey) => {
       useQuery<UserWorkoutPlanDTO | null>({
         queryKey: [...baseKey, 'userWorkoutPlan'],
         queryFn: () => exerciseServices.getUserWorkoutPlan(),
+        enabled: isLoggedIn ?? false,
         staleTime: 1000 * 60 * 5,
         gcTime: 1000 * 60 * 5,
         retry: 1,
@@ -103,8 +107,8 @@ export const exerciseQueryFactory = (baseKey: QueryKey) => {
   };
 };
 
-const useExerciseQueries = (queryKey: QueryKey) => {
-  const queries = exerciseQueryFactory(queryKey);
+const useExerciseQueries = (queryKey: QueryKey, isLoggedIn?: boolean) => {
+  const queries = exerciseQueryFactory(queryKey, isLoggedIn);
   return {
     ...queries,
   };

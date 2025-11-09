@@ -11,9 +11,13 @@ import DayDataModal from '../DayDataModal/DayDataModal';
 import BottomModal from '../../../../components/BottomModal/BottomModal';
 import Button from '../../../../components/Button/Button';
 import moment from 'moment';
-import { useDynamicTheme } from '../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../hooks/useDynamicTheme';
 
-const Calendar: React.FC = () => {
+interface CalendarProps {
+  initialSelectedDate?: string;
+}
+
+const Calendar: React.FC<CalendarProps> = ({initialSelectedDate}) => {
   const {
     monthLabel,
     goPrevMonth,
@@ -35,7 +39,7 @@ const Calendar: React.FC = () => {
     isDeletingModalOpen,
     setIsDeletingModalOpen,
     findRegisterIndex,
-  } = useCalendar();
+  } = useCalendar(initialSelectedDate);
 
   const {addUrinationData, editUrinationData, deleteUrinationData} = useDiary();
 
@@ -69,9 +73,7 @@ const Calendar: React.FC = () => {
                     dayItem={item}
                     width={tileWidth}
                     onPress={() => onPressDay(item)}
-                    isDisabled={
-                      moment(item.date).isAfter(moment())
-                    }
+                    isDisabled={moment(item.date).isAfter(moment())}
                   />
                 </View>
               ))}

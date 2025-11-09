@@ -1,11 +1,22 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import * as S from './styles';
 import Animated from 'react-native-reanimated';
 import {useCalendarRow, ITEM_WIDTH, SPACING} from './useCalendarRow';
 import CalendarRowItem from './components/CalendarRowItem';
+import {useNavigation} from '@react-navigation/native';
+import {NavigationStackProp} from '../../../../navigation/routes';
+import moment from 'moment';
 
 const CalendarRow = () => {
   const {scrollX, scrollHandler, days} = useCalendarRow();
+  const navigation = useNavigation<NavigationStackProp>();
+
+  const handleDayPress = (dayItem: {date: string}) => {
+    navigation.navigate('MainTabs', {
+      screen: 'Diary',
+      params: {selectedDate: dayItem.date},
+    });
+  };
 
   const getItemLayout = (_: any, index: number) => ({
     length: ITEM_WIDTH + SPACING,
@@ -33,7 +44,13 @@ const CalendarRow = () => {
         getItemLayout={getItemLayout}
         renderItem={({item, index}) => {
           return (
-            <CalendarRowItem dayItem={item} index={index} scrollX={scrollX} />
+            <CalendarRowItem
+              dayItem={item}
+              index={index}
+              scrollX={scrollX}
+              onPress={() => handleDayPress(item)}
+              isDisabled={moment(item.date).isAfter(moment())}
+            />
           );
         }}
         ListEmptyComponent={() => {

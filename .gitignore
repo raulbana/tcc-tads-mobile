@@ -33,6 +33,12 @@ local.properties
 .cxx/
 *.keystore
 !debug.keystore
+*.jks
+my-release-key.keystore
+release.keystore
+android/app/*.keystore
+android/app/*.jks
+android/app/release.keystore
 .kotlin/
 
 # node.js
@@ -55,6 +61,15 @@ yarn-error.log
 
 # Bundle artifact
 *.jsbundle
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/assets/index.android.bundle.map
+
+# Android release builds
+android/app/build/outputs/apk/release/
+android/app/build/outputs/bundle/release/
+*.apk
+*.aab
+!android/app/build/outputs/apk/debug/app-debug.apk
 
 # Ruby / CocoaPods
 **/Pods/
@@ -77,3 +92,5 @@ yarn-error.log
 *.stackdump
 API_CONFIG.md
 api-docs.json
+
+RELEASE_SETUP.md

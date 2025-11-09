@@ -243,6 +243,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const response = await authServices.login(credentials);
         setUser(response.user);
         setIsLoggedIn(true);
+        setIsAnonymous(false);
 
         const shouldRemember = credentials.remember !== false;
         await saveLoggedUser(response.user, response.token, shouldRemember);

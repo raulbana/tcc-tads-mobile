@@ -12,9 +12,13 @@ import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 import moment from 'moment';
 import {diaryQueryFactory} from './services/diaryQueryFactory';
 import {printReportPdf} from './utils/reportPdf';
+import {RouteProp, useRoute} from '@react-navigation/native';
+import {MainTabParamList} from '../../navigation/routes';
 
 const Diary = () => {
-  const {user, isLoggedIn} = useAuth();
+  const route = useRoute<RouteProp<MainTabParamList, 'Diary'>>();
+  const selectedDate = route.params?.selectedDate;
+  const {user} = useAuth();
   const {isLoading, error, clearError} = useDiary();
   const theme = useDynamicTheme();
   const queries = diaryQueryFactory(['diary']);
@@ -46,7 +50,7 @@ const Diary = () => {
           color={theme.colors.gray_08}
           text={'Diário Miccional'}
         />
-        <Calendar />
+        <Calendar initialSelectedDate={selectedDate} />
         <ReportCard onGenerateReport={handleGenerateReport} />
 
         {error && (

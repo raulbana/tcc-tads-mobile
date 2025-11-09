@@ -12,12 +12,16 @@ interface CalendarRowItemProps {
   dayItem: CalendarDayDTO;
   index: number;
   scrollX: ReturnType<typeof useCalendarRow>['scrollX'];
+  onPress?: () => void;
+  isDisabled?: boolean;
 }
 
 const CalendarRowItem: React.FC<CalendarRowItemProps> = ({
   dayItem,
   index,
   scrollX,
+  onPress,
+  isDisabled,
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
     const inputRange = [
@@ -40,7 +44,7 @@ const CalendarRowItem: React.FC<CalendarRowItemProps> = ({
   return (
     <Animated.View
       style={[{width: ITEM_WIDTH, marginRight: SPACING}, animatedStyle]}>
-      <CalendarTile dayItem={dayItem} />
+      <CalendarTile dayItem={dayItem} onPress={onPress} isDisabled={isDisabled} />
     </Animated.View>
   );
 };

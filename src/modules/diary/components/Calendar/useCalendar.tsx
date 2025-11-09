@@ -15,7 +15,7 @@ import diaryServices from '../../../../modules/diary/services/diaryServices';
 import {useWindowDimensions} from 'react-native';
 import {horizontalScale} from '../../../../utils/scales';
 
-export function useCalendar() {
+export function useCalendar(initialSelectedDate?: string) {
   const [isRegisterModalOpen, setIsRegisterModalOpen] =
     useState<boolean>(false);
 
@@ -161,6 +161,57 @@ export function useCalendar() {
     const newMonth = moment({year, month: monthIndex0Based, date: 1});
     setMonthRef(newMonth);
   }, []);
+
+  const processedInitialDateRef = useRef<string | null>(null);
+  const isChangingMonthRef = useRef(false);
+
+  useEffect(() => {
+    if (!initialSelectedDate || daysFlat.length === 0) {
+      return;
+    }
+
+    if (processedInitialDateRef.current === initialSelectedDate) {
+      if (isChangingMonthRef.current) {
+        const selectedDay = daysFlat.find(
+          day => day.date === initialSelectedDate,
+        );
+        if (selectedDay) {
+          setSelectedDayItem(selectedDay);
+          setIsRegisterModalOpen(true);
+          isChangingMonthRef.current = false;
+        }
+      }
+      return;
+    }
+
+    const dateMoment = moment(initialSelectedDate);
+    const selectedDay = daysFlat.find(day => day.date === initialSelectedDate);
+
+    if (!selectedDay) {
+      const currentMonth = monthRef.month();
+      const currentYear = monthRef.year();
+      const targetMonth = dateMoment.month();
+      const targetYear = dateMoment.year();
+
+      if (currentMonth !== targetMonth || currentYear !== targetYear) {
+        processedInitialDateRef.current = initialSelectedDate;
+        isChangingMonthRef.current = true;
+        setMonth(targetYear, targetMonth);
+      }
+    } else {
+      setSelectedDayItem(selectedDay);
+      setIsRegisterModalOpen(true);
+      processedInitialDateRef.current = initialSelectedDate;
+      isChangingMonthRef.current = false;
+    }
+  }, [initialSelectedDate, daysFlat, monthRef, setMonth]);
+
+  useEffect(() => {
+    if (!initialSelectedDate) {
+      processedInitialDateRef.current = null;
+      isChangingMonthRef.current = false;
+    }
+  }, [initialSelectedDate]);
 
   const {width: screenWidth} = useWindowDimensions();
   const tileWidth = Math.floor(

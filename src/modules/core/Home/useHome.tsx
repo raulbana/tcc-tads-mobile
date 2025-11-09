@@ -45,7 +45,7 @@ const useHome = () => {
   };
 
   const titleText = useMemo(() => {
-    return user && !isAnonymous ? `Olá, ${user.name}!` : 'Bem vindo (a) ao DailyIU!';
+    return user && !isAnonymous ? `Olá, ${user.name}!` : 'Bem vindo(a) ao DailyIU!';
   }, [user, isAnonymous]);
 
   return {

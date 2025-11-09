@@ -23,6 +23,13 @@ export const useCalendarRow = () => {
     const today = new Date();
     const generatedDays: CalendarDayDTO[] = [];
 
+    const formatDateLocal = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
     for (let i = -3; i <= 3; i++) {
       const currentDay = new Date(today);
       currentDay.setDate(today.getDate() + i);
@@ -34,7 +41,7 @@ export const useCalendarRow = () => {
       const isToday = i === 0;
 
       generatedDays.push({
-        date: currentDay.toISOString().split('T')[0],
+        date: formatDateLocal(currentDay),
         leakageLevel: 'NONE',
         eventsCount: 0,
         completedExercises: 0,
