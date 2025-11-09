@@ -64,8 +64,8 @@ def enableProguardInReleaseBuilds = true
  * This ensures each build has a unique, incrementing version code
  */
 def getVersionCode() {
-    def date = new Date()
-    return (int) (date.getTime() / 1000 / 60) // minutos desde epoch
+    def date = new Date().format('yyyyMMddHH')
+    return Integer.parseInt(date)
 }
 
 /**
