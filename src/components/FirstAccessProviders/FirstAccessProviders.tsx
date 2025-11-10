@@ -1,8 +1,7 @@
 import React, {ReactNode, useMemo} from 'react';
 import {AccessibilityProvider} from '../../contexts/AccessibilityContext';
-import {QueryClientProvider} from '@tanstack/react-query';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ExerciseProvider} from '../../contexts/ExerciseContext';
-import {QueryClient} from '@tanstack/react-query';
 import {DiaryProvider} from '../../contexts/DiaryContext';
 
 interface FirstAccessProvidersProps {
@@ -12,7 +11,18 @@ interface FirstAccessProvidersProps {
 const FirstAccessProviders: React.FC<FirstAccessProvidersProps> = ({
   children,
 }) => {
-  const queryClient = useMemo(() => new QueryClient(), []);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+    [],
+  );
   return (
     <AccessibilityProvider>
       <QueryClientProvider client={queryClient}>
