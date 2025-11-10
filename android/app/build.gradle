@@ -97,6 +97,29 @@ def getVersionName() {
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+def codegenModules = [
+        "../../node_modules/@react-native-async-storage/async-storage/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-date-picker/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-image-picker/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-gesture-handler/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-mmkv/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-reanimated/android/build/generated/source/codegen/jni",
+        "../../node_modules/react-native-worklets/android/build/generated/source/codegen/jni",
+]
+
+tasks.matching {
+    it.project == project && it.name in ["externalNativeBuildCleanDebug", "externalNativeBuildCleanRelease"]
+}.configureEach {
+    onlyIf {
+        def missing = codegenModules.findAll { !file(it).exists() }
+        if (!missing.isEmpty()) {
+            logger.lifecycle("Skipping ${it.path} because codegen artifacts are missing for: ${missing}")
+            return false
+        }
+        return true
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
