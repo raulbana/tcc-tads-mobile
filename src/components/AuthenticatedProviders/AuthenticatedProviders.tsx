@@ -12,12 +12,6 @@ interface AuthenticatedProvidersProps {
 const AuthenticatedProviders: React.FC<AuthenticatedProvidersProps> = ({
   children,
 }) => {
-  const {isLoggedIn} = useAuth();
-
-  if (!isLoggedIn) {
-    return <AccessibilityProvider>{children}</AccessibilityProvider>;
-  }
-
   return (
     <AccessibilityProvider>
       <ContentProvider>
