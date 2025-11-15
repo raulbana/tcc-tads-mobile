@@ -8,6 +8,7 @@ import CarouselSection from '../../../../../components/CarouselSection.tsx/Carou
 import UploadBox from '../UploadBox/UploadBox';
 import Button from '../../../../../components/Button/Button';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
+import {verticalScale} from '../../../../../utils/scales';
 
 interface UploadContentFormProps {
   parentScrollRef?: any;
@@ -82,6 +83,10 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 placeholder="Digite a descrição"
                 error={errors.description?.message}
                 label="Descrição"
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+                style={{minHeight: verticalScale(120)}}
               />
             )}
           />
@@ -115,7 +120,9 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 error={errors.subcontent?.message}
                 label="Subconteúdo"
                 multiline
-                numberOfLines={4}
+                numberOfLines={6}
+                textAlignVertical="top"
+                style={{minHeight: verticalScale(120)}}
               />
             )}
           />

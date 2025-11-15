@@ -37,3 +37,16 @@ export const GradientOverlay = styled(LinearGradient).attrs({
   bottom: 0;
   top: 0;
 `;
+
+export const ReportButtonContainer = styled.View`
+  position: absolute;
+  top: ${verticalScale(48)}px;
+  right: ${horizontalScale(16)}px;
+  z-index: 2;
+`;
+
+export const ReportButton = styled.TouchableOpacity`
+  align-items: center;
+  justify-content: center;
+  padding: ${verticalScale(8)}px;
+`;

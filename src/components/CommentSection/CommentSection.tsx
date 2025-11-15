@@ -16,10 +16,14 @@ export interface CommentSectionProps {
   onPressLike?: (commentId: string, liked: boolean) => void;
   onPressMore?: (commentId: string) => void;
   onPressReply?: (commentId: string) => void;
+  onLoadReplies?: (commentId: string) => void;
   replyTo?: string | null;
   replyText?: string;
   setReplyText?: (text: string) => void;
   setReplyTo?: (id: string | null) => void;
+  currentUserId?: string | null;
+  contentOwnerId?: string | null;
+  onRequestDelete?: (commentId: string) => void;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
@@ -31,10 +35,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onCommentTextChange,
   onPressLike,
   onPressMore,
+  onPressReply,
+  onLoadReplies,
   replyTo,
   replyText,
   setReplyText,
   setReplyTo,
+  currentUserId,
+  contentOwnerId,
+  onRequestDelete,
 }) => {
   const theme = useDynamicTheme();
 
@@ -84,9 +93,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           <Comment
             onPressLike={onPressLike}
             onPressMore={onPressMore}
-            onPressReply={id => setReplyTo && setReplyTo(id)}
+            onPressReply={onPressReply || (id => setReplyTo && setReplyTo(id))}
+            onLoadReplies={onLoadReplies}
             key={comment.id}
             comment={comment}
+            currentUserId={currentUserId}
+            contentOwnerId={contentOwnerId}
+            onRequestDelete={onRequestDelete}
           />
         ))
       ) : (

@@ -33,7 +33,7 @@ const ExerciseHome = () => {
     <ScreenContainer scrollable>
       <S.Container>
         <Label
-          text="Treinos"
+          text="Plano de Treinos"
           typography={theme.typography.title.b2}
           color={theme.colors.gray_08}
         />

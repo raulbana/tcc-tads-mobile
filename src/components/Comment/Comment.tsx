@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import {ChatCircle, DotsThree} from 'phosphor-react-native';
@@ -7,14 +7,19 @@ import {Comment as CommentType} from '../../types/content';
 import LikeButton from '../LikeButton/LikeButton';
 import useComment from './useComment';
 import {verticalScale} from '../../utils/scales';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export interface CommentProps {
   comment: CommentType;
   onPressLike?: (id: string, liked: boolean) => void;
   onPressReply?: (id: string) => void;
   onPressMore?: (id: string) => void;
+  onLoadReplies?: (id: string) => void;
   isReply?: boolean;
+  depthLevel?: number;
+  currentUserId?: string | null;
+  contentOwnerId?: string | null;
+  onRequestDelete?: (id: string) => void;
 }
 
 const Comment: React.FC<CommentProps> = ({
@@ -22,7 +27,12 @@ const Comment: React.FC<CommentProps> = ({
   onPressLike,
   onPressReply,
   onPressMore,
+  onLoadReplies,
   isReply = false,
+  depthLevel = 0,
+  currentUserId,
+  contentOwnerId,
+  onRequestDelete,
 }) => {
   const theme = useDynamicTheme();
 
@@ -39,10 +49,46 @@ const Comment: React.FC<CommentProps> = ({
   } = comment;
 
   const {toggleReplies, repliesVisible} = useComment();
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const normalizedCurrentUserId = currentUserId ?? '';
+  const normalizedContentOwnerId = contentOwnerId ?? '';
+  const authorId = comment.authorId?.toString() ?? '';
+  const canManage =
+    !!normalizedCurrentUserId &&
+    (normalizedCurrentUserId === authorId ||
+      normalizedCurrentUserId === normalizedContentOwnerId);
+
+  useEffect(() => {
+    if (!canManage && menuVisible) {
+      setMenuVisible(false);
+    }
+  }, [canManage, menuVisible]);
 
   const handleLike = () => onPressLike?.(id, !isLikedByCurrentUser);
   const handleReply = () => onPressReply?.(id);
-  const handleMore = () => onPressMore?.(id);
+  const handleMore = () => {
+    if (!canManage) return;
+    setMenuVisible(prev => !prev);
+    onPressMore?.(id);
+  };
+
+  const handleDelete = () => {
+    setMenuVisible(false);
+    onRequestDelete?.(id);
+  };
+
+  const handleToggleReplies = () => {
+    if (
+      !repliesVisible &&
+      repliesCount > 0 &&
+      (!replies || replies.length === 0) &&
+      onLoadReplies
+    ) {
+      onLoadReplies(id);
+    }
+    toggleReplies();
+  };
 
   return (
     <S.Container>
@@ -61,13 +107,32 @@ const Comment: React.FC<CommentProps> = ({
           <Label
             typography={theme.typography.paragraph.sm1}
             color={theme.colors.gray_06}
-            text={moment(createdAt).fromNow()}
+            text={moment.utc(createdAt).local().fromNow()}
           />
-          <S.IconButton
-            onPress={handleMore}
-            hitSlop={{top: 6, bottom: 6, left: 6, right: 6}}>
-            <DotsThree size={18} color={theme.colors.gray_06} weight="bold" />
-          </S.IconButton>
+          {canManage && (
+            <S.MenuWrapper>
+              {menuVisible && (
+                <S.Tooltip placement="above">
+                  <S.TooltipButton onPress={handleDelete}>
+                    <Label
+                      typography={theme.typography.paragraph.sm2}
+                      color={theme.colors.error}
+                      text="Excluir comentário"
+                    />
+                  </S.TooltipButton>
+                </S.Tooltip>
+              )}
+              <S.IconButton
+                onPress={handleMore}
+                hitSlop={{top: 6, bottom: 6, left: 6, right: 6}}>
+                <DotsThree
+                  size={18}
+                  color={theme.colors.gray_06}
+                  weight="bold"
+                />
+              </S.IconButton>
+            </S.MenuWrapper>
+          )}
         </S.HeaderRow>
 
         <Label
@@ -104,7 +169,9 @@ const Comment: React.FC<CommentProps> = ({
         </S.ActionsRow>
         {!repliesVisible && repliesCount > 0 && (
           <S.ReplyToggleContainer>
-            <S.ReplyToggleButton onPress={toggleReplies} activeOpacity={0.7}>
+            <S.ReplyToggleButton
+              onPress={handleToggleReplies}
+              activeOpacity={0.7}>
               <Label
                 typography={theme.typography.paragraph.sm2}
                 color={theme.colors.gray_06}
@@ -114,7 +181,7 @@ const Comment: React.FC<CommentProps> = ({
           </S.ReplyToggleContainer>
         )}
         {repliesVisible && replies && replies.length > 0 && (
-          <S.RepliesContainer>
+          <S.RepliesContainer isSecondLevel={depthLevel >= 1}>
             <>
               {replies.map(reply => (
                 <Comment
@@ -125,7 +192,12 @@ const Comment: React.FC<CommentProps> = ({
                   }}
                   onPressReply={onPressReply}
                   onPressMore={onPressMore}
-                  isReply
+                  onLoadReplies={onLoadReplies}
+                  isReply={depthLevel < 1}
+                  depthLevel={depthLevel + 1}
+                  currentUserId={currentUserId}
+                  contentOwnerId={contentOwnerId}
+                  onRequestDelete={onRequestDelete}
                 />
               ))}
             </>
@@ -138,7 +210,9 @@ const Comment: React.FC<CommentProps> = ({
               justifyContent: 'center',
               marginTop: verticalScale(8),
             }}>
-            <S.ReplyToggleButton onPress={toggleReplies} activeOpacity={0.7}>
+            <S.ReplyToggleButton
+              onPress={handleToggleReplies}
+              activeOpacity={0.7}>
               <Label
                 typography={theme.typography.paragraph.sb2}
                 color={theme.colors.gray_06}

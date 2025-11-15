@@ -13,8 +13,13 @@ import RestrictedAccess from '../RestrictedAccess/RestrictedAccess';
 
 const ContentHome = () => {
   const {isLoggedIn} = useAuth();
-  const {badgeList, contentCardList, navigateToCreateContent} =
-    useContentHome();
+  const {
+    badgeList,
+    contentCardList,
+    filteredContentCardList,
+    hasActiveFilters,
+    navigateToCreateContent,
+  } = useContentHome();
 
   const theme = useDynamicTheme();
 
@@ -42,38 +47,48 @@ const ContentHome = () => {
           }}
           sectionTitle="Categorias"
         />
-        <CarouselSection
-          carouselData={{
-            data: contentCardList,
-            itemWidth: 224,
-            renderItem: ({item}) => <ContentCard {...item} />,
-          }}
-          sectionTitle="Conteúdo X"
-        />
-        <CarouselSection
-          carouselData={{
-            data: contentCardList,
-            itemWidth: 224,
-            renderItem: ({item}) => <ContentCard {...item} />,
-          }}
-          sectionTitle="Conteúdo Y"
-        />
-        <CarouselSection
-          carouselData={{
-            data: contentCardList,
-            itemWidth: 224,
-            renderItem: ({item}) => <ContentCard {...item} />,
-          }}
-          sectionTitle="Conteúdo Z"
-        />
-        <CarouselSection
-          carouselData={{
-            data: contentCardList,
-            itemWidth: 224,
-            renderItem: ({item}) => <ContentCard {...item} />,
-          }}
-          sectionTitle="Conteúdo Z1"
-        />
+        {hasActiveFilters ? (
+          <S.FilteredList>
+            {filteredContentCardList.map(({id, ...card}) => (
+              <ContentCard key={id} {...card} />
+            ))}
+          </S.FilteredList>
+        ) : (
+          <>
+            <CarouselSection
+              carouselData={{
+                data: contentCardList,
+                itemWidth: 224,
+                renderItem: ({item}) => <ContentCard {...item} />,
+              }}
+              sectionTitle="Conteúdo X"
+            />
+            <CarouselSection
+              carouselData={{
+                data: contentCardList,
+                itemWidth: 224,
+                renderItem: ({item}) => <ContentCard {...item} />,
+              }}
+              sectionTitle="Conteúdo Y"
+            />
+            <CarouselSection
+              carouselData={{
+                data: contentCardList,
+                itemWidth: 224,
+                renderItem: ({item}) => <ContentCard {...item} />,
+              }}
+              sectionTitle="Conteúdo Z"
+            />
+            <CarouselSection
+              carouselData={{
+                data: contentCardList,
+                itemWidth: 224,
+                renderItem: ({item}) => <ContentCard {...item} />,
+              }}
+              sectionTitle="Conteúdo Z1"
+            />
+          </>
+        )}
       </S.Wrapper>
     </ScreenContainer>
   );

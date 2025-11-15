@@ -40,6 +40,7 @@ const Home = () => {
             onRedirectToAllExercises={handleNavigateToAllExercises}
             exercise={workoutPlan[0]?.workouts?.[0]?.exercises?.[0]}
             onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
+            showBadge={false}
           />
         )}
       </S.Container>

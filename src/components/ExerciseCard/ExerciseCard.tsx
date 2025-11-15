@@ -11,12 +11,14 @@ export interface ExerciseCardProps {
   exercise: Exercise;
   onPressPrimaryAction?: () => void;
   onPressSecondaryAction?: () => void;
+  showBadge?: boolean;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   onPressPrimaryAction,
   onPressSecondaryAction,
+  showBadge = false,
 }) => {
   const theme = useDynamicTheme();
 
@@ -31,9 +33,11 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             numberOfLines={2}
           />
         </S.TitleContainer>
-        <S.LabelContainer>
+        {showBadge && (
+            <S.LabelContainer>
           <ExerciseLabel type={exercise.status} />
         </S.LabelContainer>
+        )}
       </S.HeaderRow>
       <S.DataRow>
         <S.DataRowItem>

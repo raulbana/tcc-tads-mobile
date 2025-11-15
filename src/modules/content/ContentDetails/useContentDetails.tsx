@@ -5,6 +5,7 @@ import {RouteProp} from '@react-navigation/native';
 import {useAuth} from '../../../contexts/AuthContext';
 import {Comment} from '../../../types/content';
 import useContentQueries from '../services/contentQueryFactory';
+import contentServices from '../services/contentServices';
 
 function updateCommentById(
   comments: Comment[],
@@ -53,8 +54,81 @@ function addReplyUnderRoot(
         repliesCount: (root.repliesCount || 0) + 1,
       };
     }
+    if (root.replies && root.replies.length > 0) {
+      return {
+        ...root,
+        replies: addReplyUnderRoot(root.replies, rootId, newReply),
+      };
+    }
     return root;
   });
+}
+
+function organizeCommentsHierarchy(comments: Comment[]): Comment[] {
+  if (!comments || comments.length === 0) {
+    return [];
+  }
+
+  const replyIds = new Set<string>();
+
+  const collectAllReplyIds = (commentList: Comment[]) => {
+    commentList.forEach(comment => {
+      if (comment.replies && comment.replies.length > 0) {
+        comment.replies.forEach(reply => {
+          replyIds.add(reply.id);
+          if (reply.replies && reply.replies.length > 0) {
+            collectAllReplyIds([reply]);
+          }
+        });
+      }
+    });
+  };
+
+  collectAllReplyIds(comments);
+
+  const rootComments = comments.filter(comment => !replyIds.has(comment.id));
+
+  const organizeAndLimitDepth = (
+    commentList: Comment[],
+    depth: number = 0,
+  ): Comment[] => {
+    return commentList.map(comment => {
+      if (depth >= 2) {
+        return {
+          ...comment,
+          replies: [],
+        };
+      }
+
+      let organizedReplies: Comment[] = [];
+      if (comment.replies && comment.replies.length > 0) {
+        organizedReplies = organizeAndLimitDepth(comment.replies, depth + 1);
+      }
+
+      return {
+        ...comment,
+        replies: organizedReplies,
+      };
+    });
+  };
+
+  return organizeAndLimitDepth(rootComments);
+}
+
+function removeCommentById(comments: Comment[], commentId: string): Comment[] {
+  return comments
+    .filter(comment => comment.id !== commentId)
+    .map(comment => {
+      if (comment.replies && comment.replies.length > 0) {
+        const updatedReplies = removeCommentById(comment.replies, commentId);
+        return {
+          ...comment,
+          replies: updatedReplies,
+          repliesCount: updatedReplies.length,
+        };
+      }
+      return comment;
+    });
 }
 
 const useContentDetails = () => {
@@ -74,6 +148,8 @@ const useContentDetails = () => {
   const toggleRepostMutation = contentQueries.toggleRepost();
   const toggleSaveMutation = contentQueries.toggleSaveContent();
   const createCommentMutation = contentQueries.createComment();
+  const reportContentMutation = contentQueries.reportContent();
+  const deleteCommentMutation = contentQueries.deleteComment();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentText, setCommentText] = useState('');
@@ -81,10 +157,20 @@ const useContentDetails = () => {
   const [replyText, setReplyText] = useState('');
   const [imageCarouselVisible, setImageCarouselVisible] = useState(false);
   const [imageCarouselIndex, setImageCarouselIndex] = useState(0);
+  const [reportModalVisible, setReportModalVisible] = useState(false);
+  const [reportContentId, setReportContentId] = useState<string | null>(null);
+  const [deleteCommentModalVisible, setDeleteCommentModalVisible] =
+    useState(false);
+  const [commentPendingDeletion, setCommentPendingDeletion] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (content) {
-      setComments(content.comments || []);
+      const organizedComments = organizeCommentsHierarchy(
+        content.comments || [],
+      );
+      setComments(organizedComments);
     }
   }, [content]);
 
@@ -119,7 +205,7 @@ const useContentDetails = () => {
     try {
       await toggleSaveMutation.mutateAsync({
         contentId: content.id,
-        userId: user.id.toString(),
+        userId: user.id,
         control: !content.isSaved,
       });
     } catch (err) {
@@ -127,55 +213,46 @@ const useContentDetails = () => {
     }
   }, [content, user, toggleSaveMutation]);
 
-  const handleSendComment = useCallback(async () => {
-    if (!content || !commentText.trim() || !user) return;
+  const handleSendComment = useCallback(
+    async (text?: string, parentId?: string) => {
+      if (!content || !user) return;
 
-    if (replyTo) {
-      if (replyText.trim() === '') return;
-      const rootId = findRootCommentId(comments, replyTo) ?? replyTo;
+      const finalText = text !== undefined ? text : commentText;
+      const finalParentId = parentId !== undefined ? parentId : replyTo;
 
-      const newReply: Comment = {
-        id: Math.random().toString(36).substring(7),
-        contentId: contentId,
-        authorId: user.id.toString(),
-        authorName: user.name,
-        text: replyText,
-        likesCount: 0,
-        isLikedByCurrentUser: false,
-        repliesCount: 0,
-        replies: [],
-        authorImage:
-          user.profilePictureUrl || 'https://i.pravatar.cc/150?img=3',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+      if (!finalText.trim()) return;
 
-      setComments(prev => addReplyUnderRoot(prev, rootId, newReply));
-      setReplyTo(null);
-      setReplyText('');
-      return;
-    }
+      try {
+        await createCommentMutation.mutateAsync({
+          contentId: parseInt(contentId),
+          authorId: user.id,
+          text: finalText,
+          replyToCommentId: finalParentId ? parseInt(finalParentId) : undefined,
+        });
 
-    try {
-      await createCommentMutation.mutateAsync({
-        contentId: parseInt(contentId),
-        authorId: user.id,
-        text: commentText,
-      });
-      setCommentText('');
-    } catch (err) {
-      console.error('Error adding comment:', err);
-    }
-  }, [
-    content,
-    commentText,
-    replyTo,
-    replyText,
-    comments,
-    contentId,
-    user,
-    createCommentMutation,
-  ]);
+        if (finalParentId) {
+          setReplyText('');
+          setReplyTo(null);
+        } else {
+          setCommentText('');
+        }
+
+        await refetchContent({cancelRefetch: false});
+      } catch (err) {
+        console.error('Error adding comment:', err);
+      }
+    },
+    [
+      content,
+      commentText,
+      replyTo,
+      replyText,
+      contentId,
+      user,
+      createCommentMutation,
+      refetchContent,
+    ],
+  );
 
   const handleLikeComment = useCallback((commentId: string) => {
     setComments(prev =>
@@ -211,6 +288,101 @@ const useContentDetails = () => {
     refetchContent();
   }, [refetchContent]);
 
+  const handleLoadReplies = useCallback(async (commentId: string) => {
+    try {
+      const replies = await contentServices.getCommentReplies(commentId);
+      const limitDepth = (
+        commentList: Comment[],
+        depth: number = 0,
+      ): Comment[] => {
+        if (depth >= 2) {
+          return commentList.map(comment => ({
+            ...comment,
+            replies: [],
+          }));
+        }
+        return commentList.map(comment => ({
+          ...comment,
+          replies: comment.replies
+            ? limitDepth(comment.replies, depth + 1)
+            : [],
+        }));
+      };
+      const limitedReplies = limitDepth(replies, 1);
+      setComments(prev =>
+        updateCommentById(prev, commentId, comment => ({
+          ...comment,
+          replies: limitedReplies,
+        })),
+      );
+    } catch (err) {
+      console.error('Error loading replies:', err);
+    }
+  }, []);
+
+  const handleOpenReportModal = useCallback((contentId: string) => {
+    setReportContentId(contentId);
+    setReportModalVisible(true);
+  }, []);
+
+  const handleCloseReportModal = useCallback(() => {
+    setReportModalVisible(false);
+    setReportContentId(null);
+  }, []);
+
+  const handleReportContent = useCallback(
+    async (reason: string) => {
+      if (!reportContentId || !user) return;
+      try {
+        await reportContentMutation.mutateAsync({
+          contentId: reportContentId,
+          reason,
+          userId: user.id.toString(),
+        });
+        handleCloseReportModal();
+      } catch (err) {
+        console.error('Error reporting content:', err);
+        throw err;
+      }
+    },
+    [reportContentId, user, reportContentMutation, handleCloseReportModal],
+  );
+
+  const handleOpenDeleteCommentModal = useCallback((commentId: string) => {
+    setCommentPendingDeletion(commentId);
+    setDeleteCommentModalVisible(true);
+  }, []);
+
+  const handleCloseDeleteCommentModal = useCallback(() => {
+    setDeleteCommentModalVisible(false);
+    setCommentPendingDeletion(null);
+  }, []);
+
+  const handleConfirmDeleteComment = useCallback(async () => {
+    if (!commentPendingDeletion) return;
+    try {
+      await deleteCommentMutation.mutateAsync(commentPendingDeletion);
+      setComments(prev => removeCommentById(prev, commentPendingDeletion));
+      await refetchContent({cancelRefetch: false});
+    } catch (err) {
+      console.error('Error deleting comment:', err);
+    } finally {
+      handleCloseDeleteCommentModal();
+    }
+  }, [
+    commentPendingDeletion,
+    deleteCommentMutation,
+    handleCloseDeleteCommentModal,
+    refetchContent,
+  ]);
+
+  const currentUserId = user?.id ? user.id.toString() : null;
+  const authorId = content?.author?.id ? content.author.id.toString() : null;
+
+    useEffect(() => {
+      console.log(`content author ${JSON.stringify(content?.author)}`)
+    }, [authorId, currentUserId]);
+
   return {
     content,
     comments,
@@ -227,13 +399,16 @@ const useContentDetails = () => {
       toggleLikeMutation.isPending ||
       toggleRepostMutation.isPending ||
       toggleSaveMutation.isPending ||
-      createCommentMutation.isPending,
+      createCommentMutation.isPending ||
+      reportContentMutation.isPending ||
+      deleteCommentMutation.isPending,
     error:
       error?.message ||
       toggleLikeMutation.error?.message ||
       toggleRepostMutation.error?.message ||
       toggleSaveMutation.error?.message ||
-      createCommentMutation.error?.message,
+      createCommentMutation.error?.message ||
+      deleteCommentMutation.error?.message,
     handleToggleLike,
     handleToggleRepost,
     handleToggleSave,
@@ -244,7 +419,21 @@ const useContentDetails = () => {
     handleImagePress,
     handleCloseImageCarousel,
     handleRefresh,
+    handleLoadReplies,
+    handleOpenReportModal,
+    handleCloseReportModal,
+    handleReportContent,
+    reportModalVisible,
+    reportContentId,
+    isReporting: reportContentMutation.isPending,
     setImageCarouselIndex,
+    currentUserId,
+    handleOpenDeleteCommentModal,
+    handleCloseDeleteCommentModal,
+    handleConfirmDeleteComment,
+    isDeleteCommentModalVisible: deleteCommentModalVisible,
+    isDeletingComment: deleteCommentMutation.isPending,
+    authorId,
   };
 };
 

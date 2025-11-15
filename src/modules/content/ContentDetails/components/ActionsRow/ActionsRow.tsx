@@ -36,9 +36,6 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
       <S.RightActions>
         <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
         <SaveButton onPress={onSavePress} size={28} isSaved={isSaved} />
-        <S.RepostButtonContainer>
-          <RepostButton onPress={onRepostPress} isReposted={isReposted} />
-        </S.RepostButtonContainer>
       </S.RightActions>
     </S.ActionsRowContainer>
   );

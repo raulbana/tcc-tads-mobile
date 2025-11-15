@@ -1,8 +1,9 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
 import useContentQueries from '../services/contentQueryFactory';
+import {Content} from '../../../types/content';
 
 const useContentHome = () => {
   const {user} = useAuth();
@@ -22,6 +23,8 @@ const useContentHome = () => {
     error: categoriesError,
   } = contentQueries.getCategories();
 
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+
   const handleCardClick = useCallback(
     (contentId: string) => {
       navigate('Content', {screen: 'ContentDetails', params: {contentId}});
@@ -37,21 +40,63 @@ const useContentHome = () => {
     navigate('Content', {screen: 'ContentDetails', params: {contentId: '1'}});
   }, [navigate]);
 
-  const badgeList = useMemo(() => {
-    return categories.map(category => ({
-      content: category.name,
-    }));
-  }, [categories]);
+  const toggleCategorySelection = useCallback((categoryId: number) => {
+    setSelectedCategoryIds(prevIds =>
+      prevIds.includes(categoryId)
+        ? prevIds.filter(id => id !== categoryId)
+        : [...prevIds, categoryId],
+    );
+  }, []);
 
-  const contentCardList = useMemo(() => {
-    return contents.map(content => ({
+  const mapContentToCard = useCallback(
+    (content: Content) => ({
+      id: content.id,
       image: {uri: content.cover?.url},
-      badgeLabel: content?.categories?.length > 0 ? content.categories[0] : 'Sem categoria',
+      badgeLabel:
+        content?.categories?.length > 0
+          ? content.categories[0]
+          : 'Sem categoria',
       title: content.title,
       description: content.description,
       onClick: () => handleCardClick(content.id),
+    }),
+    [handleCardClick],
+  );
+
+  const badgeList = useMemo(() => {
+    return categories.map(category => ({
+      content: category.name,
+      onPress: () => toggleCategorySelection(category.id),
+      isActive: selectedCategoryIds.includes(category.id),
     }));
-  }, [contents, handleCardClick]);
+  }, [categories, selectedCategoryIds, toggleCategorySelection]);
+
+  const contentCardList = useMemo(() => {
+    return contents.map(mapContentToCard);
+  }, [contents, mapContentToCard]);
+
+  const selectedCategoryNames = useMemo(() => {
+    const categoryMap = new Map(categories.map(category => [category.id, category.name]));
+    return selectedCategoryIds
+      .map(id => categoryMap.get(id))
+      .filter((name): name is string => Boolean(name));
+  }, [categories, selectedCategoryIds]);
+
+  const hasActiveFilters = selectedCategoryIds.length > 0;
+
+  const filteredContentCardList = useMemo(() => {
+    if (!hasActiveFilters) {
+      return [];
+    }
+
+    const selectedNamesSet = new Set(selectedCategoryNames);
+
+    return contents
+      .filter(content =>
+        content.categories?.some(categoryName => selectedNamesSet.has(categoryName)),
+      )
+      .map(mapContentToCard);
+  }, [contents, hasActiveFilters, mapContentToCard, selectedCategoryNames]);
 
   const isLoading = isLoadingContents || isLoadingCategories;
   const error = contentsError?.message || categoriesError?.message;
@@ -59,6 +104,8 @@ const useContentHome = () => {
   return {
     badgeList,
     contentCardList,
+    filteredContentCardList,
+    hasActiveFilters,
     navigateToDetails,
     handleCardClick,
     navigateToCreateContent,

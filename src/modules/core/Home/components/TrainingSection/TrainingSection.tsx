@@ -10,12 +10,14 @@ interface TrainingSectionProps {
   onRedirectToTrainingDetails: () => void;
   onRedirectToAllExercises: () => void;
   exercise: Exercise;
+  showBadge?: boolean;
 }
 
 const TrainingSection: React.FC<TrainingSectionProps> = ({
   onRedirectToTrainingDetails,
   onRedirectToAllExercises,
   exercise,
+  showBadge = false,
 }) => {
   const theme = useDynamicTheme();
 
@@ -37,8 +39,9 @@ const TrainingSection: React.FC<TrainingSectionProps> = ({
       </S.Row>
       <ExerciseCard
         typeCard={'default'}
-        exercise={exercise}
+        exercise={exercise} 
         onPressPrimaryAction={onRedirectToTrainingDetails}
+        showBadge={showBadge}
       />
     </S.Wrapper>
   );
