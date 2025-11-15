@@ -34,9 +34,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           />
         </S.TitleContainer>
         {showBadge && (
-            <S.LabelContainer>
-          <ExerciseLabel type={exercise.status} />
-        </S.LabelContainer>
+          <S.LabelContainer>
+            <ExerciseLabel type={exercise.status} />
+          </S.LabelContainer>
         )}
       </S.HeaderRow>
       <S.DataRow>

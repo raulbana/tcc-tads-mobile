@@ -176,7 +176,10 @@ const ContentDetails = () => {
         transparent
         animationType="fade"
         visible={isDeleteCommentModalVisible}
-        onRequestClose={handleCloseDeleteCommentModal}>
+        onRequestClose={handleCloseDeleteCommentModal}
+        style={{flex: 1, justifyContent: 'center', alignItems: 'center', overflow: 'hidden'}}
+        presentationStyle="overFullScreen"
+        >
         <S.ModalOverlay>
           <S.ModalCard>
             <Label
@@ -191,7 +194,7 @@ const ContentDetails = () => {
             />
             <S.ModalActions>
               <Button
-                type="TERTIARY"
+                type="SECONDARY"
                 text="Cancelar"
                 onPress={handleCloseDeleteCommentModal}
                 disabled={isDeletingComment}

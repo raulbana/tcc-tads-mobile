@@ -41,7 +41,5 @@ export const ModalCard = styled.View`
 
 export const ModalActions = styled.View`
   width: 100%;
-  flex-direction: row;
-  justify-content: flex-end;
   gap: ${horizontalScale(12)}px;
 `;
