@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSection';
 import Label from '../../../components/Label/Label';
 import Loader from '../../../components/Loader/Loader';
@@ -12,8 +12,8 @@ import CommentSection from '../../../components/CommentSection/CommentSection';
 import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselModal';
 import ReportModal from '../../../components/ReportModal/ReportModal';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
-import {Modal, TouchableWithoutFeedback} from 'react-native';
-import Button from '../../../components/Button/Button';
+import DialogModal from '../../../components/DialogModal/DialogModal';
+import {LayoutChangeEvent, ScrollView} from 'react-native';
 
 const ContentDetails = () => {
   const {
@@ -55,11 +55,25 @@ const ContentDetails = () => {
   } = useContentDetails();
 
   const theme = useDynamicTheme();
+  const scrollRef = useRef<ScrollView | null>(null);
+  const commentInputOffsetRef = useRef(0);
+
+  const handleCommentSectionLayout = useCallback((event: LayoutChangeEvent) => {
+    commentInputOffsetRef.current = event.nativeEvent.layout.y;
+  }, []);
+
+  useEffect(() => {
+    if (replyTo && scrollRef.current) {
+      const targetOffset = Math.max(commentInputOffsetRef.current - 24, 0);
+      scrollRef.current.scrollTo({y: targetOffset, animated: true});
+    }
+  }, [replyTo]);
 
   return isLoading || !content ? (
     <Loader overlay />
   ) : (
     <ScreenContainer
+      ref={scrollRef}
       headerShown
       fullBleed
       scrollable
@@ -136,24 +150,26 @@ const ContentDetails = () => {
               : 'Sem categoria'
           }
         />
-        <CommentSection
-          comments={comments}
-          onCommentSend={handleSendComment}
-          onCommentTextChange={setCommentText}
-          commentText={commentText}
-          onPressLike={handleLikeComment}
-          onPressReply={handleReplyToComment}
-          onLoadReplies={handleLoadReplies}
-          disabled={false}
-          loading={false}
-          replyTo={replyTo}
-          replyText={replyText}
-          setReplyText={setReplyText}
-          setReplyTo={setReplyTo}
-          currentUserId={currentUserId}
-          contentOwnerId={authorId}
-          onRequestDelete={handleOpenDeleteCommentModal}
-        />
+        <S.CommentSectionAnchor onLayout={handleCommentSectionLayout}>
+          <CommentSection
+            comments={comments}
+            onCommentSend={handleSendComment}
+            onCommentTextChange={setCommentText}
+            commentText={commentText}
+            onPressLike={handleLikeComment}
+            onPressReply={handleReplyToComment}
+            onLoadReplies={handleLoadReplies}
+            disabled={false}
+            loading={false}
+            replyTo={replyTo}
+            replyText={replyText}
+            setReplyText={setReplyText}
+            setReplyTo={setReplyTo}
+            currentUserId={currentUserId}
+            contentOwnerId={authorId}
+            onRequestDelete={handleOpenDeleteCommentModal}
+          />
+        </S.CommentSectionAnchor>
       </S.Wrapper>
       <ImageCarouselModal
         images={
@@ -172,53 +188,24 @@ const ContentDetails = () => {
         onReport={handleReportContent}
         isLoading={isReporting}
       />
-      <Modal
-        transparent
-        animationType="fade"
+      <DialogModal
         visible={isDeleteCommentModalVisible}
-        onRequestClose={handleCloseDeleteCommentModal}
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          overflow: 'hidden',
+        onClose={handleCloseDeleteCommentModal}
+        title="Excluir comentário"
+        description="Tem certeza que deseja excluir este comentário? Essa ação não pode ser desfeita."
+        secondaryButton={{
+          label: 'Cancelar',
+          onPress: handleCloseDeleteCommentModal,
+          disabled: isDeletingComment,
+          type: 'SECONDARY',
         }}
-        presentationStyle="overFullScreen">
-        <TouchableWithoutFeedback onPress={handleCloseDeleteCommentModal}>
-          <S.ModalOverlay>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <S.ModalCard>
-                <Label
-                  typography={theme.typography.title.b3}
-                  color={theme.colors.gray_08}
-                  text="Excluir comentário"
-                />
-                <Label
-                  typography={theme.typography.paragraph.r2}
-                  color={theme.colors.gray_06}
-                  text="Tem certeza que deseja excluir este comentário? Essa ação não pode ser desfeita."
-                />
-                <S.ModalActions>
-                  <Button
-                    type="SECONDARY"
-                    text="Cancelar"
-                    size="SMALL"
-                    onPress={handleCloseDeleteCommentModal}
-                    disabled={isDeletingComment}
-                  />
-                  <Button
-                    type="PRIMARY"
-                    text="Excluir"
-                    size="SMALL"
-                    onPress={handleConfirmDeleteComment}
-                    loading={isDeletingComment}
-                  />
-                </S.ModalActions>
-              </S.ModalCard>
-            </TouchableWithoutFeedback>
-          </S.ModalOverlay>
-        </TouchableWithoutFeedback>
-      </Modal>
+        primaryButton={{
+          label: 'Excluir',
+          onPress: handleConfirmDeleteComment,
+          loading: isDeletingComment,
+          type: 'PRIMARY',
+        }}
+      />
     </ScreenContainer>
   );
 };

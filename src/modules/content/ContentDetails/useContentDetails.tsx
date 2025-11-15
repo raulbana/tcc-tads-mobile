@@ -219,6 +219,9 @@ const useContentDetails = () => {
 
       const finalText = text !== undefined ? text : commentText;
       const finalParentId = parentId !== undefined ? parentId : replyTo;
+      const resolvedParentId = finalParentId
+        ? findRootCommentId(comments, finalParentId) ?? finalParentId
+        : undefined;
 
       if (!finalText.trim()) return;
 
@@ -227,7 +230,9 @@ const useContentDetails = () => {
           contentId: parseInt(contentId),
           authorId: user.id,
           text: finalText,
-          replyToCommentId: finalParentId ? parseInt(finalParentId) : undefined,
+          replyToCommentId: resolvedParentId
+            ? parseInt(resolvedParentId)
+            : undefined,
         });
 
         if (finalParentId) {
@@ -247,6 +252,7 @@ const useContentDetails = () => {
       commentText,
       replyTo,
       replyText,
+      comments,
       contentId,
       user,
       createCommentMutation,
@@ -266,9 +272,13 @@ const useContentDetails = () => {
     );
   }, []);
 
-  const handleReplyToComment = useCallback((commentId: string) => {
-    setReplyTo(commentId);
-  }, []);
+  const handleReplyToComment = useCallback(
+    (commentId: string) => {
+      const rootId = findRootCommentId(comments, commentId) ?? commentId;
+      setReplyTo(rootId);
+    },
+    [comments],
+  );
 
   const handleCancelReply = useCallback(() => {
     setReplyTo(null);
