@@ -12,7 +12,7 @@ import CommentSection from '../../../components/CommentSection/CommentSection';
 import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselModal';
 import ReportModal from '../../../components/ReportModal/ReportModal';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
-import {Modal} from 'react-native';
+import {Modal, TouchableWithoutFeedback} from 'react-native';
 import Button from '../../../components/Button/Button';
 
 const ContentDetails = () => {
@@ -177,37 +177,47 @@ const ContentDetails = () => {
         animationType="fade"
         visible={isDeleteCommentModalVisible}
         onRequestClose={handleCloseDeleteCommentModal}
-        style={{flex: 1, justifyContent: 'center', alignItems: 'center', overflow: 'hidden'}}
-        presentationStyle="overFullScreen"
-        >
-        <S.ModalOverlay>
-          <S.ModalCard>
-            <Label
-              typography={theme.typography.title.b3}
-              color={theme.colors.gray_08}
-              text="Excluir comentário"
-            />
-            <Label
-              typography={theme.typography.paragraph.r2}
-              color={theme.colors.gray_06}
-              text="Tem certeza que deseja excluir este comentário? Essa ação não pode ser desfeita."
-            />
-            <S.ModalActions>
-              <Button
-                type="SECONDARY"
-                text="Cancelar"
-                onPress={handleCloseDeleteCommentModal}
-                disabled={isDeletingComment}
-              />
-              <Button
-                type="PRIMARY"
-                text="Excluir"
-                onPress={handleConfirmDeleteComment}
-                loading={isDeletingComment}
-              />
-            </S.ModalActions>
-          </S.ModalCard>
-        </S.ModalOverlay>
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
+        }}
+        presentationStyle="overFullScreen">
+        <TouchableWithoutFeedback onPress={handleCloseDeleteCommentModal}>
+          <S.ModalOverlay>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <S.ModalCard>
+                <Label
+                  typography={theme.typography.title.b3}
+                  color={theme.colors.gray_08}
+                  text="Excluir comentário"
+                />
+                <Label
+                  typography={theme.typography.paragraph.r2}
+                  color={theme.colors.gray_06}
+                  text="Tem certeza que deseja excluir este comentário? Essa ação não pode ser desfeita."
+                />
+                <S.ModalActions>
+                  <Button
+                    type="SECONDARY"
+                    text="Cancelar"
+                    size="SMALL"
+                    onPress={handleCloseDeleteCommentModal}
+                    disabled={isDeletingComment}
+                  />
+                  <Button
+                    type="PRIMARY"
+                    text="Excluir"
+                    size="SMALL"
+                    onPress={handleConfirmDeleteComment}
+                    loading={isDeletingComment}
+                  />
+                </S.ModalActions>
+              </S.ModalCard>
+            </TouchableWithoutFeedback>
+          </S.ModalOverlay>
+        </TouchableWithoutFeedback>
       </Modal>
     </ScreenContainer>
   );
