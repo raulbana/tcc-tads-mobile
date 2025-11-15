@@ -1,11 +1,12 @@
 import React from 'react';
-import {Image, TouchableOpacity, Alert} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
 import {Camera, Trash} from 'phosphor-react-native';
 import Label from '../../../../../components/Label/Label';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 import AnonymousUserProfileImage from '../../../../../assets/illustrations/anonymous_user.svg';
 import * as S from './styles';
 import {useProfileImageUpload} from '../../hooks/useProfileImageUpload';
+import useDialogModal from '../../../../../hooks/useDialogModal';
 
 export interface ProfilePictureSectionProps {
   currentPicture?: string;
@@ -23,8 +24,9 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   onRemovePicture,
 }) => {
   const theme = useDynamicTheme();
+  const {DialogPortal, showDialog} = useDialogModal();
   const {selectedImage, error, pickImage, removeImage} =
-    useProfileImageUpload();
+    useProfileImageUpload({showDialog});
 
   const displayImage = selectedImage?.uri || currentPicture;
   const hasProfilePicture = displayImage && displayImage.trim() !== '';
@@ -44,24 +46,21 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   }, [selectedImage]);
 
   const handleRemovePicture = () => {
-    Alert.alert(
-      'Remover Foto',
-      'Tem certeza que deseja remover a foto do perfil?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
+    showDialog({
+      title: 'Remover Foto',
+      description: 'Tem certeza que deseja remover a foto do perfil?',
+      secondaryButton: {
+        label: 'Cancelar',
+        onPress: () => {},
+      },
+      primaryButton: {
+        label: 'Remover',
+        onPress: () => {
+          removeImage();
+          onRemovePicture();
         },
-        {
-          text: 'Remover',
-          style: 'destructive',
-          onPress: () => {
-            removeImage();
-            onRemovePicture();
-          },
-        },
-      ],
-    );
+      },
+    });
   };
 
   return (
@@ -107,6 +106,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
           text={error}
         />
       )}
+      {DialogPortal}
     </S.Container>
   );
 };

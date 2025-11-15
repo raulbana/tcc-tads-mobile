@@ -32,6 +32,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
     categoriesList,
     isLoading,
     uploadError,
+    DialogPortal,
   } = useUploadContentForm();
 
   const theme = useDynamicTheme();
@@ -149,6 +150,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
           disabled={isLoading}
         />
       </S.ButtonContainer>
+      {DialogPortal}
     </S.Container>
   );
 };

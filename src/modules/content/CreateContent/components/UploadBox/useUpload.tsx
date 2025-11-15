@@ -1,6 +1,6 @@
 import {useState, useRef, useCallback} from 'react';
-import {Alert} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {DialogOptions} from '../../../../../hooks/useDialogModal';
 
 export type UploadFile = {
   id: string;
@@ -10,13 +10,19 @@ export type UploadFile = {
   fileSize: number;
 };
 
+interface UseUploadOptions {
+  showDialog?: (options: DialogOptions) => void;
+}
+
 export function useUpload(
   allowedTypes: ('image' | 'video')[] = ['image', 'video'],
+  options?: UseUploadOptions,
 ) {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [error, setError] = useState<string>('');
   const [totalFileSize, setTotalFileSize] = useState<number>(0);
   const listRef = useRef<any>(null);
+  const showDialog = options?.showDialog;
 
   const pickFile = useCallback(async () => {
     try {
@@ -32,29 +38,42 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
-      
       const MAX_FILE_SIZE = 500 * 1024 * 1024;
       if (asset.fileSize && asset.fileSize + totalFileSize > MAX_FILE_SIZE) {
         const totalFileSizeMB = (totalFileSize / 1024 / 1024).toFixed(2);
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
         const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 500MB total por post (${totalFileSizeMB}MB)`;
         setError(errorMsg);
-        Alert.alert('Arquivo muito grande', errorMsg);
+        showDialog?.({
+          title: 'Arquivo muito grande',
+          description: errorMsg,
+          primaryButton: {
+            label: 'Entendi',
+            onPress: () => {},
+          },
+        });
         return;
       }
-      
+
       const isVideo = asset.type?.startsWith('video');
-      
+
       if (isVideo) {
         const hasVideo = files.some(file => file.type.startsWith('video'));
         if (hasVideo) {
           const errorMsg = 'Apenas 1 vídeo é permitido por post';
           setError(errorMsg);
-          Alert.alert('Limite de vídeos atingido', errorMsg);
+          showDialog?.({
+            title: 'Limite de vídeos atingido',
+            description: errorMsg,
+            primaryButton: {
+              label: 'Entendi',
+              onPress: () => {},
+            },
+          });
           return;
         }
       }
-      
+
       const newFile: UploadFile = {
         id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         uri: asset.uri!,
@@ -62,20 +81,29 @@ export function useUpload(
         fileName: asset.fileName!,
         fileSize: asset.fileSize!,
       };
-      
+
       if (isVideo) {
         setFiles(prevFiles => [...prevFiles, newFile]);
       } else {
         setFiles(prevFiles => [newFile, ...prevFiles]);
       }
-      setTotalFileSize(prevTotalFileSize => prevTotalFileSize + asset.fileSize!);
+      setTotalFileSize(
+        prevTotalFileSize => prevTotalFileSize + asset.fileSize!,
+      );
       setError('');
     } catch (err) {
       const errorMsg = 'Não foi possível carregar o arquivo';
       setError(errorMsg);
-      Alert.alert('Erro', errorMsg);
+      showDialog?.({
+        title: 'Erro',
+        description: errorMsg,
+        primaryButton: {
+          label: 'Ok',
+          onPress: () => {},
+        },
+      });
     }
-  }, [allowedTypes, files]);
+  }, [allowedTypes, files, showDialog, totalFileSize]);
 
   const removeFile = useCallback((id: string) => {
     setFiles(prevFiles => prevFiles.filter(file => file.id !== id));

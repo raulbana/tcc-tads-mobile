@@ -11,7 +11,8 @@ import DraggableFlatList, {
 import {
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
-import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
+import useDialogModal from '../../../../../hooks/useDialogModal';
 
 interface UploadBoxProps {
   allowedTypes?: ('image' | 'video')[];
@@ -33,8 +34,9 @@ const UploadBox: React.FC<UploadBoxProps> = ({
   parentScrollRef,
   externalError,
 }) => {
+  const {DialogPortal, showDialog} = useDialogModal();
   const {files, pickFile, removeFile, reorderFiles, listRef, error} =
-    useUpload(allowedTypes);
+    useUpload(allowedTypes, {showDialog});
 
   const displayError = externalError || error;
 
@@ -210,6 +212,7 @@ const UploadBox: React.FC<UploadBoxProps> = ({
           </S.ListContainer>
         </>
       )}
+      {DialogPortal}
     </S.Wrapper>
   );
 };

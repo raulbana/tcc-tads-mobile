@@ -1,11 +1,11 @@
 import {useState, useCallback} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {Alert} from 'react-native';
 import {useAuth} from '../../../contexts/AuthContext';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {Content} from '../../../types/content';
 import {ContentTab} from './components/ContentTabs/ContentTabs';
 import useProfileQueries from './services/profileQueryFactory';
+import useDialogModal from '../../../hooks/useDialogModal';
 
 const useProfile = () => {
   const {user} = useAuth();
@@ -30,34 +30,50 @@ const useProfile = () => {
 
   const deleteContentMutation = profileQueries.useDeleteContent();
   const unsaveContentMutation = profileQueries.useUnsaveContent();
+  const {DialogPortal, showDialog} = useDialogModal();
 
   const handleDeletePost = useCallback(
     async (postId: string) => {
-      Alert.alert(
-        'Excluir Postagem',
-        'Tem certeza que deseja excluir esta postagem? Esta ação não pode ser desfeita.',
-        [
-          {
-            text: 'Cancelar',
-            style: 'cancel',
+      showDialog({
+        title: 'Excluir Postagem',
+        description:
+          'Tem certeza que deseja excluir esta postagem? Esta ação não pode ser desfeita.',
+        secondaryButton: {
+          label: 'Cancelar',
+          onPress: () => {},
+        },
+        primaryButton: {
+          label: 'Excluir',
+          onPress: async () => {
+            try {
+              await deleteContentMutation.mutateAsync(postId);
+              showDialog({
+                title: 'Sucesso',
+                description: 'Postagem excluída com sucesso!',
+                primaryButton: {
+                  label: 'OK',
+                  onPress: () => {},
+                },
+              });
+            } catch (error) {
+              console.error('Error deleting post:', error);
+              showDialog({
+                title: 'Erro',
+                description: 'Ocorreu um erro ao excluir a postagem.',
+                primaryButton: {
+                  label: 'OK',
+                  onPress: () => {},
+                },
+              });
+            }
           },
-          {
-            text: 'Excluir',
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                await deleteContentMutation.mutateAsync(postId);
-                Alert.alert('Sucesso', 'Postagem excluída com sucesso!');
-              } catch (error) {
-                console.error('Error deleting post:', error);
-                Alert.alert('Erro', 'Ocorreu um erro ao excluir a postagem.');
-              }
-            },
-          },
-        ],
-      );
+          type: 'PRIMARY',
+          autoClose: true,
+        },
+        dismissOnBackdropPress: false,
+      });
     },
-    [deleteContentMutation],
+    [deleteContentMutation, showDialog],
   );
 
   const handleEditProfile = useCallback(() => {
@@ -66,31 +82,43 @@ const useProfile = () => {
 
   const handleUnsaveContent = useCallback(
     async (contentId: string) => {
-      Alert.alert(
-        'Remover dos Salvos',
-        'Tem certeza que deseja remover este conteúdo dos salvos?',
-        [
-          {
-            text: 'Cancelar',
-            style: 'cancel',
+      showDialog({
+        title: 'Remover dos Salvos',
+        description: 'Tem certeza que deseja remover este conteúdo dos salvos?',
+        secondaryButton: {
+          label: 'Cancelar',
+          onPress: () => {},
+        },
+        primaryButton: {
+          label: 'Remover',
+          onPress: async () => {
+            try {
+              await unsaveContentMutation.mutateAsync(contentId);
+              showDialog({
+                title: 'Sucesso',
+                description: 'Conteúdo removido dos salvos!',
+                primaryButton: {
+                  label: 'OK',
+                  onPress: () => {},
+                },
+              });
+            } catch (error) {
+              console.error('Error unsaving content:', error);
+              showDialog({
+                title: 'Erro',
+                description: 'Ocorreu um erro ao remover o conteúdo.',
+                primaryButton: {
+                  label: 'OK',
+                  onPress: () => {},
+                },
+              });
+            }
           },
-          {
-            text: 'Remover',
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                await unsaveContentMutation.mutateAsync(contentId);
-                Alert.alert('Sucesso', 'Conteúdo removido dos salvos!');
-              } catch (error) {
-                console.error('Error unsaving content:', error);
-                Alert.alert('Erro', 'Ocorreu um erro ao remover o conteúdo.');
-              }
-            },
-          },
-        ],
-      );
+        },
+        dismissOnBackdropPress: false,
+      });
     },
-    [unsaveContentMutation],
+    [unsaveContentMutation, showDialog],
   );
 
   const handleEditContent = useCallback(
@@ -148,6 +176,7 @@ const useProfile = () => {
     handleContentPress,
     handleTabChange,
     error,
+    DialogPortal,
   };
 };
 

@@ -1,7 +1,6 @@
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useCallback, useState, useEffect, useMemo} from 'react';
-import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
@@ -12,13 +11,15 @@ import {
 } from './schema/uploadContentSchema';
 import {UploadFile} from './UploadBox/useUpload';
 import useContentQueries from '../../../../content/services/contentQueryFactory';
-import { useAuth } from '../../../../../contexts/AuthContext';
+import {useAuth} from '../../../../../contexts/AuthContext';
+import useDialogModal from '../../../../../hooks/useDialogModal';
 
 const useUploadContentForm = (initialContent?: Content | null) => {
   const navigation = useNavigation<NavigationStackProp>();
   const theme = useDynamicTheme();
-  const { user } = useAuth();
-  
+  const {user} = useAuth();
+  const {DialogPortal, showDialog} = useDialogModal();
+
   const {
     control,
     handleSubmit,
@@ -187,15 +188,18 @@ const useUploadContentForm = (initialContent?: Content | null) => {
             subtitle: data.subtitle || '',
             subcontent: data.subcontent || '',
           },
-            userId: user?.id.toString() || '', 
-          });
+          userId: user?.id.toString() || '',
+        });
 
-        Alert.alert('Sucesso', 'Post atualizado com sucesso!', [
-          {
-            text: 'OK',
+        showDialog({
+          title: 'Sucesso',
+          description: 'Post atualizado com sucesso!',
+          primaryButton: {
+            label: 'OK',
             onPress: () => navigation.goBack(),
           },
-        ]);
+          dismissOnBackdropPress: false,
+        });
       } catch (error) {
         setUploadError('Erro ao atualizar o post. Tente novamente.');
       } finally {
@@ -206,21 +210,19 @@ const useUploadContentForm = (initialContent?: Content | null) => {
   );
 
   const handleCancel = useCallback(() => {
-    Alert.alert(
-      'Descartar Alterações',
-      'Você tem certeza que deseja descartar as alterações?',
-      [
-        {
-          text: 'Não',
-          style: 'cancel',
-        },
-        {
-          text: 'Sim',
-          onPress: () => navigation.goBack(),
-        },
-      ],
-    );
-  }, [navigation]);
+    showDialog({
+      title: 'Descartar Alterações',
+      description: 'Você tem certeza que deseja descartar as alterações?',
+      secondaryButton: {
+        label: 'Não',
+        onPress: () => {},
+      },
+      primaryButton: {
+        label: 'Sim',
+        onPress: () => navigation.goBack(),
+      },
+    });
+  }, [navigation, showDialog]);
 
   return {
     control,
@@ -237,6 +239,7 @@ const useUploadContentForm = (initialContent?: Content | null) => {
     handleCategoryToggle,
     title: watch('title') || '',
     description: watch('description') || '',
+    DialogPortal,
   };
 };
 
