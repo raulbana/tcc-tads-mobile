@@ -379,10 +379,6 @@ const useContentDetails = () => {
   const currentUserId = user?.id ? user.id.toString() : null;
   const authorId = content?.author?.id ? content.author.id.toString() : null;
 
-    useEffect(() => {
-      console.log(`content author ${JSON.stringify(content?.author)}`)
-    }, [authorId, currentUserId]);
-
   return {
     content,
     comments,
