@@ -1,7 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -128,7 +127,7 @@ android {
 
     namespace "com.dailyiu"
     defaultConfig {
-        applicationId "com.dailyiu"
+        applicationId "com.dailyiu.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode getVersionCode()
@@ -190,3 +189,6 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// Apply Google Services plugin at the end of the file
+apply plugin: "com.google.gms.google-services"
