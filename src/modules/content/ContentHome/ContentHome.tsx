@@ -58,13 +58,13 @@ const ContentHome = () => {
           <>
             {contentSections.length > 0 ? (
               contentSections.map((section) => (
-                <CarouselSection
+            <CarouselSection
                   key={section.title}
-                  carouselData={{
+              carouselData={{
                     data: section.contents,
-                    itemWidth: 224,
-                    renderItem: ({item}) => <ContentCard {...item} />,
-                  }}
+                itemWidth: 224,
+                renderItem: ({item}) => <ContentCard {...item} />,
+              }}
                   sectionTitle={section.title}
                 />
               ))

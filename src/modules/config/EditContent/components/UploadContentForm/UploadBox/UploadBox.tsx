@@ -44,10 +44,6 @@ const UploadBox: React.FC<UploadBoxProps> = ({
 
   const displayError = externalError || error;
 
-  useEffect(() => {
-    onUpdateFiles(files);
-  }, [files, onUpdateFiles]);
-
   const theme = useDynamicTheme();
 
   const renderUpload = useCallback(
@@ -211,6 +207,7 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                   }
                   reorderFiles(data);
                   onReorderFiles(data);
+                  onUpdateFiles(data);
                 }}
               />
             </GestureHandlerRootView>

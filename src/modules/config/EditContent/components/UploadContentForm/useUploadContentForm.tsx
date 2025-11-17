@@ -1,6 +1,6 @@
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useCallback, useState, useEffect, useMemo} from 'react';
+import {useCallback, useState, useEffect, useMemo, useRef} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
@@ -13,6 +13,7 @@ import {UploadFile} from './UploadBox/useUpload';
 import useContentQueries from '../../../../content/services/contentQueryFactory';
 import {useAuth} from '../../../../../contexts/AuthContext';
 import useDialogModal from '../../../../../hooks/useDialogModal';
+import contentServices from '../../../../content/services/contentServices';
 
 const useUploadContentForm = (initialContent?: Content | null) => {
   const navigation = useNavigation<NavigationStackProp>();
@@ -40,6 +41,16 @@ const useUploadContentForm = (initialContent?: Content | null) => {
   });
 
   const [filesList, setFilesList] = useState<UploadFile[]>([]);
+  const [existingMedia, setExistingMedia] = useState<
+    Array<{
+      id?: number | null;
+      url: string;
+      contentType: string;
+      contentSize: number;
+      altText?: string | null;
+    }>
+  >([]);
+  const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
 
@@ -48,6 +59,7 @@ const useUploadContentForm = (initialContent?: Content | null) => {
     contentQueries.getCategories();
 
   const {mutateAsync: updateContent} = contentQueries.updateContent();
+  const {mutateAsync: uploadMedia} = contentQueries.uploadMedia();
 
   const filteredCategories = useMemo(() => {
     const userRole = user?.role?.toUpperCase();
@@ -69,61 +81,32 @@ const useUploadContentForm = (initialContent?: Content | null) => {
     }));
   }, [filteredCategories, theme.colors]);
 
+  const prevInitialContentIdRef = useRef<string>('');
+
   useEffect(() => {
-    if (initialContent) {
+    if (
+      initialContent &&
+      initialContent.id !== prevInitialContentIdRef.current
+    ) {
+      prevInitialContentIdRef.current = initialContent.id;
       setValue('title', initialContent.title);
       setValue('description', initialContent.description || '');
       setValue('subtitle', initialContent.subtitle || '');
       setValue('subcontent', initialContent.subcontent || '');
-      if (initialContent.media && initialContent.media.length > 0) {
-        const imageFiles: UploadFile[] = initialContent.media
-          .filter(media => media.contentType.startsWith('image/'))
-          .map(media => ({
-            id: media.url,
-            uri: media.url,
-            type: media.contentType,
-            fileName: media.altText,
-            fileSize: media.contentSize,
-          }));
-        setFilesList(prev => [...prev, ...imageFiles]);
-        setValue(
-          'images',
-          imageFiles.map(f => f.uri),
-        );
-      }
-      if (
-        initialContent.media.find(media =>
-          media.contentType.startsWith('video/'),
-        )
-      ) {
-        const videoFile: UploadFile = {
-          id: 'video-0',
-          uri:
-            initialContent.media.find(media =>
-              media.contentType.startsWith('video/'),
-            )?.url || '',
-          type:
-            initialContent.media.find(media =>
-              media.contentType.startsWith('video/'),
-            )?.contentType || '',
-          fileName:
-            initialContent.media.find(media =>
-              media.contentType.startsWith('video/'),
-            )?.altText || '',
-          fileSize:
-            initialContent.media.find(media =>
-              media.contentType.startsWith('video/'),
-            )?.contentSize || 0,
-        };
-        setFilesList(prev => [...prev, videoFile]);
-        setValue('video', videoFile.uri);
-      }
+
+      const mediaArray = Array.isArray(initialContent.media)
+        ? initialContent.media
+        : [];
+      setExistingMedia(mediaArray);
+      setRemovedMediaIds([]);
+      setFilesList([]);
+
       if (initialContent.categories && initialContent.categories.length > 0) {
         const categoryArray = initialContent.categories;
         setValue('categories', categoryArray);
       }
     }
-  }, [initialContent, setValue]);
+  }, [initialContent?.id, setValue]);
 
   useEffect(() => {
     if (initialContent?.categories && initialContent.categories.length > 0) {
@@ -136,42 +119,50 @@ const useUploadContentForm = (initialContent?: Content | null) => {
 
   const handleRemoveFile = useCallback(
     (file: UploadFile) => {
-      setFilesList(prev => {
-        const updatedList = prev.filter(f => f.id !== file.id);
-        const images = updatedList
-          .filter(f => f.type.startsWith('image'))
-          .map(f => f.uri);
-        setValue('images', images);
+      const isExistingMedia = existingMedia.some(m => m.url === file.uri);
 
-        const videoFile = updatedList.find(f => f.type.startsWith('video'));
-        setValue('video', videoFile?.uri || '');
-
-        return updatedList;
-      });
+      if (isExistingMedia) {
+        const mediaToRemove = existingMedia.find(m => m.url === file.uri);
+        if (mediaToRemove?.id) {
+          setRemovedMediaIds(prev => [...prev, mediaToRemove.id!]);
+          setExistingMedia(prev => prev.filter(m => m.id !== mediaToRemove.id));
+        }
+      } else {
+        setFilesList(prev => {
+          const updatedList = prev.filter(f => f.id !== file.id);
+          return updatedList;
+        });
+      }
     },
-    [setValue],
+    [existingMedia],
   );
 
   const handleUpdateFiles = useCallback(
     (files: UploadFile[]) => {
-      setFilesList(files);
-      const images = files
-        .filter(f => f.type.startsWith('image'))
-        .map(f => f.uri);
-      setValue('images', images);
+      const existingFiles = files.filter(file =>
+        existingMedia.some(m => m.url === file.uri),
+      );
+      const newFiles = files.filter(
+        file => !existingMedia.some(m => m.url === file.uri),
+      );
 
-      const videoFile = files.find(f => f.type.startsWith('video'));
-      if (videoFile && videoFile.uri) {
-        setValue('video', videoFile.uri);
-      } else {
-        setValue('video', '');
-      }
+      const reorderedExistingMedia = existingFiles
+        .map(file => {
+          const media = existingMedia.find(m => m.url === file.uri);
+          return media;
+        })
+        .filter(
+          (media): media is NonNullable<typeof media> => media !== undefined,
+        );
+
+      setExistingMedia(reorderedExistingMedia);
+      setFilesList(newFiles);
 
       if (files.length > 0) {
         setUploadError('');
       }
     },
-    [setValue],
+    [existingMedia],
   );
 
   const handleCategoryToggle = useCallback(
@@ -212,6 +203,64 @@ const useUploadContentForm = (initialContent?: Content | null) => {
         setIsLoading(true);
         setUploadError('');
 
+        let uploadedMedia: Array<{
+          url: string;
+          contentType: string;
+          contentSize: number;
+          altText?: string;
+        }> = [];
+
+        const newFiles = filesList.filter(
+          file => !existingMedia.some(m => m.url === file.uri),
+        );
+
+        if (newFiles.length > 0) {
+          const formData = new FormData();
+          newFiles.forEach((file, index) => {
+            formData.append('files', {
+              uri: file.uri,
+              name: file.fileName || `upload_${index}`,
+              type: file.type.startsWith('video') ? 'video/mp4' : 'image/jpeg',
+            } as any);
+          });
+
+          const uploadRes: any = await uploadMedia(formData);
+
+          uploadedMedia = Array.isArray(uploadRes?.media)
+            ? uploadRes.media
+            : Array.isArray(uploadRes)
+            ? uploadRes
+            : [];
+        }
+
+        const newMediaArray = uploadedMedia.map(m => ({
+          url: m.url,
+          contentType: m.contentType || 'image/jpeg',
+          contentSize: m.contentSize || 0,
+          altText: m.altText || data.title,
+        }));
+
+        const keptExistingMedia = existingMedia
+          .filter(media => {
+            if (media.id === null || media.id === undefined) return false;
+            return !removedMediaIds.includes(media.id);
+          })
+          .map(media => ({
+            id: media.id,
+            url: media.url,
+            contentType: media.contentType,
+            contentSize: media.contentSize,
+            altText: media.altText || data.title,
+          }));
+
+        const allMedia = [...keptExistingMedia, ...newMediaArray];
+
+        const images = allMedia
+          .filter(m => m.contentType?.startsWith('image/'))
+          .map(m => m.url);
+        const video =
+          allMedia.find(m => m.contentType?.startsWith('video/'))?.url || '';
+
         await updateContent({
           id: initialContent?.id || '',
           contentData: {
@@ -219,6 +268,8 @@ const useUploadContentForm = (initialContent?: Content | null) => {
             description: data.description,
             subtitle: data.subtitle || '',
             subcontent: data.subcontent || '',
+            images: images,
+            video: video,
           },
           userId: user?.id.toString() || '',
         });
@@ -233,12 +284,23 @@ const useUploadContentForm = (initialContent?: Content | null) => {
           dismissOnBackdropPress: false,
         });
       } catch (error) {
+        console.error('Erro ao atualizar o post:', error);
         setUploadError('Erro ao atualizar o post. Tente novamente.');
       } finally {
         setIsLoading(false);
       }
     },
-    [navigation],
+    [
+      navigation,
+      filesList,
+      existingMedia,
+      removedMediaIds,
+      initialContent,
+      user,
+      showDialog,
+      updateContent,
+      uploadMedia,
+    ],
   );
 
   const handleCancel = useCallback(() => {
@@ -256,11 +318,22 @@ const useUploadContentForm = (initialContent?: Content | null) => {
     });
   }, [navigation, showDialog]);
 
+  const allFilesList = useMemo(() => {
+    const existingFiles: UploadFile[] = existingMedia.map(media => ({
+      id: media.url,
+      uri: media.url,
+      type: media.contentType,
+      fileName: media.altText || 'Mídia existente',
+      fileSize: media.contentSize,
+    }));
+    return [...existingFiles, ...filesList];
+  }, [existingMedia, filesList]);
+
   return {
     control,
     handleSubmit,
     formState: {errors, isValid},
-    filesList,
+    filesList: allFilesList,
     categoriesList: categoriesListWithState,
     isLoading: isLoading || isLoadingCategories,
     uploadError,
