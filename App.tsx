@@ -8,6 +8,8 @@ import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import AuthenticatedProviders from './src/components/AuthenticatedProviders/AuthenticatedProviders';
 import UnauthenticatedProviders from './src/components/UnauthenticatedProviders/UnauthenticatedProviders';
 import FirstAccessProviders from './src/components/FirstAccessProviders/FirstAccessProviders';
+import NotificationHandler from './src/components/NotificationHandler/NotificationHandler';
+import notificationService from './src/services/notificationService';
 
 if (__DEV__) {
   require('./ReactotronConfig');
@@ -55,10 +57,16 @@ const AppContent = () => {
 function App(): React.ReactElement {
   moment.locale('pt-br');
 
+  // Set background message handler
+  React.useEffect(() => {
+    notificationService.setBackgroundMessageHandler();
+  }, []);
+
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <NotificationHandler />
           <AppContent />
         </AuthProvider>
       </QueryClientProvider>

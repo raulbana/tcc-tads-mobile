@@ -1,0 +1,12 @@
+{
+  "_comment": "Este é um arquivo de exemplo. Baixe o google-services.json do Firebase Console e coloque-o neste mesmo diretório, substituindo este arquivo.",
+  "_instructions": [
+    "1. Acesse o Firebase Console",
+    "2. Selecione seu projeto",
+    "3. Vá em Project Settings > Your apps",
+    "4. Selecione o app Android",
+    "5. Baixe o arquivo google-services.json",
+    "6. Coloque o arquivo em android/app/google-services.json"
+  ]
+}
+

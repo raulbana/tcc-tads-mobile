@@ -21,6 +21,7 @@ import {
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
+import useNotifications from '../hooks/useNotifications';
 
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
@@ -63,6 +64,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const {navigate} = useNavigation<NavigationStackProp>();
+  const {registerToken, removeToken, hasPermission} = useNotifications();
 
   const clearAuthData = useCallback(async () => {
     try {
@@ -78,6 +80,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     try {
       setIsLoading(true);
       setError(null);
+      
+      // Remove FCM token from backend
+      if (user?.id) {
+        try {
+          await removeToken(user.id);
+        } catch (error) {
+          console.error('Error removing FCM token:', error);
+        }
+      }
+      
       await clearAuthData();
       setUser(null);
       setIsLoggedIn(false);
@@ -87,7 +99,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuthData]);
+  }, [clearAuthData, user, removeToken]);
 
   const validateToken = useCallback(
     async (userId?: number): Promise<boolean> => {
@@ -150,6 +162,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             if (isValid) {
               setUser(parsedUser);
               setIsLoggedIn(true);
+              
+              // Register FCM token if permission granted
+              if (hasPermission && parsedUser?.id) {
+                try {
+                  await registerToken(parsedUser.id);
+                } catch (error) {
+                  console.error('Error registering FCM token:', error);
+                }
+              }
+              
               navigate('MainTabs');
             } else {
               await clearAuthData();
@@ -196,7 +218,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return () => {
       mounted = false;
     };
-  }, [clearAuthData, navigate, validateToken]);
+  }, [clearAuthData, navigate, validateToken, registerToken, hasPermission]);
 
   const saveLoggedUser = useCallback(
     async (userObj: User, token: string, remember: boolean = true) => {
@@ -248,6 +270,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const shouldRemember = credentials.remember !== false;
         await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();
+        
+        // Register FCM token after successful login
+        if (hasPermission && response.user?.id) {
+          try {
+            await registerToken(response.user.id);
+          } catch (error) {
+            console.error('Error registering FCM token:', error);
+          }
+        }
+        
         navigate('MainTabs');
       } catch (error) {
         const errorMessage =
@@ -258,7 +290,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [saveLoggedUser, clearTempUser, navigate],
+    [saveLoggedUser, clearTempUser, navigate, registerToken, hasPermission],
   );
 
   const register = useCallback(
