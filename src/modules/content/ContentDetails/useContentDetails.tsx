@@ -352,6 +352,7 @@ const useContentDetails = () => {
         handleCloseReportModal();
       } catch (err) {
         console.error('Error reporting content:', err);
+        handleCloseReportModal();
         throw err;
       }
     },

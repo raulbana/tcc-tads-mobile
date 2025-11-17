@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {forwardRef} from 'react';
+import {TextInput as RNTextInput} from 'react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
 import { useDynamicTheme } from '../../hooks/useDynamicTheme';
@@ -13,7 +14,7 @@ interface CommentInputProps {
   row?: boolean;
 }
 
-const CommentInput: React.FC<CommentInputProps> = ({
+const CommentInput = forwardRef<RNTextInput, CommentInputProps>(({
   value,
   onChange,
   onSend,
@@ -21,12 +22,13 @@ const CommentInput: React.FC<CommentInputProps> = ({
   disabled = false,
   loading = false,
   row,
-}) => {
+}, ref) => {
   const theme = useDynamicTheme();
 
   return (
     <S.Container row={row}>
       <S.TextInput
+        ref={ref}
         value={value}
         onChangeText={onChange}
         placeholder={placeholder}
@@ -47,6 +49,8 @@ const CommentInput: React.FC<CommentInputProps> = ({
       </S.SendButton>
     </S.Container>
   );
-};
+});
+
+CommentInput.displayName = 'CommentInput';
 
 export default CommentInput;

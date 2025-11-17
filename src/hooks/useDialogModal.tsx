@@ -27,11 +27,11 @@ const useDialogModal = () => {
       button
         ? {
             ...button,
-            onPress: () => {
+            onPress: async () => {
+              await button.onPress?.();
               if (button.autoClose !== false) {
                 closeDialog();
               }
-              button.onPress?.();
             },
           }
         : undefined,

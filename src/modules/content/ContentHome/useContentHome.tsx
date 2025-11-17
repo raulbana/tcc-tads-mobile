@@ -84,19 +84,22 @@ const useContentHome = () => {
 
   const hasActiveFilters = selectedCategoryIds.length > 0;
 
+  const selectedNamesSet = useMemo(
+    () => new Set(selectedCategoryNames),
+    [selectedCategoryNames],
+  );
+
   const filteredContentCardList = useMemo(() => {
     if (!hasActiveFilters) {
       return [];
     }
-
-    const selectedNamesSet = new Set(selectedCategoryNames);
 
     return contents
       .filter(content =>
         content.categories?.some(categoryName => selectedNamesSet.has(categoryName)),
       )
       .map(mapContentToCard);
-  }, [contents, hasActiveFilters, mapContentToCard, selectedCategoryNames]);
+  }, [contents, hasActiveFilters, mapContentToCard, selectedNamesSet]);
 
   const contentSections = useMemo(() => {
     // Agrupar conteúdos por seção

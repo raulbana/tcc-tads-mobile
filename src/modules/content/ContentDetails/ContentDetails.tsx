@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useRef} from 'react';
+import {LayoutChangeEvent, ScrollView, TextInput} from 'react-native';
 import CarouselSection from '../../../components/CarouselSection.tsx/CarouselSection';
 import Label from '../../../components/Label/Label';
 import Loader from '../../../components/Loader/Loader';
@@ -13,7 +14,6 @@ import ImageCarouselModal from './components/ImageCarouselModal/ImageCarouselMod
 import ReportModal from '../../../components/ReportModal/ReportModal';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import DialogModal from '../../../components/DialogModal/DialogModal';
-import {LayoutChangeEvent, ScrollView} from 'react-native';
 
 const ContentDetails = () => {
   const {
@@ -43,7 +43,6 @@ const ContentDetails = () => {
     handleCloseReportModal,
     handleReportContent,
     reportModalVisible,
-    reportContentId,
     isReporting,
     currentUserId,
     handleOpenDeleteCommentModal,
@@ -57,17 +56,24 @@ const ContentDetails = () => {
   const theme = useDynamicTheme();
   const scrollRef = useRef<ScrollView | null>(null);
   const commentInputOffsetRef = useRef(0);
+  const commentInputRef = useRef<TextInput>(null);
 
   const handleCommentSectionLayout = useCallback((event: LayoutChangeEvent) => {
     commentInputOffsetRef.current = event.nativeEvent.layout.y;
   }, []);
 
   useEffect(() => {
-    if (replyTo && scrollRef.current) {
+    if (replyTo && scrollRef.current && commentInputOffsetRef.current > 0) {
       const targetOffset = Math.max(commentInputOffsetRef.current - 24, 0);
       scrollRef.current.scrollTo({y: targetOffset, animated: true});
+      
+      setTimeout(() => {
+        commentInputRef.current?.focus();
+      }, 300);
     }
   }, [replyTo]);
+
+  const videoMedia = content?.media?.find(m => m?.contentType?.startsWith('video/'));
 
   return isLoading || !content ? (
     <Loader overlay />
@@ -79,15 +85,8 @@ const ContentDetails = () => {
       scrollable
       header={
         <ContentDetailsHeader
-          image={
-            content?.media?.find(m => m?.contentType?.startsWith('video/'))
-              ?.url ?? content?.cover?.url
-          }
-          type={
-            content.media?.find(m => m?.contentType?.startsWith('video/'))
-              ? 'video'
-              : 'image'
-          }
+          image={videoMedia?.url ?? content?.cover?.url}
+          type={videoMedia ? 'video' : 'image'}
           onReport={() => handleOpenReportModal(content.id)}
         />
       }>
@@ -168,6 +167,7 @@ const ContentDetails = () => {
             currentUserId={currentUserId}
             contentOwnerId={authorId}
             onRequestDelete={handleOpenDeleteCommentModal}
+            commentInputRef={commentInputRef}
           />
         </S.CommentSectionAnchor>
       </S.Wrapper>

@@ -63,7 +63,7 @@ const Comment: React.FC<CommentProps> = ({
     if (!canManage && menuVisible) {
       setMenuVisible(false);
     }
-  }, [canManage, menuVisible]);
+  }, [canManage]);
 
   const handleLike = () => onPressLike?.(id, !isLikedByCurrentUser);
   const handleReply = () => onPressReply?.(id);
