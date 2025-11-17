@@ -98,6 +98,35 @@ const useContentHome = () => {
       .map(mapContentToCard);
   }, [contents, hasActiveFilters, mapContentToCard, selectedCategoryNames]);
 
+  const contentSections = useMemo(() => {
+    // Agrupar conteúdos por seção
+    const sectionMap = new Map<string, Map<string, Content>>();
+
+    contents.forEach((content) => {
+      if (content.section && content.section.length > 0) {
+        content.section.forEach((sectionName) => {
+          if (!sectionMap.has(sectionName)) {
+            sectionMap.set(sectionName, new Map());
+          }
+          // Usar Map para evitar duplicatas dentro da mesma seção
+          const sectionContents = sectionMap.get(sectionName)!;
+          if (!sectionContents.has(content.id)) {
+            sectionContents.set(content.id, content);
+          }
+        });
+      }
+    });
+
+    // Converter Map para array de seções
+    const sections = Array.from(sectionMap.entries()).map(([title, contentsMap]) => ({
+      title,
+      contents: Array.from(contentsMap.values()).map(mapContentToCard),
+    }));
+
+    // Filtrar seções vazias
+    return sections.filter((section) => section.contents.length > 0);
+  }, [contents, mapContentToCard]);
+
   const isLoading = isLoadingContents || isLoadingCategories;
   const error = contentsError?.message || categoriesError?.message;
 
@@ -105,6 +134,7 @@ const useContentHome = () => {
     badgeList,
     contentCardList,
     filteredContentCardList,
+    contentSections,
     hasActiveFilters,
     navigateToDetails,
     handleCardClick,

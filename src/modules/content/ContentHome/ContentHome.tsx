@@ -17,6 +17,7 @@ const ContentHome = () => {
     badgeList,
     contentCardList,
     filteredContentCardList,
+    contentSections,
     hasActiveFilters,
     navigateToCreateContent,
   } = useContentHome();
@@ -55,38 +56,19 @@ const ContentHome = () => {
           </S.FilteredList>
         ) : (
           <>
-            <CarouselSection
-              carouselData={{
-                data: contentCardList,
-                itemWidth: 224,
-                renderItem: ({item}) => <ContentCard {...item} />,
-              }}
-              sectionTitle="Conteúdo X"
-            />
-            <CarouselSection
-              carouselData={{
-                data: contentCardList,
-                itemWidth: 224,
-                renderItem: ({item}) => <ContentCard {...item} />,
-              }}
-              sectionTitle="Conteúdo Y"
-            />
-            <CarouselSection
-              carouselData={{
-                data: contentCardList,
-                itemWidth: 224,
-                renderItem: ({item}) => <ContentCard {...item} />,
-              }}
-              sectionTitle="Conteúdo Z"
-            />
-            <CarouselSection
-              carouselData={{
-                data: contentCardList,
-                itemWidth: 224,
-                renderItem: ({item}) => <ContentCard {...item} />,
-              }}
-              sectionTitle="Conteúdo Z1"
-            />
+            {contentSections.length > 0 ? (
+              contentSections.map((section) => (
+                <CarouselSection
+                  key={section.title}
+                  carouselData={{
+                    data: section.contents,
+                    itemWidth: 224,
+                    renderItem: ({item}) => <ContentCard {...item} />,
+                  }}
+                  sectionTitle={section.title}
+                />
+              ))
+            ) : null}
           </>
         )}
       </S.Wrapper>
