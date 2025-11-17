@@ -47,16 +47,27 @@ const useUploadContentForm = (initialContent?: Content | null) => {
   const {data: categoriesData = [], isLoading: isLoadingCategories} =
     contentQueries.getCategories();
 
-  const { mutateAsync: updateContent } = contentQueries.updateContent();
+  const {mutateAsync: updateContent} = contentQueries.updateContent();
+
+  const filteredCategories = useMemo(() => {
+    const userRole = user?.role?.toUpperCase();
+    const isUser = !userRole || userRole === 'USER';
+
+    if (isUser) {
+      return categoriesData.filter(category => !category.auditable);
+    }
+
+    return categoriesData;
+  }, [categoriesData, user?.role]);
 
   const categoriesList = useMemo(() => {
-    return categoriesData.map((category: ContentCategory) => ({
+    return filteredCategories.map((category: ContentCategory) => ({
       id: category.id,
       content: category.name,
       textColor: theme.colors.gray_08,
       backgroundColor: theme.colors.gray_03,
     }));
-  }, [categoriesData, theme.colors]);
+  }, [filteredCategories, theme.colors]);
 
   useEffect(() => {
     if (initialContent) {
@@ -65,23 +76,44 @@ const useUploadContentForm = (initialContent?: Content | null) => {
       setValue('subtitle', initialContent.subtitle || '');
       setValue('subcontent', initialContent.subcontent || '');
       if (initialContent.media && initialContent.media.length > 0) {
-        const imageFiles: UploadFile[] = initialContent.media.filter(media => media.contentType.startsWith('image/')).map(media => ({
-          id: media.url,
-          uri: media.url,
-          type: media.contentType,
-          fileName: media.altText,
-          fileSize: media.contentSize,
-        })); 
+        const imageFiles: UploadFile[] = initialContent.media
+          .filter(media => media.contentType.startsWith('image/'))
+          .map(media => ({
+            id: media.url,
+            uri: media.url,
+            type: media.contentType,
+            fileName: media.altText,
+            fileSize: media.contentSize,
+          }));
         setFilesList(prev => [...prev, ...imageFiles]);
-        setValue('images', imageFiles.map(f => f.uri));
+        setValue(
+          'images',
+          imageFiles.map(f => f.uri),
+        );
       }
-      if (initialContent.media.find(media => media.contentType.startsWith('video/'))) {
+      if (
+        initialContent.media.find(media =>
+          media.contentType.startsWith('video/'),
+        )
+      ) {
         const videoFile: UploadFile = {
           id: 'video-0',
-          uri: initialContent.media.find(media => media.contentType.startsWith('video/'))?.url || '',
-          type: initialContent.media.find(media => media.contentType.startsWith('video/'))?.contentType || '',
-          fileName: initialContent.media.find(media => media.contentType.startsWith('video/'))?.altText || '',
-          fileSize: initialContent.media.find(media => media.contentType.startsWith('video/'))?.contentSize || 0,
+          uri:
+            initialContent.media.find(media =>
+              media.contentType.startsWith('video/'),
+            )?.url || '',
+          type:
+            initialContent.media.find(media =>
+              media.contentType.startsWith('video/'),
+            )?.contentType || '',
+          fileName:
+            initialContent.media.find(media =>
+              media.contentType.startsWith('video/'),
+            )?.altText || '',
+          fileSize:
+            initialContent.media.find(media =>
+              media.contentType.startsWith('video/'),
+            )?.contentSize || 0,
         };
         setFilesList(prev => [...prev, videoFile]);
         setValue('video', videoFile.uri);

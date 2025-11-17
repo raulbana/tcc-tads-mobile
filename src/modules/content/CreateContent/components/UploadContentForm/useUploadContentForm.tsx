@@ -5,7 +5,7 @@ import {
 } from './schema/uploadContentSchema';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {UploadFile} from '../../../../../types/content';
-import {useCallback, useState} from 'react';
+import {useCallback, useState, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
 import useContentQueries from '../../../services/contentQueryFactory';
@@ -55,13 +55,24 @@ const useUploadContentForm = () => {
 
   const selectedCategories = watch('categories');
 
+  const filteredCategories = useMemo(() => {
+    const userRole = user?.role?.toUpperCase();
+    const isUser = !userRole || userRole === 'USER';
+
+    if (isUser) {
+      return categories.filter(category => !category.auditable);
+    }
+
+    return categories;
+  }, [categories, user?.role]);
+
   const categoriesList = useCallback(() => {
-    return categories.map(c => ({
+    return filteredCategories.map(c => ({
       content: c.name,
       categoryId: c.id,
       isActive: selectedCategories.includes(c.id),
     }));
-  }, [categories, selectedCategories]);
+  }, [filteredCategories, selectedCategories]);
 
   const onSubmit = async (data: UploadContentSchema) => {
     try {

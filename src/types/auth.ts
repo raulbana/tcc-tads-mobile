@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   profilePictureUrl?: string;
+  role?: string;
   profile: PatientProfile;
   preferences: Preferences;
 }
