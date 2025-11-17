@@ -15,7 +15,6 @@ const ContentHome = () => {
   const {isLoggedIn} = useAuth();
   const {
     badgeList,
-    contentCardList,
     filteredContentCardList,
     contentSections,
     hasActiveFilters,

@@ -33,7 +33,6 @@ export const Content = styled.View`
 `;
 
 export const GradientOverlay = styled(LinearGradient).attrs({
-  colors: ['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)'],
   locations: [0, 0.6, 1],
   start: {x: 0.5, y: 1},
   end: {x: 0.5, y: 0},
