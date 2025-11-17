@@ -18,3 +18,8 @@ export const CreatePostButton = styled.TouchableOpacity`
   border: 2px solid ${({theme}) => theme.colors.gray_08};
   border-radius: ${moderateScale(8)}px;
 `;
+
+export const FilteredList = styled.View`
+  width: 100%;
+  gap: ${verticalScale(16)}px;
+`;

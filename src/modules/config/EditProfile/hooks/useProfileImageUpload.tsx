@@ -1,6 +1,6 @@
 import {useState, useCallback} from 'react';
-import {Alert} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {DialogOptions} from '../../../../hooks/useDialogModal';
 
 export type ProfileImageFile = {
   id: string;
@@ -10,11 +10,16 @@ export type ProfileImageFile = {
   fileSize: number;
 };
 
-export function useProfileImageUpload() {
+interface ProfileImageUploadOptions {
+  showDialog?: (options: DialogOptions) => void;
+}
+
+export function useProfileImageUpload(options?: ProfileImageUploadOptions) {
   const [selectedImage, setSelectedImage] = useState<ProfileImageFile | null>(
     null,
   );
   const [error, setError] = useState<string>('');
+  const showDialog = options?.showDialog;
 
   const pickImage = useCallback(async () => {
     try {
@@ -38,7 +43,14 @@ export function useProfileImageUpload() {
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
         const errorMsg = `Imagem muito grande (${fileSizeMB}MB). Máximo: 5MB`;
         setError(errorMsg);
-        Alert.alert('Imagem muito grande', errorMsg);
+        showDialog?.({
+          title: 'Imagem muito grande',
+          description: errorMsg,
+          primaryButton: {
+            label: 'OK',
+            onPress: () => {},
+          },
+        });
         return;
       }
 
@@ -46,7 +58,14 @@ export function useProfileImageUpload() {
       if (asset.type && !allowedTypes.includes(asset.type)) {
         const errorMsg = 'Formato não suportado. Use JPG ou PNG';
         setError(errorMsg);
-        Alert.alert('Formato inválido', errorMsg);
+        showDialog?.({
+          title: 'Formato inválido',
+          description: errorMsg,
+          primaryButton: {
+            label: 'OK',
+            onPress: () => {},
+          },
+        });
         return;
       }
 
@@ -63,9 +82,16 @@ export function useProfileImageUpload() {
     } catch (err) {
       const errorMsg = 'Não foi possível carregar a imagem';
       setError(errorMsg);
-      Alert.alert('Erro', errorMsg);
+      showDialog?.({
+        title: 'Erro',
+        description: errorMsg,
+        primaryButton: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
     }
-  }, []);
+  }, [showDialog]);
 
   const removeImage = useCallback(() => {
     setSelectedImage(null);

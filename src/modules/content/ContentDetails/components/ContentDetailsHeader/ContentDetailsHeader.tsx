@@ -7,11 +7,13 @@ import {VideoPlayer} from '../../../../../components/VideoPlayer/VideoPlayer';
 export interface ContentDetailsHeaderProps {
   image: string;
   type: 'image' | 'video';
+  onReport?: () => void;
 }
 
 const ContentDetailsHeader: React.FC<ContentDetailsHeaderProps> = ({
   image,
   type,
+  onReport,
 }) => {
   const {goBack} = useContentDetailsHeader();
 
@@ -33,6 +35,13 @@ const ContentDetailsHeader: React.FC<ContentDetailsHeaderProps> = ({
           <Icon name="ArrowLeft" size={36} color="white" />
         </S.BackButton>
       </S.BackButtonContainer>
+      {onReport && (
+        <S.ReportButtonContainer>
+          <S.ReportButton onPress={onReport}>
+            <Icon name="Flag" size={24} color="white" weight="fill" />
+          </S.ReportButton>
+        </S.ReportButtonContainer>
+      )}
     </S.Container>
   );
 };

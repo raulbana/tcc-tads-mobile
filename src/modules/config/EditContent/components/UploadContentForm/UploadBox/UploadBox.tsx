@@ -10,6 +10,7 @@ import DraggableFlatList, {
 } from 'react-native-draggable-flatlist';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useDynamicTheme} from '../../../../../../hooks/useDynamicTheme';
+import useDialogModal from '../../../../../../hooks/useDialogModal';
 
 interface UploadBoxProps {
   allowedTypes?: ('image' | 'video')[];
@@ -34,16 +35,14 @@ const UploadBox: React.FC<UploadBoxProps> = ({
   externalError,
   initialFiles = [],
 }) => {
+  const {DialogPortal, showDialog} = useDialogModal();
   const {files, pickFile, removeFile, reorderFiles, listRef, error} = useUpload(
     allowedTypes,
     initialFiles,
+    {showDialog},
   );
 
   const displayError = externalError || error;
-
-  useEffect(() => {
-    onUpdateFiles(files);
-  }, [files, onUpdateFiles]);
 
   const theme = useDynamicTheme();
 
@@ -143,7 +142,7 @@ const UploadBox: React.FC<UploadBoxProps> = ({
         <Label
           typography={theme.typography.paragraph.r2}
           color={theme.colors.gray_07}
-          text="Formato: jpg, png, mp4 / Max 10mb"
+          text="Formato: jpg, png, mp4 / Max 500mb"
         />
       </S.Container>
 
@@ -208,12 +207,14 @@ const UploadBox: React.FC<UploadBoxProps> = ({
                   }
                   reorderFiles(data);
                   onReorderFiles(data);
+                  onUpdateFiles(data);
                 }}
               />
             </GestureHandlerRootView>
           </S.ListContainer>
         </>
       )}
+      {DialogPortal}
     </S.Wrapper>
   );
 };

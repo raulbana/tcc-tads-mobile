@@ -36,6 +36,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
     handleCategoryToggle,
     title,
     description,
+    DialogPortal,
   } = useUploadContentForm(initialContent);
 
   return (
@@ -161,6 +162,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
           </S.ButtonContainer>
         </S.ActionButtons>
       </S.Container>
+      {DialogPortal}
     </ScrollView>
   );
 };

@@ -13,6 +13,7 @@ import {
   UpdateContentRequest,
   Comment,
 } from '../../../types/content';
+import {contentCache} from './contentCache';
 
 export const contentQueryFactory = (baseKey: QueryKey) => {
   const queryClient = useQueryClient();
@@ -157,7 +158,9 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
         onSuccess: (_, {contentId}) => {
           queryClient.invalidateQueries({
             queryKey: [...baseKey, 'contentDetails', contentId.toString()],
+            exact: false,
           });
+          contentCache.invalidateContent(contentId.toString());
         },
       }),
 
@@ -195,11 +198,21 @@ export const contentQueryFactory = (baseKey: QueryKey) => {
       useMutation<
         void,
         Error,
-        {contentId: string; userId: string; control: boolean}
+        {contentId: string; userId: number; control: boolean}
       >({
         mutationFn: ({contentId, userId, control}) =>
           contentServices.toggleSaveContent(contentId, userId, control),
-        onSuccess: () => {
+        onSuccess: (_, {contentId, userId, control}) => {
+          queryClient.setQueryData<Content>(
+            [...baseKey, 'contentDetails', contentId, userId.toString()],
+            previous => (previous ? {...previous, isSaved: control} : previous),
+          );
+
+          queryClient.invalidateQueries({
+            queryKey: [...baseKey, 'contentList'],
+            exact: false,
+          });
+
           queryClient.invalidateQueries({
             queryKey: [...baseKey, 'savedContent'],
           });

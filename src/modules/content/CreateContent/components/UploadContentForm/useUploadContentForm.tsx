@@ -5,12 +5,12 @@ import {
 } from './schema/uploadContentSchema';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {UploadFile} from '../../../../../types/content';
-import {useCallback, useState} from 'react';
-import {Alert} from 'react-native';
+import {useCallback, useState, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../../../navigation/routes';
 import useContentQueries from '../../../services/contentQueryFactory';
 import {useAuth} from '../../../../../contexts/AuthContext';
+import useDialogModal from '../../../../../hooks/useDialogModal';
 
 const useUploadContentForm = () => {
   const navigation = useNavigation<NavigationStackProp>();
@@ -42,6 +42,7 @@ const useUploadContentForm = () => {
   const [filesList, setFilesList] = useState<UploadFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
+  const {DialogPortal, showDialog} = useDialogModal();
 
   const {
     data: categories = [],
@@ -54,13 +55,24 @@ const useUploadContentForm = () => {
 
   const selectedCategories = watch('categories');
 
+  const filteredCategories = useMemo(() => {
+    const userRole = user?.role?.toUpperCase();
+    const isUser = !userRole || userRole === 'USER';
+
+    if (isUser) {
+      return categories.filter(category => !category.auditable);
+    }
+
+    return categories;
+  }, [categories, user?.role]);
+
   const categoriesList = useCallback(() => {
-    return categories.map(c => ({
+    return filteredCategories.map(c => ({
       content: c.name,
       categoryId: c.id,
       isActive: selectedCategories.includes(c.id),
     }));
-  }, [categories, selectedCategories]);
+  }, [filteredCategories, selectedCategories]);
 
   const onSubmit = async (data: UploadContentSchema) => {
     try {
@@ -70,7 +82,14 @@ const useUploadContentForm = () => {
       if (filesList.length === 0) {
         const errorMsg = 'Adicione pelo menos 1 imagem ou vídeo';
         setUploadError(errorMsg);
-        Alert.alert('Erro', errorMsg);
+        showDialog({
+          title: 'Erro',
+          description: errorMsg,
+          primaryButton: {
+            label: 'OK',
+            onPress: () => {},
+          },
+        });
         setIsLoading(false);
         return;
       }
@@ -92,21 +111,28 @@ const useUploadContentForm = () => {
         },
       });
 
-      Alert.alert('Sucesso!', 'Seu conteúdo foi publicado com sucesso.', [
-        {
-          text: 'OK',
+      showDialog({
+        title: 'Sucesso!',
+        description: 'Seu conteúdo foi publicado com sucesso.',
+        primaryButton: {
+          label: 'OK',
           onPress: () => {
             reset();
             navigation.navigate('MainTabs', {screen: 'Contents'});
           },
         },
-      ]);
+        dismissOnBackdropPress: false,
+      });
     } catch (error) {
       console.error('Error creating content:', error);
-      Alert.alert(
-        'Erro',
-        'Não foi possível publicar seu conteúdo. Tente novamente.',
-      );
+      showDialog({
+        title: 'Erro',
+        description: 'Não foi possível publicar seu conteúdo. Tente novamente.',
+        primaryButton: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
     } finally {
       setIsLoading(false);
     }
@@ -191,6 +217,7 @@ const useUploadContentForm = () => {
     categoriesList: categoriesList(),
     isLoading,
     uploadError,
+    DialogPortal,
   };
 };
 

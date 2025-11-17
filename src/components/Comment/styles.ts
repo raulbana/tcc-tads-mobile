@@ -1,9 +1,13 @@
-import styled from 'styled-components/native';
+import styled, {css} from 'styled-components/native';
 import {
   horizontalScale,
   moderateScale,
   verticalScale,
 } from '../../utils/scales';
+
+export interface RepliesContainerProps {
+  isSecondLevel?: boolean;
+}
 
 export const Container = styled.View`
   width: 100%;
@@ -38,6 +42,40 @@ export const IconButton = styled.TouchableOpacity`
   padding: ${verticalScale(4)}px;
 `;
 
+export const MenuWrapper = styled.View`
+  margin-left: auto;
+  position: relative;
+`;
+
+export const Tooltip = styled.View<{placement?: 'above' | 'below'}>`
+  position: absolute;
+  ${({placement}) =>
+    placement === 'below'
+      ? css`
+          top: ${verticalScale(28)}px;
+        `
+      : css`
+          bottom: ${verticalScale(36)}px;
+        `}
+  right: 0;
+  background-color: ${({theme}) => theme.colors.white};
+  padding: ${verticalScale(8)}px ${horizontalScale(12)}px;
+  border-radius: ${moderateScale(8)}px;
+  gap: ${verticalScale(8)}px;
+  shadow-color: rgba(0, 0, 0, 0.2);
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.2;
+  shadow-radius: 6px;
+  elevation: 8;
+  z-index: 10;
+  min-width: ${horizontalScale(160)}px;
+`;
+
+export const TooltipButton = styled.TouchableOpacity`
+  width: 100%;
+  padding-vertical: ${verticalScale(4)}px;
+`;
+
 export const ActionsRow = styled.View`
   flex-direction: row;
   gap: ${horizontalScale(8)}px;
@@ -57,7 +95,7 @@ export const ActionButton = styled.TouchableOpacity`
   padding-vertical: ${verticalScale(4)}px;
 `;
 
-export const RepliesContainer = styled.View`
+export const RepliesContainer = styled.View<RepliesContainerProps>`
   width: 100%;
   margin-top: ${verticalScale(8)}px;
   gap: ${verticalScale(16)}px;

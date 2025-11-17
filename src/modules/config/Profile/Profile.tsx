@@ -23,6 +23,7 @@ const Profile: React.FC = () => {
     handleEditContent,
     handleContentPress,
     handleTabChange,
+    DialogPortal,
   } = useProfile();
 
   const theme = useDynamicTheme();
@@ -88,6 +89,7 @@ const Profile: React.FC = () => {
             onContentPress={handleContentPress}
           />
         )}
+        {DialogPortal}
       </S.Wrapper>
     </ScreenContainer>
   );

@@ -79,6 +79,7 @@ export interface Content {
   };
   media: MediaDTO[];
   categories: string[];
+  section?: string[];
   isReposted?: boolean;
   isLiked?: boolean;
   isSaved?: boolean;
@@ -95,6 +96,7 @@ export interface ContentSimpleDTO {
   id: number;
   title: string;
   category: string;
+  section?: string[];
   author: AuthorDTO;
   cover: MediaDTO;
   isReposted: boolean;

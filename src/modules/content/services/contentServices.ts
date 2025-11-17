@@ -17,6 +17,33 @@ import {contentCache} from './contentCache';
 
 const api = apiFactory(BASE_URL);
 
+const updateCachedContent = (
+  contentId: string,
+  updater: (content: Content) => Content,
+) => {
+  const cachedContent = contentCache.getContent(contentId);
+  if (cachedContent) {
+    const updated = updater({...cachedContent});
+    contentCache.setContent(contentId, updated);
+  }
+
+  const cachedList = contentCache.getContents();
+  if (cachedList) {
+    let hasChanges = false;
+    const updatedList = cachedList.map(content => {
+      if (content.id === contentId) {
+        hasChanges = true;
+        return updater({...content});
+      }
+      return content;
+    });
+
+    if (hasChanges) {
+      contentCache.setContents(updatedList);
+    }
+  }
+};
+
 const contentServices = {
   getById: async (contentId: string, userId: string): Promise<Content> => {
     const cached = contentCache.getContent(contentId);
@@ -145,6 +172,36 @@ const contentServices = {
     const headers = {
       'x-user-id': userId,
     };
+
+    const mediaArray: Array<{
+      url: string;
+      contentType: string;
+      contentSize: number;
+      altText?: string;
+    }> = [];
+
+    if (contentData.images && contentData.images.length > 0) {
+      contentData.images.forEach(url => {
+        const isVideo =
+          url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+        mediaArray.push({
+          url,
+          contentType: isVideo ? 'video/mp4' : 'image/jpeg',
+          contentSize: 0,
+          altText: contentData.title || '',
+        });
+      });
+    }
+
+    if (contentData.video) {
+      mediaArray.push({
+        url: contentData.video,
+        contentType: 'video/mp4',
+        contentSize: 0,
+        altText: contentData.title || '',
+      });
+    }
+
     const updateData = {
       title: contentData.title,
       description: contentData.description,
@@ -153,6 +210,7 @@ const contentServices = {
       categoryId: contentData.categories
         ? parseInt(contentData.categories[0])
         : undefined,
+      media: mediaArray,
     };
 
     const response = await api.put(apiRoutes.content.update(id), updateData, {
@@ -178,6 +236,23 @@ const contentServices = {
       control: liked,
     };
     await api.patch(apiRoutes.content.like(id), toggleData);
+    updateCachedContent(id, content => {
+      const wasLiked = content.isLiked ?? false;
+      const currentLikes = content.likesCount ?? 0;
+      let likesCount = currentLikes;
+
+      if (liked && !wasLiked) {
+        likesCount = currentLikes + 1;
+      } else if (!liked && wasLiked) {
+        likesCount = Math.max(0, currentLikes - 1);
+      }
+
+      return {
+        ...content,
+        isLiked: liked,
+        likesCount,
+      };
+    });
   },
 
   toggleRepost: async (
@@ -193,10 +268,7 @@ const contentServices = {
   },
 
   createComment: async (commentData: CommentCreatorDTO): Promise<void> => {
-    await api.post(
-      apiRoutes.content.comments(commentData.contentId.toString()),
-      commentData,
-    );
+    await api.post(apiRoutes.content.createComment, commentData);
   },
 
   reportContent: async (
@@ -231,13 +303,19 @@ const contentServices = {
 
   toggleSaveContent: async (
     contentId: string,
-    userId: string,
+    userId: number,
     control: boolean,
   ): Promise<void> => {
-    await api.patch(apiRoutes.content.save(contentId), {
-      control: control,
-      userId: userId,
-    });
+    const toggleData: ToggleDTO = {
+      userId,
+      control,
+    };
+
+    await api.patch(apiRoutes.content.save(contentId), toggleData);
+    updateCachedContent(contentId, content => ({
+      ...content,
+      isSaved: control,
+    }));
   },
 
   getComments: async (

@@ -21,6 +21,7 @@ const EditProfile: React.FC = () => {
     handleProfilePictureChange,
     handleRemoveProfilePicture,
     goBack,
+    DialogPortal,
   } = useEditProfile();
 
   const theme = useDynamicTheme();
@@ -95,6 +96,7 @@ const EditProfile: React.FC = () => {
           />
         </S.FormSection>
       </S.Wrapper>
+        {DialogPortal}
     </ScreenContainer>
   );
 };

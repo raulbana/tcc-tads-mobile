@@ -1,6 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {Alert} from 'react-native';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../../contexts/AuthContext';
@@ -8,10 +7,12 @@ import {NavigationStackProp} from '../../../navigation/routes';
 import {User, updateUserRequest} from '../../../types/auth';
 import authServices from '../../auth/services/authServices';
 import {profileFormSchema, ProfileFormData} from './schema/profileFormSchema';
+import useDialogModal from '../../../hooks/useDialogModal';
 
 const useEditProfile = () => {
   const {user, updateUser} = useAuth();
   const navigation = useNavigation<NavigationStackProp>();
+  const {DialogPortal, showDialog} = useDialogModal();
 
   const [isLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,39 +94,53 @@ const useEditProfile = () => {
 
         await updateUser(updatedUser);
 
-        Alert.alert('Sucesso', 'Perfil atualizado com sucesso!', [
-          {
-            text: 'OK',
+        showDialog({
+          title: 'Sucesso',
+          description: 'Perfil atualizado com sucesso!',
+          primaryButton: {
+            label: 'OK',
             onPress: () => goBack(),
           },
-        ]);
+          dismissOnBackdropPress: false,
+        });
       } else {
-        Alert.alert('Erro', 'Falha ao atualizar perfil');
+        showDialog({
+          title: 'Erro',
+          description: 'Falha ao atualizar perfil',
+          primaryButton: {
+            label: 'OK',
+            onPress: () => {},
+          },
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      Alert.alert('Erro', 'Falha ao atualizar perfil. Tente novamente.');
+      showDialog({
+        title: 'Erro',
+        description: 'Falha ao atualizar perfil. Tente novamente.',
+        primaryButton: {
+          label: 'OK',
+          onPress: () => {},
+        },
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
-    Alert.alert(
-      'Cancelar Edição',
-      'Tem certeza que deseja cancelar? As alterações serão perdidas.',
-      [
-        {
-          text: 'Continuar Editando',
-          style: 'cancel',
-        },
-        {
-          text: 'Cancelar',
-          style: 'destructive',
-          onPress: () => goBack(),
-        },
-      ],
-    );
+    showDialog({
+      title: 'Cancelar Edição',
+      description: 'Tem certeza que deseja cancelar? As alterações serão perdidas.',
+      secondaryButton: {
+        label: 'Continuar Editando',
+        onPress: () => {},
+      },
+      primaryButton: {
+        label: 'Cancelar',
+        onPress: () => goBack(),
+      },
+    });
   };
 
   const goBack = useCallback(() => {
@@ -145,6 +160,7 @@ const useEditProfile = () => {
     handleProfilePictureChange,
     handleRemoveProfilePicture,
     goBack,
+    DialogPortal,
   };
 };
 

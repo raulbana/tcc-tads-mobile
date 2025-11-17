@@ -1,4 +1,5 @@
 import React from 'react';
+import {TextInput as RNTextInput} from 'react-native';
 import {Comment as CommentType} from '../../types/content';
 import Label from '../Label/Label';
 import Comment from '../Comment/Comment';
@@ -16,10 +17,15 @@ export interface CommentSectionProps {
   onPressLike?: (commentId: string, liked: boolean) => void;
   onPressMore?: (commentId: string) => void;
   onPressReply?: (commentId: string) => void;
+  onLoadReplies?: (commentId: string) => void;
   replyTo?: string | null;
   replyText?: string;
   setReplyText?: (text: string) => void;
   setReplyTo?: (id: string | null) => void;
+  currentUserId?: string | null;
+  contentOwnerId?: string | null;
+  onRequestDelete?: (commentId: string) => void;
+  commentInputRef?: React.RefObject<RNTextInput>;
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({
@@ -31,10 +37,16 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   onCommentTextChange,
   onPressLike,
   onPressMore,
+  onPressReply,
+  onLoadReplies,
   replyTo,
   replyText,
   setReplyText,
   setReplyTo,
+  currentUserId,
+  contentOwnerId,
+  onRequestDelete,
+  commentInputRef,
 }) => {
   const theme = useDynamicTheme();
 
@@ -49,6 +61,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       </S.HeaderRow>
       {!replyTo && (
         <CommentInput
+          ref={commentInputRef}
           value={commentText || ''}
           onChange={onCommentTextChange}
           onSend={() => onCommentSend(commentText || '')}
@@ -64,6 +77,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
             color={theme.colors.purple_03}
           />
           <CommentInput
+            ref={commentInputRef}
             value={replyText || ''}
             onChange={setReplyText ?? (() => {})}
             onSend={() => onCommentSend(replyText || '', replyTo)}
@@ -84,9 +98,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({
           <Comment
             onPressLike={onPressLike}
             onPressMore={onPressMore}
-            onPressReply={id => setReplyTo && setReplyTo(id)}
+            onPressReply={onPressReply || (id => setReplyTo && setReplyTo(id))}
+            onLoadReplies={onLoadReplies}
             key={comment.id}
             comment={comment}
+            currentUserId={currentUserId}
+            contentOwnerId={contentOwnerId}
+            onRequestDelete={onRequestDelete}
           />
         ))
       ) : (

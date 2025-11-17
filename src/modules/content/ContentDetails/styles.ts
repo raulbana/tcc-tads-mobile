@@ -16,3 +16,7 @@ export const Row = styled.View`
   align-items: center;
   gap: ${horizontalScale(8)}px;
 `;
+
+export const CommentSectionAnchor = styled.View`
+  width: 100%;
+`;
