@@ -19,7 +19,9 @@ export const InputContainer = styled.View<{
   margin-top: ${horizontalScale(4)}px;
 `;
 
-export const StyledInput = styled.TextInput`
+export const StyledInput = styled.TextInput.attrs<{theme: any}>(({theme}) => ({
+  placeholderTextColor: theme.colors.gray_06,
+}))`
   font-size: ${moderateScale(14)}px;
   color: ${({theme}) => theme.colors.gray_08};
   width: 100%;
