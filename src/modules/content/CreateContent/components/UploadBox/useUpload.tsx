@@ -38,11 +38,28 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
-      const MAX_FILE_SIZE = 500 * 1024 * 1024;
-      if (asset.fileSize && asset.fileSize + totalFileSize > MAX_FILE_SIZE) {
+      const MAX_FILE_SIZE = 50 * 1024 * 1024;
+      const MAX_TOTAL_SIZE = 500 * 1024 * 1024;
+      
+      if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+        const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
+        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 50MB`;
+        setError(errorMsg);
+        showDialog?.({
+          title: 'Arquivo muito grande',
+          description: errorMsg,
+          primaryButton: {
+            label: 'Entendi',
+            onPress: () => {},
+          },
+        });
+        return;
+      }
+
+      if (asset.fileSize && asset.fileSize + totalFileSize > MAX_TOTAL_SIZE) {
         const totalFileSizeMB = (totalFileSize / 1024 / 1024).toFixed(2);
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
-        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 500MB total por post (${totalFileSizeMB}MB)`;
+        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 500MB total (${totalFileSizeMB}MB)`;
         setError(errorMsg);
         showDialog?.({
           title: 'Arquivo muito grande',

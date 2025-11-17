@@ -30,13 +30,21 @@ export function useUpload(
   const prevInitialFilesRef = useRef<string>('');
 
   useEffect(() => {
-    const initialFilesKey = initialFiles.map(f => f.id).sort().join(',');
+    const initialFilesKey = initialFiles
+      .map(f => f.id)
+      .sort()
+      .join(',');
     if (prevInitialFilesRef.current !== initialFilesKey) {
       prevInitialFilesRef.current = initialFilesKey;
-      const currentFilesKey = files.map(f => f.id).sort().join(',');
+      const currentFilesKey = files
+        .map(f => f.id)
+        .sort()
+        .join(',');
       if (initialFilesKey !== currentFilesKey) {
         setFiles(initialFiles);
-        setTotalFileSize(initialFiles.reduce((sum, file) => sum + file.fileSize, 0));
+        setTotalFileSize(
+          initialFiles.reduce((sum, file) => sum + file.fileSize, 0),
+        );
       }
     }
   }, [initialFiles.map(f => f.id).join(',')]);
@@ -55,11 +63,11 @@ export function useUpload(
       const asset = result.assets?.[0];
       if (!asset) return;
 
-      const MAX_FILE_SIZE = 10 * 1024 * 1024;
+      const MAX_FILE_SIZE = 50 * 1024 * 1024;
       if (asset.fileSize && asset.fileSize + totalFileSize > MAX_FILE_SIZE) {
         const totalFileSizeMB = (totalFileSize / 1024 / 1024).toFixed(2);
         const fileSizeMB = (asset.fileSize / 1024 / 1024).toFixed(2);
-        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 10MB total por post (${totalFileSizeMB}MB)`;
+        const errorMsg = `Limite excedido (${fileSizeMB}MB). Máximo: 500MB total por post (${totalFileSizeMB}MB)`;
         setError(errorMsg);
         showDialog?.({
           title: 'Arquivo muito grande',

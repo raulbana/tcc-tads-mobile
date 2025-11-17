@@ -172,7 +172,7 @@ const contentServices = {
     const headers = {
       'x-user-id': userId,
     };
-    
+
     const mediaArray: Array<{
       url: string;
       contentType: string;
@@ -182,7 +182,8 @@ const contentServices = {
 
     if (contentData.images && contentData.images.length > 0) {
       contentData.images.forEach(url => {
-        const isVideo = url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+        const isVideo =
+          url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
         mediaArray.push({
           url,
           contentType: isVideo ? 'video/mp4' : 'image/jpeg',
@@ -267,10 +268,7 @@ const contentServices = {
   },
 
   createComment: async (commentData: CommentCreatorDTO): Promise<void> => {
-    await api.post(
-      apiRoutes.content.createComment,
-      commentData,
-    );
+    await api.post(apiRoutes.content.createComment, commentData);
   },
 
   reportContent: async (
