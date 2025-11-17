@@ -58,7 +58,6 @@ const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           editable={!disabled}
           keyboardType={type === 'text' ? 'default' : 'numeric'}
-          style={{color: theme.colors.gray_08}}
           {...rest}
         />
       </S.InputContainer>

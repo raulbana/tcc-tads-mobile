@@ -10,7 +10,7 @@ const darkColors = {
   gray_04: '#4D3A57',
   gray_05: '#6D5A77',
   gray_06: '#B8A5C2',
-  gray_07: '#B8A5C2',
+  gray_07: '#D1C0DC',
   gray_08: '#E5D5ED',
 
   default_green: '#00B545',

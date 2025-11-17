@@ -47,7 +47,6 @@ const useAccessibilitySettings = () => {
 
   const handleToggle = useCallback((index: number, value: boolean) => {
     if (index === 0) {
-      // Alto Contraste: se ativado, desativa Modo Escuro
       setLocalHighContrast(value);
       if (value) {
         setLocalDarkMode(false);
@@ -55,7 +54,6 @@ const useAccessibilitySettings = () => {
     } else if (index === 1) {
       setLocalBigFont(value);
     } else if (index === 2) {
-      // Modo Escuro: se ativado, desativa Alto Contraste
       setLocalDarkMode(value);
       if (value) {
         setLocalHighContrast(false);

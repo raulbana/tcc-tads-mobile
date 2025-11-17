@@ -11,7 +11,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
 
 export const useContentCard = () => {
   const theme = useDynamicTheme();
-  const {highContrast} = useAccessibility();
+  const {highContrast, darkMode} = useAccessibility();
 
   const gradientColors = useMemo(() => {
     const baseColor = theme.colors.gray_08;
@@ -22,6 +22,12 @@ export const useContentCard = () => {
         hexToRgba(baseColor, 0.5),
         hexToRgba(baseColor, 0),
       ];
+    } else if (darkMode) {
+      return [
+        hexToRgba(baseColor, 0.9),
+        hexToRgba(baseColor, 0.4),
+        hexToRgba(baseColor, 0),
+      ];
     } else {
       return [
         hexToRgba(baseColor, 0.85),
@@ -29,11 +35,17 @@ export const useContentCard = () => {
         hexToRgba(baseColor, 0),
       ];
     }
-  }, [theme.colors.gray_08, highContrast]);
+  }, [theme.colors.gray_08, highContrast, darkMode]);
 
   const textColor = useMemo(() => {
-    return highContrast ? theme.colors.gray_01 : theme.colors.white;
-  }, [highContrast, theme.colors.gray_01, theme.colors.white]);
+    if (highContrast) {
+      return theme.colors.gray_01;
+    } else if (darkMode) {
+      return theme.colors.gray_08;
+    } else {
+      return theme.colors.white;
+    }
+  }, [highContrast, darkMode, theme.colors.gray_01, theme.colors.gray_08, theme.colors.white]);
 
   return {
     gradientColors,
