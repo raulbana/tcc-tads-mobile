@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './styles';
 import Label from '../Label/Label';
 import Badge from '../Badge/Badge';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useContentCard} from './useContentCard';
 
 export interface ContentCardProps {
   image: number | {uri: string};
@@ -16,10 +16,9 @@ const ContentCard: React.FC<ContentCardProps> = ({
   image,
   badgeLabel,
   title,
-  description,
   onClick,
 }) => {
-  const theme = useDynamicTheme();
+  const {gradientColors, textColor, theme} = useContentCard();
 
   return (
     <S.Container onPress={onClick}>
@@ -27,16 +26,14 @@ const ContentCard: React.FC<ContentCardProps> = ({
         source={image}
         imageStyle={{width: '100%', height: '100%', borderRadius: 16}}
         resizeMode="cover">
-        <S.GradientOverlay
-          colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']}
-        />
+        <S.GradientOverlay colors={gradientColors} />
         <S.BadgeContainer>
           <Badge content={badgeLabel} />
         </S.BadgeContainer>
         <S.Content>
           <Label
             typography={theme.typography.paragraph.b3}
-            color={theme.colors.white}
+            color={textColor}
             text={title}
           />
         </S.Content>

@@ -2,7 +2,7 @@ import styled from 'styled-components/native';
 import { horizontalScale, moderateScale, verticalScale} from '../../utils/scales';
 
 export const Container = styled.View`
-  background-color: ${({theme}) => theme.colors.white};
+  background-color: ${({theme}) => theme.colors.gray_01};
   elevation: 2;
   shadow-color: #000;
   shadow-offset: 0px 2px;

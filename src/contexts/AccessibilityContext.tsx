@@ -16,10 +16,12 @@ import typography from '../theme/typography';
 import fonts from '../theme/fonts';
 import {accessibleColors} from '../theme/accessibleColors';
 import {accessibleTypography} from '../theme/accessibleTypography';
+import darkColors from '../theme/darkColors';
 
 interface AccessibilityContextType {
   highContrast: boolean;
   bigFont: boolean;
+  darkMode: boolean;
   isLoading: boolean;
   error: string | null;
   saveAccessibilityPreferences: (
@@ -36,20 +38,32 @@ const AccessibilityContext = createContext<
 export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
   const [highContrast, setHighContrast] = useState<boolean>(false);
   const [bigFont, setBigFont] = useState<boolean>(false);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [themeKey, setThemeKey] = useState<string>('theme-default');
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const {user, isLoggedIn, savePreferences} = useAuth();
 
-  const currentTheme = useMemo(
-    () => ({
-      colors: highContrast ? accessibleColors : colors,
+  const currentTheme = useMemo(() => {
+    let themeColors = colors;
+    let themeKey = 'default';
+    
+    if (highContrast) {
+      themeColors = accessibleColors;
+      themeKey = 'high-contrast';
+    } else if (darkMode) {
+      themeColors = darkColors;
+      themeKey = 'dark';
+    }
+    
+    return {
+      key: themeKey,
+      colors: themeColors,
       typography: bigFont ? accessibleTypography : typography,
       fonts,
-    }),
-    [highContrast, bigFont],
-  );
+    };
+  }, [highContrast, bigFont, darkMode]);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -67,6 +81,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           );
           setHighContrast(preferences.isHighContrast);
           setBigFont(preferences.isBigFont);
+          setDarkMode(preferences.isDarkMode || false);
         } catch (apiError) {
           console.warn(
             'Failed to load accessibility preferences from API, using local preferences',
@@ -74,11 +89,13 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           const localPreferences = user.preferences;
           setHighContrast(localPreferences.highContrast);
           setBigFont(localPreferences.bigFont);
+          setDarkMode(localPreferences.darkMode || false);
         }
       } else if (user) {
         const localPreferences = user.preferences;
         setHighContrast(localPreferences.highContrast);
         setBigFont(localPreferences.bigFont);
+        setDarkMode(localPreferences.darkMode || false);
       }
     } catch (error) {
       console.error('Error loading accessibility preferences:', error);
@@ -97,12 +114,14 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
         setHighContrast(preferences.isHighContrast);
         setBigFont(preferences.isBigFont);
+        setDarkMode(preferences.isDarkMode || false);
 
         if (user) {
           const updatedPreferences = {
             ...user.preferences,
             highContrast: preferences.isHighContrast,
             bigFont: preferences.isBigFont,
+            darkMode: preferences.isDarkMode || false,
           };
           await savePreferences(updatedPreferences);
 
@@ -138,17 +157,19 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
     } else if (!user) {
       setHighContrast(false);
       setBigFont(false);
+      setDarkMode(false);
     }
   }, [user, loadAccessibilityPreferences, isSaving]);
 
   useEffect(() => {
-    const newThemeKey = `theme-${highContrast}-${bigFont}`;
+    const newThemeKey = `theme-${highContrast}-${bigFont}-${darkMode}`;
     setThemeKey(newThemeKey);
-  }, [highContrast, bigFont]);
+  }, [highContrast, bigFont, darkMode]);
 
   const value = {
     highContrast,
     bigFont,
+    darkMode,
     isLoading,
     error,
     saveAccessibilityPreferences,

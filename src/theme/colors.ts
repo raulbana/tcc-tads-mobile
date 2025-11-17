@@ -30,8 +30,6 @@ const colors = {
   success: '#52C41A',
   success_02: '#73D13D',
 
-
-
   white: '#FFFFFF',
 };
 

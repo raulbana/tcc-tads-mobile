@@ -85,7 +85,7 @@ const DatePickerInput: React.FC<DatePickerInputProps> = ({
         maximumDate={maximumDate}
         is24hourSource="locale"
         locale="pt-BR"
-        theme="light"
+        theme={theme.key === 'dark' ? 'dark' : 'light'}
         dividerColor={theme.colors.gray_04}
         onConfirm={date => {
           onChange(date);

@@ -60,7 +60,9 @@ function DataTable<
         key={column.key}
         width={column.width}
         align={column.align || 'center'}>
-        <Label typography={theme.typography.paragraph.sm1}>
+        <Label 
+          typography={theme.typography.paragraph.sm1}
+          color={theme.colors.gray_08}>
           {displayValue as React.ReactNode}
         </Label>
       </S.Cell>

@@ -167,7 +167,7 @@ const ContentDetails = () => {
             currentUserId={currentUserId}
             contentOwnerId={authorId}
             onRequestDelete={handleOpenDeleteCommentModal}
-            commentInputRef={commentInputRef}
+            commentInputRef={commentInputRef as React.RefObject<TextInput>}
           />
         </S.CommentSectionAnchor>
       </S.Wrapper>
