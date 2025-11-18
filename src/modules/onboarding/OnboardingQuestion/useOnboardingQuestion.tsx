@@ -9,7 +9,10 @@ import useOnboardingQueries from '../services/onboardingQueryFactory';
 import {Question} from '../../../types/question';
 import {useAuth} from '../../../contexts/AuthContext';
 import {Gender, PatientProfile} from '../../../types/auth';
-import {v7 as uuidv7} from 'uuid';
+
+const generateId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+};
 
 const useOnboardingQuestion = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
@@ -61,8 +64,12 @@ const useOnboardingQuestion = () => {
     },
   });
 
-  const {savePatientProfile, saveOfflineOnboardingData, isLoggedIn, user} =
-    useAuth();
+  const {
+    saveOfflineOnboardingData,
+    saveOnboardingProfileDTO,
+    isLoggedIn,
+    user,
+  } = useAuth();
 
   const getDefaultValueForQuestion = (question: Question) => {
     switch (question.type) {
@@ -109,7 +116,7 @@ const useOnboardingQuestion = () => {
 
       const createProfileData = (): PatientProfile => {
         return {
-          id: uuidv7(),
+          id: generateId(),
           birthDate: answers.birthdate,
           gender: answers.gender as Gender,
           q1Score: answers.q3_frequency,
@@ -133,13 +140,32 @@ const useOnboardingQuestion = () => {
 
         const result = await submitAnswersMutation.mutateAsync(submitData);
 
-        const profileData = result.profile || createProfileData();
-
-        await saveOfflineOnboardingData(profileData);
-
-        if (result.profile && isLoggedIn) {
-          await savePatientProfile(result.profile);
+        // Se a API retornou o profile DTO, salva diretamente para uso no registro
+        if (result.profile) {
+          await saveOnboardingProfileDTO(result.profile);
         }
+
+        // Salva também o profile local para uso offline
+        const profileData = result.profile
+          ? {
+              id: generateId(),
+              birthDate: result.profile.birthDate,
+              gender: result.profile.gender as Gender,
+              q1Score: result.profile.iciq3answer,
+              q2Score: result.profile.iciq4answer,
+              q3Score: result.profile.iciq5answer,
+              q4Score: result.profile.urinationLoss
+                ? result.profile.urinationLoss.split(',').length
+                : 0,
+            }
+          : createProfileData();
+
+        // Converte q6_when (array) para string separada por vírgula
+        const urinationLoss = Array.isArray(answers.q6_when)
+          ? answers.q6_when.join(',')
+          : '';
+
+        await saveOfflineOnboardingData(profileData, urinationLoss);
 
         navigate('Onboarding', {screen: 'OnboardingEnd'});
       } catch (error) {
@@ -150,7 +176,12 @@ const useOnboardingQuestion = () => {
         setIsToastOpen(true);
 
         const profileData = createProfileData();
-        await saveOfflineOnboardingData(profileData);
+
+        const urinationLoss = Array.isArray(answers.q6_when)
+          ? answers.q6_when.join(',')
+          : '';
+
+        await saveOfflineOnboardingData(profileData, urinationLoss);
 
         navigate('Onboarding', {screen: 'OnboardingEnd'});
       }
@@ -162,8 +193,8 @@ const useOnboardingQuestion = () => {
     isLoggedIn,
     user,
     submitAnswersMutation,
-    savePatientProfile,
     saveOfflineOnboardingData,
+    saveOnboardingProfileDTO,
     navigate,
   ]);
 

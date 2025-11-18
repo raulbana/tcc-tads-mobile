@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import RegisterForm from './components/RegisterForm/RegisterForm';
 import * as S from './styles';
 import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
@@ -6,11 +6,25 @@ import useRegister from './useRegister';
 import Label from '../../../components/Label/Label';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useAuth} from '../../../contexts/AuthContext';
+import {useNavigation} from '@react-navigation/native';
+import {NavigationStackProp} from '../../../navigation/routes';
 
 const Register: React.FC = () => {
   const {handleGoToLogin} = useRegister();
-
+  const {hasOnboardingData, setPendingRegister} = useAuth();
+  const {navigate} = useNavigation<NavigationStackProp>();
   const theme = useDynamicTheme();
+  const hasChecked = useRef(false);
+
+  useEffect(() => {
+    // Se o usuário não tiver dados de onboarding, redireciona para o onboarding
+    if (!hasChecked.current && !hasOnboardingData()) {
+      hasChecked.current = true;
+      setPendingRegister(true);
+      navigate('Onboarding', {screen: 'OnboardingHome'});
+    }
+  }, [hasOnboardingData, setPendingRegister, navigate]);
 
   return (
     <ScreenContainer>
