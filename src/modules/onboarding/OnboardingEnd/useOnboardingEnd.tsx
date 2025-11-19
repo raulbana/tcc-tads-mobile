@@ -8,7 +8,6 @@ const useOnboardingEnd = () => {
   const {setAnonymousMode, isPendingRegister, setPendingRegister} = useAuth();
   const hasNavigated = useRef(false);
 
-  // Se veio do fluxo de registro, navega automaticamente para registro
   useEffect(() => {
     if (!hasNavigated.current && isPendingRegister()) {
       hasNavigated.current = true;

@@ -295,16 +295,13 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const getOnboardingDataForRegister =
     useCallback((): PatientProfileDTO | null => {
       try {
-        // Primeiro tenta obter o profile DTO salvo diretamente da API
         const profileDTOStr = MMKVStorage.getString(ONBOARDING_PROFILE_DTO_KEY);
 
         let profileDTO: PatientProfileDTO | null = null;
 
         if (profileDTOStr) {
-          // Usa o profile DTO retornado pela API
           profileDTO = JSON.parse(profileDTOStr) as PatientProfileDTO;
         } else {
-          // Fallback: se não tiver o DTO, tenta transformar do profile local
           const onboardingDataStr = MMKVStorage.getString(ONBOARDING_DATA_KEY);
           if (!onboardingDataStr) {
             return null;
@@ -314,7 +311,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           const urinationLoss =
             MMKVStorage.getString(ONBOARDING_URINATION_LOSS_KEY) || '';
 
-          // Transforma o profile para o formato DTO
           profileDTO = transformProfileToDTO(profile, urinationLoss);
         }
 
@@ -331,7 +327,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(true);
         setError(null);
 
-        // Se não tiver profile no userData, tenta obter dos dados de onboarding salvos
         const profileDTO = getOnboardingDataForRegister();
         if (profileDTO && !userData.profile) {
           userData.profile = profileDTO;
@@ -344,7 +339,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         };
         await login(loginCredentials);
 
-        // Limpa os dados de onboarding após registro bem-sucedido
         await clearOnboardingData();
         await setPendingRegister(false);
       } catch (error) {
@@ -525,7 +519,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const saveOnboardingProfileDTO = useCallback(
     async (profileDTO: PatientProfileDTO) => {
       try {
-        // Salva o profile DTO retornado pela API para uso no registro
         MMKVStorage.set(ONBOARDING_PROFILE_DTO_KEY, JSON.stringify(profileDTO));
       } catch (error) {
         console.error('Save onboarding profile DTO error:', error);

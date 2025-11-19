@@ -140,12 +140,10 @@ const useOnboardingQuestion = () => {
 
         const result = await submitAnswersMutation.mutateAsync(submitData);
 
-        // Se a API retornou o profile DTO, salva diretamente para uso no registro
         if (result.profile) {
           await saveOnboardingProfileDTO(result.profile);
         }
 
-        // Salva também o profile local para uso offline
         const profileData = result.profile
           ? {
               id: generateId(),
@@ -160,7 +158,6 @@ const useOnboardingQuestion = () => {
             }
           : createProfileData();
 
-        // Converte q6_when (array) para string separada por vírgula
         const urinationLoss = Array.isArray(answers.q6_when)
           ? answers.q6_when.join(',')
           : '';

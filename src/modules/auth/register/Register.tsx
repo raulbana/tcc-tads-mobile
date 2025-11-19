@@ -18,7 +18,6 @@ const Register: React.FC = () => {
   const hasChecked = useRef(false);
 
   useEffect(() => {
-    // Se o usuário não tiver dados de onboarding, redireciona para o onboarding
     if (!hasChecked.current && !hasOnboardingData()) {
       hasChecked.current = true;
       setPendingRegister(true);
