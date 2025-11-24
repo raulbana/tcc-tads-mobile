@@ -11,7 +11,6 @@ const NotificationPermissionModal: React.FC<NotificationPermissionModalProps> = 
   visible,
   onClose,
 }) => {
-
   const handleOpenSettings = async () => {
     try {
       if (Platform.OS === 'ios') {

@@ -21,7 +21,6 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
   }, [navigation]);
 
   useEffect(() => {
-    // Handle notification when app is opened from notification
     const handleInitialNotification = async () => {
       const initialNotification =
         await notificationService.getInitialNotification();
@@ -32,12 +31,10 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
       }
     };
 
-    // Delay to ensure navigation is ready
     const timer = setTimeout(() => {
       handleInitialNotification();
     }, 1000);
 
-    // Handle notification when app is opened from background
     const unsubscribeOpenedApp = notificationService.onNotificationOpenedApp(
       data => {
         if (onNotificationPress) {
@@ -48,20 +45,15 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
       },
     );
 
-    // Handle foreground notifications
-    // A exibição da notificação local já é feita dentro do notificationService.onForegroundMessage
     const unsubscribeForeground = notificationService.onForegroundMessage(
       async remoteMessage => {
         console.log(
           '[NotificationHandler] Foreground notification received:',
           remoteMessage,
         );
-        // A notificação local já foi exibida pelo notificationService
-        // Aqui você pode adicionar lógica adicional se necessário
       },
     );
 
-    // Handle quando o usuário toca em uma notificação local (do notifee) com app em foreground
     const unsubscribeNotifee = notifee.onForegroundEvent(({type, detail}) => {
       console.log(
         '[NotificationHandler] Notifee foreground event:',
@@ -72,7 +64,6 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
         const notification = detail.notification;
         if (notification?.data) {
           try {
-            // O data já é um objeto, não precisa fazer parse
             const data = notification.data as NotificationData;
             if (onNotificationPress) {
               onNotificationPress(data);

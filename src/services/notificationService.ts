@@ -36,7 +36,7 @@ class NotificationService {
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
           const hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
-      
+
           return hasPermission;
         }
         return true;
@@ -169,8 +169,6 @@ class NotificationService {
     data?: NotificationData,
   ): Promise<void> {
     try {
-      // Converter NotificationData para o formato esperado pelo notifee
-      // O notifee espera { [key: string]: string | number | object }
       const notifeeData: {[key: string]: string | number | object} | undefined =
         data
           ? {
@@ -182,7 +180,6 @@ class NotificationService {
           : undefined;
 
       if (Platform.OS === 'android') {
-        // Criar canal de notificação para Android (obrigatório no Android 8.0+)
         const channelId = await notifee.createChannel({
           id: 'dailyiu-default',
           name: 'DailyIU Notificações',
@@ -191,7 +188,6 @@ class NotificationService {
           vibration: true,
         });
 
-        // Exibir notificação local
         await notifee.displayNotification({
           title,
           body,
@@ -212,7 +208,6 @@ class NotificationService {
           channelId,
         });
       } else {
-        // iOS
         await notifee.displayNotification({
           title,
           body,
@@ -246,15 +241,11 @@ class NotificationService {
         remoteMessage,
       );
 
-      // Extrair título e corpo da notificação
       const title = remoteMessage.notification?.title || 'DailyIU';
       const body = remoteMessage.notification?.body || '';
       const data = remoteMessage.data as NotificationData | undefined;
 
-      // Exibir notificação local
       await this.displayLocalNotification(title, body, data);
-
-      // Chamar callback para processamento adicional
       callback(remoteMessage);
     });
   }

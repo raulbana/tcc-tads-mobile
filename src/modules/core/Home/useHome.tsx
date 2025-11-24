@@ -19,10 +19,8 @@ const useHome = () => {
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
 
-  // Verificar e exibir modal de permissão na primeira vez
   useEffect(() => {
     if (!isLoading) {
-      // Aguardar um pouco para garantir que a tela está carregada
       const timer = setTimeout(() => {
         checkAndShowIfNeeded();
       }, 1000);

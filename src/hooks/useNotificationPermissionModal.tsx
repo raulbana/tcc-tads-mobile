@@ -19,16 +19,13 @@ export const useNotificationPermissionModal = () => {
 
   const shouldShowModal = useCallback(async () => {
     try {
-      // Verificar se já foi exibido
       const alreadyShown = MMKVStorage.getBoolean(NOTIFICATION_PERMISSION_MODAL_SHOWN_KEY);
       if (alreadyShown) {
         return false;
       }
 
-      // Verificar se já tem permissão
       const hasPermission = await checkPermission();
       if (hasPermission) {
-        // Se já tem permissão, marcar como exibido para não mostrar novamente
         MMKVStorage.set(NOTIFICATION_PERMISSION_MODAL_SHOWN_KEY, true);
         return false;
       }
@@ -46,7 +43,6 @@ export const useNotificationPermissionModal = () => {
 
   const hideModal = useCallback(() => {
     setVisible(false);
-    // Marcar como exibido quando o usuário fechar
     MMKVStorage.set(NOTIFICATION_PERMISSION_MODAL_SHOWN_KEY, true);
   }, []);
 
@@ -57,7 +53,6 @@ export const useNotificationPermissionModal = () => {
     }
   }, [shouldShowModal]);
 
-  // Verificar permissão quando o hook é montado
   useEffect(() => {
     checkPermission();
   }, [checkPermission]);
