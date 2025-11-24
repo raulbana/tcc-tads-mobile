@@ -1,7 +1,6 @@
 import {useState, useEffect, useCallback} from 'react';
 import notificationService from '../services/notificationService';
 import notificationApiService from '../services/notificationApiService';
-import {NotificationData} from '../types/notification';
 
 interface UseNotificationsReturn {
   hasPermission: boolean;
@@ -48,33 +47,27 @@ const useNotifications = (): UseNotificationsReturn => {
     }
   }, []);
 
-  const registerToken = useCallback(
-    async (userId: number) => {
-      try {
-        const token = await notificationService.getToken();
-        if (token) {
-          setFcmToken(token);
-          await notificationApiService.registerToken(token, userId);
-        }
-      } catch (error) {
-        console.error('Error registering token:', error);
+  const registerToken = useCallback(async (userId: number) => {
+    try {
+      const token = await notificationService.getToken();
+      if (token) {
+        setFcmToken(token);
+        await notificationApiService.registerToken(token, userId);
       }
-    },
-    [],
-  );
+    } catch (error) {
+      console.error('Error registering token:', error);
+    }
+  }, []);
 
-  const removeToken = useCallback(
-    async (userId: number) => {
-      try {
-        await notificationApiService.removeToken(userId);
-        await notificationService.deleteToken();
-        setFcmToken(null);
-      } catch (error) {
-        console.error('Error removing token:', error);
-      }
-    },
-    [],
-  );
+  const removeToken = useCallback(async (userId: number) => {
+    try {
+      await notificationApiService.removeToken(userId);
+      await notificationService.deleteToken();
+      setFcmToken(null);
+    } catch (error) {
+      console.error('Error removing token:', error);
+    }
+  }, []);
 
   useEffect(() => {
     const initialize = async () => {
@@ -116,4 +109,3 @@ const useNotifications = (): UseNotificationsReturn => {
 };
 
 export default useNotifications;
-

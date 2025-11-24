@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {Platform} from 'react-native';
+import notifee, {EventType} from '@notifee/react-native';
 import notificationService from '../../services/notificationService';
 import {NotificationData} from '../../types/notification';
 import {useNavigation} from '@react-navigation/native';
@@ -48,24 +49,51 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
     );
 
     // Handle foreground notifications
+    // A exibição da notificação local já é feita dentro do notificationService.onForegroundMessage
     const unsubscribeForeground = notificationService.onForegroundMessage(
       async remoteMessage => {
-        // You can show a local notification or toast here
-        console.log('Foreground notification received:', remoteMessage);
-
-        // Optionally show a local notification
-        if (Platform.OS === 'android') {
-          // Android handles foreground notifications automatically
-        } else {
-          // iOS may need local notification for foreground
-        }
+        console.log(
+          '[NotificationHandler] Foreground notification received:',
+          remoteMessage,
+        );
+        // A notificação local já foi exibida pelo notificationService
+        // Aqui você pode adicionar lógica adicional se necessário
       },
     );
+
+    // Handle quando o usuário toca em uma notificação local (do notifee) com app em foreground
+    const unsubscribeNotifee = notifee.onForegroundEvent(({type, detail}) => {
+      console.log(
+        '[NotificationHandler] Notifee foreground event:',
+        type,
+        detail,
+      );
+      if (type === EventType.PRESS) {
+        const notification = detail.notification;
+        if (notification?.data) {
+          try {
+            // O data já é um objeto, não precisa fazer parse
+            const data = notification.data as NotificationData;
+            if (onNotificationPress) {
+              onNotificationPress(data);
+            } else {
+              handleNotificationNavigation(data);
+            }
+          } catch (error) {
+            console.error(
+              '[NotificationHandler] Erro ao processar dados da notificação:',
+              error,
+            );
+          }
+        }
+      }
+    });
 
     return () => {
       clearTimeout(timer);
       unsubscribeOpenedApp();
       unsubscribeForeground();
+      unsubscribeNotifee();
     };
   }, [onNotificationPress]);
 
@@ -78,10 +106,10 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
         case 'reply':
           if (data.contentId) {
             navigationRef.current?.navigate('Content', {
-                screen: 'ContentDetails',
-                params: {
-                  contentId: data.contentId,
-                },
+              screen: 'ContentDetails',
+              params: {
+                contentId: data.contentId,
+              },
             });
           }
           break;
@@ -90,10 +118,9 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({
             navigationRef.current?.navigate('Content', {
               screen: 'ContentDetails',
               params: {
-              contentId: data.contentId,
+                contentId: data.contentId,
               },
-              },
-            );
+            });
           }
           break;
         default:

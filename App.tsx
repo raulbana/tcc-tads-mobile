@@ -1,3 +1,4 @@
+import '@react-native-firebase/app';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import Navigator from './src/navigation';
@@ -59,7 +60,9 @@ function App(): React.ReactElement {
 
   // Set background message handler
   React.useEffect(() => {
+    console.log('[App] Configurando background message handler...');
     notificationService.setBackgroundMessageHandler();
+    console.log('[App] Background message handler configurado');
   }, []);
 
   return (

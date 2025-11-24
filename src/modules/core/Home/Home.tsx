@@ -6,6 +6,7 @@ import TrainingSection from './components/TrainingSection/TrainingSection';
 import CalendarRow from '../../../components/Calendar/components/CalendarRow/CalendarRow';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import useHome from './useHome';
+import NotificationPermissionModal from '../../../components/NotificationPermissionModal/NotificationPermissionModal';
 
 const Home = () => {
   const theme = useDynamicTheme();
@@ -17,6 +18,8 @@ const Home = () => {
     workoutPlan,
     handleNavigateToAllExercises,
     titleText,
+    notificationModalVisible,
+    hideNotificationModal,
   } = useHome();
   return (
     <ScreenContainer>
@@ -44,6 +47,10 @@ const Home = () => {
           />
         )}
       </S.Container>
+      <NotificationPermissionModal
+        visible={notificationModalVisible}
+        onClose={hideNotificationModal}
+      />
     </ScreenContainer>
   );
 };
