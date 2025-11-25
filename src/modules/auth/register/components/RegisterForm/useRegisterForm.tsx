@@ -1,7 +1,6 @@
 import {useCallback} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import useAuthQueries from '../../../services/authQueryFactory';
 import {useAuth} from '../../../../../contexts/AuthContext';
 import {registerSchema, RegisterFormData} from '../../schema/registerSchema';
 import {useNavigation} from '@react-navigation/native';
@@ -28,13 +27,7 @@ const useRegisterForm = () => {
     mode: 'onSubmit',
   });
 
-  const {useRegister} = useAuthQueries(['auth']);
-
   const {navigate} = useNavigation<NavigationStackProp>();
-
-  const registerMutation = useRegister();
-  const {mutateAsync: registerMutate, isPending: isRegistering} =
-    registerMutation;
 
   const {register: authRegister, isLoading: authLoading} = useAuth();
 
@@ -66,7 +59,6 @@ const useRegisterForm = () => {
     setValue,
     watch,
     onSubmit,
-    isRegistering,
     register,
     isLoading: authLoading,
   };

@@ -48,6 +48,26 @@ export interface registerRequest {
   name: string;
   email: string;
   password: string;
+  profile?: PatientProfileDTO;
+}
+
+export interface PatientProfileDTO {
+  birthDate: string;
+  gender: string;
+  iciq3answer: number;
+  iciq4answer: number;
+  iciq5answer: number;
+  iciqScore: number;
+  urinationLoss: string;
+}
+
+export interface PreferencesDTO {
+  highContrast: boolean;
+  bigFont: boolean;
+  reminderCalendar: boolean;
+  reminderWorkout: boolean;
+  encouragingMessages: boolean;
+  workoutMediaType: string;
 }
 
 export interface registerResponse {
