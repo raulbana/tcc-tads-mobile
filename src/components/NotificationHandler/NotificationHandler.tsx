@@ -1,5 +1,4 @@
 import React, {useEffect, useRef} from 'react';
-import {Platform} from 'react-native';
 import notifee, {EventType} from '@notifee/react-native';
 import notificationService from '../../services/notificationService';
 import {NotificationData} from '../../types/notification';
