@@ -38,8 +38,7 @@ const Comment: React.FC<CommentProps> = ({
 
   const {
     id,
-    authorName,
-    authorImage,
+    author,
     text,
     createdAt,
     likesCount = 0,
@@ -53,7 +52,7 @@ const Comment: React.FC<CommentProps> = ({
 
   const normalizedCurrentUserId = currentUserId ?? '';
   const normalizedContentOwnerId = contentOwnerId ?? '';
-  const authorId = comment.authorId?.toString() ?? '';
+  const authorId = comment.author.id.toString();
   const canManage =
     !!normalizedCurrentUserId &&
     (normalizedCurrentUserId === authorId ||
@@ -92,7 +91,7 @@ const Comment: React.FC<CommentProps> = ({
 
   return (
     <S.Container>
-      <S.Avatar source={{uri: authorImage}} />
+      <S.Avatar source={{uri: author.profilePicture}} />
       <S.Content>
         <S.HeaderRow>
           <Label
@@ -102,7 +101,7 @@ const Comment: React.FC<CommentProps> = ({
                 : theme.typography.paragraph.sb3
             }
             color={theme.colors.gray_08}
-            text={authorName}
+            text={author.name}
           />
           <Label
             typography={theme.typography.paragraph.sm1}
