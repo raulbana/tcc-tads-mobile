@@ -20,3 +20,17 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Adicionar repositório Maven local do Notifee
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Repositório local do Notifee
+        def notifeeLibsPath = file("${rootProject.projectDir}/../node_modules/@notifee/react-native/android/libs")
+        maven {
+            url notifeeLibsPath.getAbsolutePath()
+            allowInsecureProtocol = false
+        }
+    }
+}

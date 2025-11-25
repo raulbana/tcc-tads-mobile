@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // Configurar Firebase
+    // IMPORTANTE: O arquivo GoogleService-Info.plist DEVE estar no bundle do app
     FirebaseApp.configure()
     
     UNUserNotificationCenter.current().delegate = self
