@@ -12,12 +12,17 @@ import {
   Preferences,
   loginRequest,
   registerRequest,
+  PatientProfileDTO,
 } from '../types/auth';
 import {
   MMKVStorage,
   REMEMBER_ME_KEY,
   ONBOARDING_DATA_KEY,
+  ONBOARDING_PROFILE_DTO_KEY,
+  ONBOARDING_URINATION_LOSS_KEY,
+  PENDING_REGISTER_KEY,
 } from '../storage/mmkvStorage';
+import {transformProfileToDTO} from '../utils/profileUtils';
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
@@ -46,12 +51,20 @@ interface AuthContextType {
   getProfilePictureUrl: () => string;
   savePatientProfile: (profile: PatientProfile) => Promise<void>;
   savePreferences: (preferences: Preferences) => Promise<void>;
-  saveOfflineOnboardingData: (profile: PatientProfile) => Promise<void>;
+  saveOfflineOnboardingData: (
+    profile: PatientProfile,
+    urinationLoss?: string,
+  ) => Promise<void>;
+  saveOnboardingProfileDTO: (profileDTO: PatientProfileDTO) => Promise<void>;
   setAnonymousMode: (isAnonymous: boolean) => Promise<void>;
   hasOnboardingData: () => boolean;
   validateToken: () => Promise<boolean>;
   clearError: () => void;
   refreshUser: () => Promise<void>;
+  getOnboardingDataForRegister: () => PatientProfileDTO | null;
+  setPendingRegister: (pending: boolean) => void;
+  isPendingRegister: () => boolean;
+  clearOnboardingData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -293,17 +306,73 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [saveLoggedUser, clearTempUser, navigate, registerToken, hasPermission],
   );
 
+  const clearOnboardingData = useCallback(async () => {
+    try {
+      MMKVStorage.delete(ONBOARDING_DATA_KEY);
+      MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
+      MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
+    } catch (error) {
+      console.error('Error clearing onboarding data:', error);
+    }
+  }, []);
+
+  const setPendingRegister = useCallback((pending: boolean) => {
+    try {
+      MMKVStorage.set(PENDING_REGISTER_KEY, pending.toString());
+    } catch (error) {
+      console.error('Error setting pending register:', error);
+    }
+  }, []);
+
+  const getOnboardingDataForRegister =
+    useCallback((): PatientProfileDTO | null => {
+      try {
+        const profileDTOStr = MMKVStorage.getString(ONBOARDING_PROFILE_DTO_KEY);
+
+        let profileDTO: PatientProfileDTO | null = null;
+
+        if (profileDTOStr) {
+          profileDTO = JSON.parse(profileDTOStr) as PatientProfileDTO;
+        } else {
+          const onboardingDataStr = MMKVStorage.getString(ONBOARDING_DATA_KEY);
+          if (!onboardingDataStr) {
+            return null;
+          }
+
+          const profile: PatientProfile = JSON.parse(onboardingDataStr);
+          const urinationLoss =
+            MMKVStorage.getString(ONBOARDING_URINATION_LOSS_KEY) || '';
+
+          profileDTO = transformProfileToDTO(profile, urinationLoss);
+        }
+
+        return profileDTO;
+      } catch (error) {
+        console.error('Error getting onboarding data for register:', error);
+        return null;
+      }
+    }, []);
+
   const register = useCallback(
     async (userData: registerRequest) => {
       try {
         setIsLoading(true);
         setError(null);
+
+        const profileDTO = getOnboardingDataForRegister();
+        if (profileDTO && !userData.profile) {
+          userData.profile = profileDTO;
+        }
+
         const response = await authServices.register(userData);
         const loginCredentials = {
           email: userData.email,
           password: userData.password,
         };
         await login(loginCredentials);
+
+        await clearOnboardingData();
+        setPendingRegister(false);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Erro ao registrar usuário';
@@ -313,7 +382,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [login],
+    [
+      login,
+      getOnboardingDataForRegister,
+      clearOnboardingData,
+      setPendingRegister,
+    ],
   );
 
   const saveTempUserData = useCallback(
@@ -436,9 +510,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   );
 
   const saveOfflineOnboardingData = useCallback(
-    async (profile: PatientProfile) => {
+    async (profile: PatientProfile, urinationLoss?: string) => {
       try {
         MMKVStorage.set(ONBOARDING_DATA_KEY, JSON.stringify(profile));
+        if (urinationLoss) {
+          MMKVStorage.set(ONBOARDING_URINATION_LOSS_KEY, urinationLoss);
+        }
         if (user) {
           const updatedUser = {
             ...user,
@@ -454,6 +531,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             preferences: {
               highContrast: false,
               bigFont: false,
+              darkMode: false,
               reminderCalendar: false,
               reminderWorkout: false,
               encouragingMessages: false,
@@ -468,6 +546,18 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       }
     },
     [user, updateUser, saveTempUser],
+  );
+
+  const saveOnboardingProfileDTO = useCallback(
+    async (profileDTO: PatientProfileDTO) => {
+      try {
+        MMKVStorage.set(ONBOARDING_PROFILE_DTO_KEY, JSON.stringify(profileDTO));
+      } catch (error) {
+        console.error('Save onboarding profile DTO error:', error);
+        throw new Error('Erro ao salvar profile DTO de onboarding');
+      }
+    },
+    [],
   );
 
   const hasOnboardingData = useCallback((): boolean => {
@@ -500,6 +590,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
+  const isPendingRegister = useCallback((): boolean => {
+    try {
+      const pending = MMKVStorage.getString(PENDING_REGISTER_KEY);
+      return pending === 'true';
+    } catch (error) {
+      console.error('Error checking pending register:', error);
+      return false;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -521,11 +621,16 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         savePatientProfile,
         savePreferences,
         saveOfflineOnboardingData,
+        saveOnboardingProfileDTO,
         setAnonymousMode,
         hasOnboardingData,
         validateToken: validateTokenExposed,
         clearError,
         refreshUser,
+        getOnboardingDataForRegister,
+        setPendingRegister,
+        isPendingRegister,
+        clearOnboardingData,
       }}>
       {children}
     </AuthContext.Provider>
