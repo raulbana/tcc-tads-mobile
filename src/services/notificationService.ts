@@ -2,7 +2,7 @@ import '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
 import {Platform, PermissionsAndroid} from 'react-native';
 import notifee, {AndroidImportance} from '@notifee/react-native';
-import {NotificationPayload, NotificationData} from '../types/notification';
+import {NotificationData} from '../types/notification';
 
 class NotificationService {
   private token: string | null = null;
