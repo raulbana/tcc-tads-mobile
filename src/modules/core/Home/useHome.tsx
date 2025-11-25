@@ -3,15 +3,30 @@ import {useAuth} from '../../../contexts/AuthContext';
 import {useExercises} from '../../../contexts/ExerciseContext';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useDiary} from '../../../contexts/DiaryContext';
-import {useMemo} from 'react';
+import {useMemo, useEffect} from 'react';
+import {useNotificationPermissionModal} from '../../../hooks/useNotificationPermissionModal';
 
 const useHome = () => {
   const {user, isAnonymous, isLoading: isAuthLoading} = useAuth();
   const {workoutPlan, isLoading: isExercisesLoading} = useExercises();
   const {calendarData, isLoading: isDiaryLoading} = useDiary();
   const {navigate} = useNavigation<NavigationStackProp>();
+  const {
+    visible: notificationModalVisible,
+    hideModal: hideNotificationModal,
+    checkAndShowIfNeeded,
+  } = useNotificationPermissionModal();
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
+
+  useEffect(() => {
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        checkAndShowIfNeeded();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, checkAndShowIfNeeded]);
 
   const hasDiaryEntriesToday = Object.values(calendarData || {}).some(
     day => day.isToday,
@@ -58,6 +73,8 @@ const useHome = () => {
     hasDiaryEntriesToday,
     hasTrainingData,
     titleText,
+    notificationModalVisible,
+    hideNotificationModal,
   };
 };
 

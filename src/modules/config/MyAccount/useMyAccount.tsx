@@ -4,10 +4,16 @@ import {OptionItem} from './components/OptionsList/OptionsList';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
+import {useNotificationPermissionModal} from '../../../hooks/useNotificationPermissionModal';
 
 const useMyAccount = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
   const {user, isLoggedIn, logout} = useAuth();
+  const {
+    visible: notificationModalVisible,
+    showModal: showNotificationModal,
+    hideModal: hideNotificationModal,
+  } = useNotificationPermissionModal();
 
   const theme = useDynamicTheme();
 
@@ -40,7 +46,7 @@ const useMyAccount = () => {
   };
 
   const handleNotifications = () => {
-    navigate('Config', {screen: 'Notifications'});
+    showNotificationModal();
   };
 
   const handleAboutApp = () => {
@@ -120,6 +126,8 @@ const useMyAccount = () => {
     navigateToProfile,
     user,
     isLoggedIn,
+    notificationModalVisible,
+    hideNotificationModal,
   };
 };
 

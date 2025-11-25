@@ -8,6 +8,7 @@ import OptionsList from './components/OptionsList/OptionsList';
 import useMyAccount from './useMyAccount';
 import ContactUsCard from './components/ContactUsCard/ContactUsCard';
 import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import NotificationPermissionModal from '../../../components/NotificationPermissionModal/NotificationPermissionModal';
 
 const MyAccount = () => {
   const {
@@ -18,6 +19,8 @@ const MyAccount = () => {
     navigateToEditProfile,
     user,
     isLoggedIn,
+    notificationModalVisible,
+    hideNotificationModal,
   } = useMyAccount();
 
   const theme = useDynamicTheme();
@@ -41,6 +44,10 @@ const MyAccount = () => {
         <OptionsList options={options} />
         <ContactUsCard onPress={navigateToTalkToUs} />
       </S.Wrapper>
+      <NotificationPermissionModal
+        visible={notificationModalVisible}
+        onClose={hideNotificationModal}
+      />
     </ScreenContainer>
   );
 };

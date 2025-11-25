@@ -15,7 +15,22 @@ buildscript {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+        classpath("com.google.gms:google-services:4.4.2")
     }
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Adicionar repositório Maven local do Notifee
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Repositório local do Notifee
+        def notifeeLibsPath = file("${rootProject.projectDir}/../node_modules/@notifee/react-native/android/libs")
+        maven {
+            url notifeeLibsPath.getAbsolutePath()
+            allowInsecureProtocol = false
+        }
+    }
+}

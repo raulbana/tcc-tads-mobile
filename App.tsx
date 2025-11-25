@@ -1,3 +1,4 @@
+import '@react-native-firebase/app';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import Navigator from './src/navigation';
@@ -8,6 +9,8 @@ import {AuthProvider, useAuth} from './src/contexts/AuthContext';
 import AuthenticatedProviders from './src/components/AuthenticatedProviders/AuthenticatedProviders';
 import UnauthenticatedProviders from './src/components/UnauthenticatedProviders/UnauthenticatedProviders';
 import FirstAccessProviders from './src/components/FirstAccessProviders/FirstAccessProviders';
+import NotificationHandler from './src/components/NotificationHandler/NotificationHandler';
+import notificationService from './src/services/notificationService';
 
 if (__DEV__) {
   require('./ReactotronConfig');
@@ -55,10 +58,27 @@ const AppContent = () => {
 function App(): React.ReactElement {
   moment.locale('pt-br');
 
+  // Inicializar serviço de notificações (registrar dispositivo iOS para mensagens remotas)
+  React.useEffect(() => {
+    const initializeNotifications = async () => {
+      try {
+        console.log('[App] Inicializando serviço de notificações...');
+        await notificationService.initialize();
+        console.log('[App] Serviço de notificações inicializado');
+      } catch (error) {
+        console.error('[App] Erro ao inicializar serviço de notificações:', error);
+      }
+    };
+
+    initializeNotifications();
+    notificationService.setBackgroundMessageHandler();
+  }, []);
+
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <NotificationHandler />
           <AppContent />
         </AuthProvider>
       </QueryClientProvider>

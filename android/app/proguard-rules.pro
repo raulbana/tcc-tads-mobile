@@ -131,4 +131,14 @@
 # Keep View classes
 -keep class * extends com.facebook.react.views.** { *; }
 
+# Firebase
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
+
+# React Native Firebase
+-keep class io.invertase.firebase.** { *; }
+-dontwarn io.invertase.firebase.**
+
 # Add any project specific keep options here:

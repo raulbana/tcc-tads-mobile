@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Este é um arquivo de exemplo. Baixe o GoogleService-Info.plist do Firebase Console e coloque-o neste mesmo diretório, substituindo este arquivo. -->
+	<!-- Instruções: -->
+	<!-- 1. Acesse o Firebase Console -->
+	<!-- 2. Selecione seu projeto -->
+	<!-- 3. Vá em Project Settings > Your apps -->
+	<!-- 4. Selecione o app iOS -->
+	<!-- 5. Baixe o arquivo GoogleService-Info.plist -->
+	<!-- 6. Coloque o arquivo em ios/DailyIU/GoogleService-Info.plist -->
+	<!-- 7. Adicione o arquivo ao projeto no Xcode -->
+</dict>
+</plist>
+

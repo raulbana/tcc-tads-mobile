@@ -59,6 +59,11 @@ const apiRoutes = {
       accessibility: '/preferences/accessibility',
     },
   },
+  notifications: {
+    register: '/notifications/token',
+    update: '/notifications/token',
+    remove: '/notifications/token',
+  },
 };
 
 export default apiRoutes;
