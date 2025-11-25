@@ -1,4 +1,4 @@
-import {PatientProfile, PatientProfileDTO} from './auth';
+import {PatientProfileDTO} from './auth';
 
 export interface OnboardSubmitDTO {
   userId?: number;

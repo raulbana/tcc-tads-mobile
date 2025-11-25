@@ -11,21 +11,23 @@ const useOnboardingEnd = () => {
   useEffect(() => {
     if (!hasNavigated.current && isPendingRegister()) {
       hasNavigated.current = true;
-      setPendingRegister(false);
       navigate('Auth', {screen: 'Register'});
+      setTimeout(() => {
+        setPendingRegister(false);
+      }, 0);
     }
   }, [isPendingRegister, setPendingRegister, navigate]);
 
   const handleGoToRegister = async () => {
     await setAnonymousMode(false);
-    await setPendingRegister(false);
     navigate('Auth', {screen: 'Register'});
+    setPendingRegister(false);
   };
 
   const handleContinueAnonymous = async () => {
     await setAnonymousMode(true);
-    await setPendingRegister(false);
     navigate('MainTabs');
+    setPendingRegister(false);
   };
 
   return {
@@ -35,4 +37,3 @@ const useOnboardingEnd = () => {
 };
 
 export default useOnboardingEnd;
-

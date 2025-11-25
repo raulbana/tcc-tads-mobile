@@ -61,7 +61,7 @@ interface AuthContextType {
   clearError: () => void;
   refreshUser: () => Promise<void>;
   getOnboardingDataForRegister: () => PatientProfileDTO | null;
-  setPendingRegister: (pending: boolean) => Promise<void>;
+  setPendingRegister: (pending: boolean) => void;
   isPendingRegister: () => boolean;
   clearOnboardingData: () => Promise<void>;
 }
@@ -284,7 +284,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
-  const setPendingRegister = useCallback(async (pending: boolean) => {
+  const setPendingRegister = useCallback((pending: boolean) => {
     try {
       MMKVStorage.set(PENDING_REGISTER_KEY, pending.toString());
     } catch (error) {
@@ -340,7 +340,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         await login(loginCredentials);
 
         await clearOnboardingData();
-        await setPendingRegister(false);
+        setPendingRegister(false);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Erro ao registrar usuário';
