@@ -58,6 +58,7 @@ const apiRoutes = {
     preferences: {
       accessibility: '/preferences/accessibility',
     },
+    editProfile: (id: number) => `/users/${id}`,
   },
   notifications: {
     register: '/notifications/token',
