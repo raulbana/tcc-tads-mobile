@@ -54,7 +54,6 @@ export interface Comment {
   likesCount?: number;
   isLikedByCurrentUser?: boolean;
   repliesCount?: number;
-  authorId: string;
   replies?: Comment[];
   author: AuthorDTO;
 }
