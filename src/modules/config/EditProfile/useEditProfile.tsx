@@ -93,8 +93,12 @@ const useEditProfile = () => {
         email: response.email,
         profilePictureUrl: response.profilePictureUrl,
         profile: {
-          ...user.profile,
-          gender: data.gender,
+          ...response.profile,
+          gender: response.profile.gender as User['profile']['gender'],
+        },
+        preferences: {
+          ...response.preferences,
+          workoutMediaType: response.preferences.workoutMediaType as User['preferences']['workoutMediaType'],
         },
       };
 
