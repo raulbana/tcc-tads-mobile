@@ -49,15 +49,13 @@ export interface Comment {
   id: string;
   contentId: string;
   text: string;
-  authorId: string;
-  authorName: string;
-  authorImage: string;
   createdAt: string;
   updatedAt: string;
   likesCount?: number;
   isLikedByCurrentUser?: boolean;
   repliesCount?: number;
   replies?: Comment[];
+  author: AuthorDTO;
 }
 
 export interface Content {

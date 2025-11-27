@@ -10,7 +10,7 @@ const mediaServices = {
     const formData = new FormData();
     const filename = imageUri.split('/').pop() || 'image.jpg';
     
-    formData.append('file', {
+    formData.append('files', {
       uri: imageUri,
       name: filename,
       type: 'image/jpeg',
@@ -22,14 +22,16 @@ const mediaServices = {
       },
     });
 
-    return response.data;
+    // A API retorna um array, então pegamos o primeiro item
+    const result = Array.isArray(response.data) ? response.data[0] : response.data;
+    return result;
   },
 
   uploadVideo: async (videoUri: string): Promise<MediaDTO> => {
     const formData = new FormData();
     const filename = videoUri.split('/').pop() || 'video.mp4';
     
-    formData.append('file', {
+    formData.append('files', {
       uri: videoUri,
       name: filename,
       type: 'video/mp4',
@@ -41,7 +43,9 @@ const mediaServices = {
       },
     });
 
-    return response.data;
+    // A API retorna um array, então pegamos o primeiro item
+    const result = Array.isArray(response.data) ? response.data[0] : response.data;
+    return result;
   },
 };
 

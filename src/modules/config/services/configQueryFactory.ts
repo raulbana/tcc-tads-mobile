@@ -1,12 +1,16 @@
-import {QueryKey, useQuery, useMutation} from '@tanstack/react-query';
+import {QueryKey, useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import {
   ContactRequest,
   ContactResponse,
   AccessibilityPreferences,
+  EditProfileRequest,
+  EditProfileResponse,
 } from '../../../types/config';
 import configServices from './configServices';
 
 export const configQueryFactory = (baseKey: QueryKey) => {
+  const queryClient = useQueryClient();
+
   return {
     useGetAccessibilityPreferences: (userId: number) =>
       useQuery<AccessibilityPreferences>({
@@ -33,6 +37,21 @@ export const configQueryFactory = (baseKey: QueryKey) => {
       useMutation<ContactResponse, Error, ContactRequest>({
         mutationFn: (data: ContactRequest) =>
           configServices.sendContactEmail(data),
+      }),
+
+    editProfile: () =>
+      useMutation<
+        EditProfileResponse,
+        Error,
+        {userId: number; data: EditProfileRequest; profilePictureUri?: string}
+      >({
+        mutationFn: ({userId, data, profilePictureUri}) =>
+          configServices.editProfile(userId, data, profilePictureUri),
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: [...baseKey, 'user'],
+          });
+        },
       }),
   };
 };

@@ -4,8 +4,9 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../../contexts/AuthContext';
 import {NavigationStackProp} from '../../../navigation/routes';
-import {User, updateUserRequest} from '../../../types/auth';
-import authServices from '../../auth/services/authServices';
+import {User} from '../../../types/auth';
+import {EditProfileRequest} from '../../../types/config';
+import useConfigQueries from '../services/configQueryFactory';
 import {profileFormSchema, ProfileFormData} from './schema/profileFormSchema';
 import useDialogModal from '../../../hooks/useDialogModal';
 
@@ -14,8 +15,10 @@ const useEditProfile = () => {
   const navigation = useNavigation<NavigationStackProp>();
   const {DialogPortal, showDialog} = useDialogModal();
 
+  const configQueries = useConfigQueries(['config']);
+  const editProfileMutation = configQueries.editProfile();
+
   const [isLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   const {
     register,
@@ -63,75 +66,74 @@ const useEditProfile = () => {
       return;
     }
 
-    setIsSaving(true);
-
     try {
-      const updateData: updateUserRequest = {
-        id: user.id,
+      const originalPictureUrl = user.profilePictureUrl || '';
+      const newPictureUrl = data.profilePictureUrl || '';
+      const isPictureChanged = newPictureUrl !== originalPictureUrl;
+
+      const profilePictureUri =
+        isPictureChanged && newPictureUrl && !newPictureUrl.startsWith('http')
+          ? newPictureUrl
+          : undefined;
+
+      const editProfileData: EditProfileRequest = {
         name: data.name.trim(),
         email: data.email.trim(),
-        profilePictureUrl: data.profilePictureUrl,
-        profile: {
-          ...user.profile,
-          gender: data.gender,
-        },
-        preferences: user.preferences,
       };
 
-      const response = await authServices.updateUser(updateData);
+      const response = await editProfileMutation.mutateAsync({
+        userId: user.id,
+        data: editProfileData,
+        profilePictureUri,
+      });
 
-      if (response.status === 'success') {
-        const updatedUser: User = {
-          ...user,
-          name: data.name.trim(),
-          email: data.email.trim(),
-          profilePictureUrl: data.profilePictureUrl,
-          profile: {
-            ...user.profile,
-            gender: data.gender,
-          },
-        };
+      const updatedUser: User = {
+        ...user,
+        name: response.name,
+        email: response.email,
+        profilePictureUrl: response.profilePictureUrl,
+        profile: {
+          ...response.profile,
+          gender: response.profile.gender as User['profile']['gender'],
+        },
+        preferences: {
+          ...response.preferences,
+          workoutMediaType: response.preferences.workoutMediaType as User['preferences']['workoutMediaType'],
+        },
+      };
 
-        await updateUser(updatedUser);
+      await updateUser(updatedUser);
 
-        showDialog({
-          title: 'Sucesso',
-          description: 'Perfil atualizado com sucesso!',
-          primaryButton: {
-            label: 'OK',
-            onPress: () => goBack(),
-          },
-          dismissOnBackdropPress: false,
-        });
-      } else {
-        showDialog({
-          title: 'Erro',
-          description: 'Falha ao atualizar perfil',
-          primaryButton: {
-            label: 'OK',
-            onPress: () => {},
-          },
-        });
-      }
+      showDialog({
+        title: 'Sucesso',
+        description: 'Perfil atualizado com sucesso!',
+        primaryButton: {
+          label: 'OK',
+          onPress: () => goBack(),
+        },
+        dismissOnBackdropPress: false,
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
       showDialog({
         title: 'Erro',
-        description: 'Falha ao atualizar perfil. Tente novamente.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Falha ao atualizar perfil. Tente novamente.',
         primaryButton: {
           label: 'OK',
           onPress: () => {},
         },
       });
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
     showDialog({
       title: 'Cancelar Edição',
-      description: 'Tem certeza que deseja cancelar? As alterações serão perdidas.',
+      description:
+        'Tem certeza que deseja cancelar? As alterações serão perdidas.',
       secondaryButton: {
         label: 'Continuar Editando',
         onPress: () => {},
@@ -150,7 +152,7 @@ const useEditProfile = () => {
   return {
     user,
     isLoading,
-    isSaving,
+    isSaving: editProfileMutation.isPending,
     errors,
     isValid,
     register,
