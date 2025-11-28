@@ -74,6 +74,8 @@ const RegisterForm: React.FC = () => {
             placeholder="Digite sua senha"
             error={errors.password?.message as string | undefined}
             secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
             onChange={field.onChange}
           />
         )}
@@ -91,6 +93,8 @@ const RegisterForm: React.FC = () => {
             placeholder="Confirme sua senha"
             error={errors.confirmPassword?.message as string | undefined}
             secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
             onChange={field.onChange}
           />
         )}

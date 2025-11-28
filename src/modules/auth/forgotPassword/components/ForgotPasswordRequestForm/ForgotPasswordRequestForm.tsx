@@ -39,7 +39,9 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
             onChangeText={field.onChange}
             placeholder="Digite seu e-mail"
             error={errors.email?.message as string | undefined}
-            autoCapitalize="words"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
             onChange={field.onChange}
           />
         )}

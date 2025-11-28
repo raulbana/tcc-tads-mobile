@@ -6,7 +6,7 @@ export const BarContainer = styled.View`
   flex-direction: row;
   background-color: ${({theme}) => theme.colors.white};
   padding-top: ${verticalScale(8)}px;
-  padding-bottom: ${verticalScale(8)}px;
+  padding-bottom: ${verticalScale(14)}px;
   padding-horizontal: ${horizontalScale(4)}px;
   border-top-width: 1px;
   border-top-color: ${({theme}) => theme.colors.gray_03};

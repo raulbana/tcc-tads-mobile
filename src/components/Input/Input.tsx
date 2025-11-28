@@ -58,6 +58,8 @@ const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           editable={!disabled}
           keyboardType={type === 'text' ? 'default' : 'numeric'}
+          autoCapitalize="none"
+          autoCorrect={false}
           {...rest}
         />
       </S.InputContainer>

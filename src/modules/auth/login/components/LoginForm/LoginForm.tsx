@@ -35,6 +35,7 @@ const LoginForm: React.FC = () => {
             placeholder="Digite seu e-mail"
             error={errors.email?.message}
             keyboardType="email-address"
+            autoCapitalize="none"
             autoCorrect={false}
             onChange={field.onChange}
           />
@@ -53,6 +54,8 @@ const LoginForm: React.FC = () => {
             error={errors.password?.message}
             secureTextEntry
             required
+            autoCapitalize="none"
+            autoCorrect={false}
             onChange={field.onChange}
           />
         )}
