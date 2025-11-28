@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useRef} from 'react';
+import {TextInput} from 'react-native';
 import {Controller} from 'react-hook-form';
 import useLoginForm from './useLoginForm';
 import * as S from './styles';
@@ -19,6 +20,8 @@ const LoginForm: React.FC = () => {
     isLoading,
   } = useLoginForm();
 
+  const passwordInputRef = useRef<TextInput>(null);
+
   const theme = useDynamicTheme();
 
   return (
@@ -37,6 +40,13 @@ const LoginForm: React.FC = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              requestAnimationFrame(() => {
+                passwordInputRef.current?.focus();
+              });
+            }}
             onChange={field.onChange}
           />
         )}
@@ -46,6 +56,7 @@ const LoginForm: React.FC = () => {
         name="password"
         render={({field}) => (
           <Input
+            ref={passwordInputRef}
             {...register('password')}
             label="Senha"
             value={field.value}
@@ -56,6 +67,8 @@ const LoginForm: React.FC = () => {
             required
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChange={field.onChange}
           />
         )}

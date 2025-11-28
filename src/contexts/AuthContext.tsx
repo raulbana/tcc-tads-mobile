@@ -69,12 +69,65 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Função helper para inicializar o estado síncronamente
+const getInitialAuthState = () => {
+  try {
+    const rememberMe = MMKVStorage.getString(REMEMBER_ME_KEY);
+    if (rememberMe === 'false') {
+      return {user: null, isLoggedIn: false, isAnonymous: false};
+    }
+
+    const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
+    const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
+
+    if (loggedUser && token) {
+      try {
+        const parsedUser = JSON.parse(loggedUser) as User;
+        return {user: parsedUser, isLoggedIn: true, isAnonymous: false};
+      } catch (error) {
+        console.error('Error parsing logged user:', error);
+        return {user: null, isLoggedIn: false, isAnonymous: false};
+      }
+    }
+
+    // Verificar se há usuário temporário
+    const tempUser = MMKVStorage.getString(TEMP_USER_KEY);
+    const anonymousStatus = MMKVStorage.getString(IS_ANONYMOUS_KEY);
+    if (tempUser) {
+      try {
+        const parsedUser = JSON.parse(tempUser) as User;
+        return {
+          user: parsedUser,
+          isLoggedIn: false,
+          isAnonymous: anonymousStatus === 'true',
+        };
+      } catch (error) {
+        console.error('Error parsing temp user:', error);
+      }
+    }
+
+    return {
+      user: null,
+      isLoggedIn: false,
+      isAnonymous: anonymousStatus === 'true',
+    };
+  } catch (error) {
+    console.error('Error getting initial auth state:', error);
+    return {user: null, isLoggedIn: false, isAnonymous: false};
+  }
+};
+
 export const AuthProvider = ({children}: {children: ReactNode}) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const initialAuthState = getInitialAuthState();
+  const [user, setUser] = useState<User | null>(initialAuthState.user);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    initialAuthState.isLoggedIn,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(
+    initialAuthState.isAnonymous,
+  );
   const [error, setError] = useState<string | null>(null);
   const {navigate} = useNavigation<NavigationStackProp>();
   const {registerToken, removeToken, hasPermission} = useNotifications();
@@ -89,11 +142,29 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
+  const saveTempUser = useCallback(async (userObj: User) => {
+    try {
+      const userJson = JSON.stringify(userObj);
+      MMKVStorage.set(TEMP_USER_KEY, userJson);
+    } catch (error) {
+      console.error('Error saving temp user:', error);
+      throw new Error('Erro ao salvar dados temporários');
+    }
+  }, []);
+
+  const clearTempUser = useCallback(async () => {
+    try {
+      MMKVStorage.delete(TEMP_USER_KEY);
+    } catch (error) {
+      console.error('Error clearing temp user:', error);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Remove FCM token from backend
       if (user?.id) {
         try {
@@ -102,17 +173,20 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           console.error('Error removing FCM token:', error);
         }
       }
-      
+
       await clearAuthData();
+      await clearTempUser();
       setUser(null);
       setIsLoggedIn(false);
+      setIsAnonymous(false);
+      navigate('Auth', {screen: 'Login'});
     } catch (error) {
       console.error('Logout error:', error);
       setError('Erro ao fazer logout');
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuthData, user, removeToken]);
+  }, [clearAuthData, user, removeToken, navigate, clearTempUser]);
 
   const validateToken = useCallback(
     async (userId?: number): Promise<boolean> => {
@@ -166,16 +240,23 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
         const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
 
+        // Se há usuário e token salvos, validar token em background
         if (loggedUser && token) {
-          const parsedUser = JSON.parse(loggedUser) as User;
-          if (!mounted) return;
-
           try {
+            const parsedUser = JSON.parse(loggedUser) as User;
+            if (!mounted) return;
+
             const isValid = await validateToken(parsedUser.id);
+            if (!mounted) return;
+
             if (isValid) {
-              setUser(parsedUser);
-              setIsLoggedIn(true);
-              
+              // Atualizar estado se necessário (pode já estar atualizado pelo estado inicial)
+              if (mounted) {
+                setUser(parsedUser);
+                setIsLoggedIn(true);
+                setIsAnonymous(false);
+              }
+
               // Register FCM token if permission granted
               if (hasPermission && parsedUser?.id) {
                 try {
@@ -184,18 +265,35 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
                   console.error('Error registering FCM token:', error);
                 }
               }
-              
+
+              // Navegar para MainTabs (a navegação já deve estar na MainTabs pelo estado inicial,
+              // mas garantimos aqui caso não esteja)
               navigate('MainTabs');
             } else {
+              // Token inválido, fazer logout
               await clearAuthData();
-              await loadTempUser();
+              await clearTempUser();
+              if (mounted) {
+                setUser(null);
+                setIsLoggedIn(false);
+                setIsAnonymous(false);
+              }
               navigate('Auth', {screen: 'Login'});
             }
           } catch (error) {
+            console.error('Token validation error during init:', error);
+            // Em caso de erro, fazer logout para segurança
             await clearAuthData();
-            await loadTempUser();
+            await clearTempUser();
+            if (mounted) {
+              setUser(null);
+              setIsLoggedIn(false);
+              setIsAnonymous(false);
+            }
+            navigate('Auth', {screen: 'Login'});
           }
         } else {
+          // Não há usuário logado, carregar usuário temporário se existir
           await loadTempUser();
         }
       } catch (error) {
@@ -231,7 +329,14 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     return () => {
       mounted = false;
     };
-  }, [clearAuthData, navigate, validateToken, registerToken, hasPermission]);
+  }, [
+    clearAuthData,
+    navigate,
+    validateToken,
+    registerToken,
+    hasPermission,
+    clearTempUser,
+  ]);
 
   const saveLoggedUser = useCallback(
     async (userObj: User, token: string, remember: boolean = true) => {
@@ -247,24 +352,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     },
     [],
   );
-
-  const saveTempUser = useCallback(async (userObj: User) => {
-    try {
-      const userJson = JSON.stringify(userObj);
-      MMKVStorage.set(TEMP_USER_KEY, userJson);
-    } catch (error) {
-      console.error('Error saving temp user:', error);
-      throw new Error('Erro ao salvar dados temporários');
-    }
-  }, []);
-
-  const clearTempUser = useCallback(async () => {
-    try {
-      MMKVStorage.delete(TEMP_USER_KEY);
-    } catch (error) {
-      console.error('Error clearing temp user:', error);
-    }
-  }, []);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -283,8 +370,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const shouldRemember = credentials.remember !== false;
         await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();
-        
-        // Register FCM token after successful login
+
         if (hasPermission && response.user?.id) {
           try {
             await registerToken(response.user.id);
@@ -292,7 +378,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             console.error('Error registering FCM token:', error);
           }
         }
-        
+
         navigate('MainTabs');
       } catch (error) {
         const errorMessage =

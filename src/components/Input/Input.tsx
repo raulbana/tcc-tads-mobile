@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextInputProps} from 'react-native';
+import {TextInputProps, TextInput} from 'react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
 import {ZodType} from 'zod';
@@ -20,7 +20,7 @@ interface InputProps extends Omit<TextInputProps, 'onChange'> {
   onValidate?: (isValid: boolean) => void;
 }
 
-const Input: React.FC<InputProps> = ({
+const Input = React.forwardRef<TextInput, InputProps>(({
   label,
   value,
   onChange,
@@ -32,7 +32,7 @@ const Input: React.FC<InputProps> = ({
   error,
   onValidate,
   ...rest
-}) => {
+}, ref) => {
   React.useEffect(() => {
     if (validationSchema && onValidate) {
       const result = validationSchema.safeParse(value);
@@ -53,6 +53,7 @@ const Input: React.FC<InputProps> = ({
       )}
       <S.InputContainer disabled={disabled} error={!!error}>
         <S.StyledInput
+          ref={ref}
           value={value}
           onChangeText={onChange}
           placeholder={placeholder}
@@ -72,6 +73,8 @@ const Input: React.FC<InputProps> = ({
       )}
     </S.Wrapper>
   );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;

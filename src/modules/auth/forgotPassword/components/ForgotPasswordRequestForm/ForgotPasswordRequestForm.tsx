@@ -42,6 +42,8 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChange={field.onChange}
           />
         )}

@@ -10,6 +10,14 @@ const Navigator: React.FC = () => {
   const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();
 
   const initialRouteName = useMemo(() => {
+    // Se está inicializando mas o usuário já está logado (baseado no estado inicial),
+    // começar na MainTabs para evitar mostrar a tela de login
+    if (isInitializing && isLoggedIn) {
+      return 'MainTabs';
+    }
+    
+    // Se está inicializando e não está logado, mostrar Auth (mas isso só acontece
+    // se não houver token/usuário salvo, então é seguro)
     if (isInitializing) {
       return 'Auth';
     }
@@ -19,7 +27,7 @@ const Navigator: React.FC = () => {
     }
 
     if (!isLoggedIn) {
-      return 'MainTabs';
+      return 'Auth';
     }
 
     return 'MainTabs';

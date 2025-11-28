@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useRef} from 'react';
+import {TextInput} from 'react-native';
 import {Controller} from 'react-hook-form';
 import * as S from './styles';
 import useRegisterForm from './useRegisterForm';
@@ -22,6 +23,10 @@ const RegisterForm: React.FC = () => {
 
   const terms = watch('acceptTerms');
 
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+  const confirmPasswordInputRef = useRef<TextInput>(null);
+
   const theme = useDynamicTheme();
 
   return (
@@ -38,6 +43,13 @@ const RegisterForm: React.FC = () => {
             placeholder="Digite seu nome"
             error={errors.name?.message as string | undefined}
             autoCapitalize="words"
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              requestAnimationFrame(() => {
+                emailInputRef.current?.focus();
+              });
+            }}
             onChange={field.onChange}
           />
         )}
@@ -48,6 +60,7 @@ const RegisterForm: React.FC = () => {
         name="email"
         render={({field}) => (
           <Input
+            ref={emailInputRef}
             {...register('email')}
             label="E-mail"
             value={field.value}
@@ -57,6 +70,13 @@ const RegisterForm: React.FC = () => {
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              requestAnimationFrame(() => {
+                passwordInputRef.current?.focus();
+              });
+            }}
             onChange={field.onChange}
           />
         )}
@@ -67,6 +87,7 @@ const RegisterForm: React.FC = () => {
         name="password"
         render={({field}) => (
           <Input
+            ref={passwordInputRef}
             {...register('password')}
             label="Senha"
             value={field.value}
@@ -76,6 +97,13 @@ const RegisterForm: React.FC = () => {
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              requestAnimationFrame(() => {
+                confirmPasswordInputRef.current?.focus();
+              });
+            }}
             onChange={field.onChange}
           />
         )}
@@ -86,6 +114,7 @@ const RegisterForm: React.FC = () => {
         name="confirmPassword"
         render={({field}) => (
           <Input
+            ref={confirmPasswordInputRef}
             {...register('confirmPassword')}
             label="Confirmar senha"
             value={field.value}
@@ -95,6 +124,8 @@ const RegisterForm: React.FC = () => {
             secureTextEntry
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChange={field.onChange}
           />
         )}
