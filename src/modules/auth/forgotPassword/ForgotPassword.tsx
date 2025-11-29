@@ -7,7 +7,7 @@ import DailyIULogo from '../../../assets/illustrations/daily-iu-logo.svg';
 import * as S from './styles';
 import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
 const ForgotPassword: React.FC = () => {
-  const {step, onRequestSuccess, onVerifySuccess, goBack, setStep} =
+  const {step, email, onRequestSuccess, onVerifySuccess, goBack, setStep} =
     useForgotPassword();
 
   const theme = useDynamicTheme();
@@ -34,6 +34,7 @@ const ForgotPassword: React.FC = () => {
         )}
         {step === 'verify' && (
           <ForgotPasswordVerifyForm
+            email={email}
             onSuccess={onVerifySuccess}
             onBack={() => setStep('request')}
           />

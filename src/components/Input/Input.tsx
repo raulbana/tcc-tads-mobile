@@ -3,7 +3,7 @@ import {TextInputProps, TextInput} from 'react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
 import {ZodType} from 'zod';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 type InputType = 'text' | 'date' | 'time';
 
@@ -20,60 +20,71 @@ interface InputProps extends Omit<TextInputProps, 'onChange'> {
   onValidate?: (isValid: boolean) => void;
 }
 
-const Input = React.forwardRef<TextInput, InputProps>(({
-  label,
-  value,
-  onChange,
-  type = 'text',
-  placeholder,
-  required,
-  disabled,
-  validationSchema,
-  error,
-  onValidate,
-  ...rest
-}, ref) => {
-  React.useEffect(() => {
-    if (validationSchema && onValidate) {
-      const result = validationSchema.safeParse(value);
-      onValidate(result.success);
-    }
-  }, [value, validationSchema, onValidate]);
+const Input = React.forwardRef<TextInput, InputProps>(
+  (
+    {
+      label,
+      value,
+      onChange,
+      type = 'text',
+      placeholder,
+      required,
+      disabled,
+      validationSchema,
+      error,
+      onValidate,
+      ...rest
+    },
+    ref,
+  ) => {
+    React.useEffect(() => {
+      if (validationSchema && onValidate) {
+        const result = validationSchema.safeParse(value);
+        onValidate(result.success);
+      }
+    }, [value, validationSchema, onValidate]);
 
-  const theme = useDynamicTheme();
-  
-  return (
-    <S.Wrapper>
-      {label && (
-        <Label
-          typography={theme.typography.paragraph.r3}
-          color={theme.colors.gray_08}
-          text={label + (required ? ' *' : '')}
-        />
-      )}
-      <S.InputContainer disabled={disabled} error={!!error}>
-        <S.StyledInput
-          ref={ref}
-          value={value}
-          onChangeText={onChange}
-          placeholder={placeholder}
-          editable={!disabled}
-          keyboardType={type === 'text' ? 'default' : 'numeric'}
-          autoCapitalize="none"
-          autoCorrect={false}
-          {...rest}
-        />
-      </S.InputContainer>
-      {error && (
-        <Label
-          typography={theme.typography.paragraph.sm1}
-          color={theme.colors.error}
-          text={error}
-        />
-      )}
-    </S.Wrapper>
-  );
-});
+    const theme = useDynamicTheme();
+
+    // Garantir que autoCapitalize="none" seja sempre aplicado para inputs de email
+    const emailKeyboardType = rest.keyboardType === 'email-address';
+    const finalAutoCapitalize = emailKeyboardType
+      ? 'none'
+      : rest.autoCapitalize || 'none';
+
+    return (
+      <S.Wrapper>
+        {label && (
+          <Label
+            typography={theme.typography.paragraph.r3}
+            color={theme.colors.gray_08}
+            text={label + (required ? ' *' : '')}
+          />
+        )}
+        <S.InputContainer disabled={disabled} error={!!error}>
+          <S.StyledInput
+            ref={ref}
+            value={value}
+            onChangeText={onChange}
+            placeholder={placeholder}
+            editable={!disabled}
+            keyboardType={type === 'text' ? 'default' : 'numeric'}
+            autoCorrect={false}
+            {...rest}
+            autoCapitalize={finalAutoCapitalize}
+          />
+        </S.InputContainer>
+        {error && (
+          <Label
+            typography={theme.typography.paragraph.sm1}
+            color={theme.colors.error}
+            text={error}
+          />
+        )}
+      </S.Wrapper>
+    );
+  },
+);
 
 Input.displayName = 'Input';
 

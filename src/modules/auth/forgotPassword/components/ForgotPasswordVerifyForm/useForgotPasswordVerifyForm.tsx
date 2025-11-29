@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useState, useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import useAuthQueries from '../../../services/authQueryFactory';
@@ -11,7 +11,13 @@ import {
   forgotPasswordValidationSchema,
 } from '../schema/forgotPassword';
 
-const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
+const useForgotPasswordVerifyForm = (
+  email: string,
+  onSuccess: () => void,
+) => {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'SUCCESS' | 'ERROR'>('ERROR');
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const {
     control,
     handleSubmit,
@@ -23,7 +29,7 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
   } = useForm<ForgotPasswordValidationFormData>({
     resolver: zodResolver(forgotPasswordValidationSchema),
     defaultValues: {
-      email: '',
+      email: email,
       otp: '',
       newPassword: '',
       confirmPassword: '',
@@ -31,9 +37,25 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     mode: 'onSubmit',
   });
 
+  // Atualizar o email quando ele mudar
+  useEffect(() => {
+    setValue('email', email);
+  }, [email, setValue]);
+
   const {useForgotPasswordReset} = useAuthQueries(['auth']);
 
   const {navigate} = useNavigation<NavigationStackProp>();
+
+  const showToast = useCallback((message: string, type: 'SUCCESS' | 'ERROR') => {
+    setToastMessage(message);
+    setToastType(type);
+    setIsToastOpen(true);
+  }, []);
+
+  const closeToast = useCallback(() => {
+    setIsToastOpen(false);
+    setToastMessage(null);
+  }, []);
 
   const onBackCleanup = () => {
     reset();
@@ -55,26 +77,37 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     async (values: ForgotPasswordValidationFormData) => {
       try {
         const payload: forgotPasswordValidateRequest = {
-          email: values.email,
+          email: email,
           otp: values.otp,
           newPassword: values.newPassword,
         };
 
         const res = await forgotPasswordValidateMutate(payload);
 
-        if (res.status === 'success') {
-          navigateToLogin();
+        if (res && res.status === 'success') {
+          reset();
+          showToast('Senha redefinida com sucesso!', 'SUCCESS');
+          // Aguardar um pouco para mostrar o toast antes de redirecionar
+          setTimeout(() => {
+            onSuccess();
+          }, 1500);
         } else {
-          throw new Error('Forgot password request failed');
+          const errorMessage =
+            res?.message || 'Falha ao redefinir senha. Tente novamente.';
+          showToast(errorMessage, 'ERROR');
         }
 
-        reset();
         return res;
       } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao redefinir senha. Verifique os dados e tente novamente.';
+        showToast(errorMessage, 'ERROR');
         throw error;
       }
     },
-    [forgotPasswordValidateMutate, reset],
+    [forgotPasswordValidateMutate, reset, onSuccess, email, showToast],
   );
 
   return {
@@ -90,6 +123,10 @@ const useForgotPasswordVerifyForm = (onSuccess: () => void) => {
     navigateToLogin,
     onBackCleanup,
     isLoading: isForgotPasswordValidating,
+    toastMessage,
+    toastType,
+    isToastOpen,
+    closeToast,
   };
 };
 

@@ -46,6 +46,13 @@ const authServices = {
         },
       },
     );
+    // Se a resposta for 204 (No Content), retornar um objeto de sucesso
+    if (response.status === 204 || !response.data) {
+      return {
+        status: 'success',
+        message: 'Código de verificação enviado com sucesso',
+      };
+    }
     return response.data;
   },
 
@@ -56,6 +63,13 @@ const authServices = {
       apiRoutes.authentication.forgotPasswordReset,
       data,
     );
+    // Se a resposta for 204 (No Content), retornar um objeto de sucesso
+    if (response.status === 204 || !response.data) {
+      return {
+        status: 'success',
+        message: 'Senha redefinida com sucesso',
+      };
+    }
     return response.data;
   },
 
