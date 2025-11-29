@@ -4,10 +4,11 @@ import Label from '../../../components/Label/Label';
 import Button from '../../../components/Button/Button';
 import useOnboardingEnd from './useOnboardingEnd';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
+import ICIQWarningModal from '../components/ICIQWarningModal';
 import * as S from './styles';
 
 const OnboardingEnd: React.FC = () => {
-  const {handleGoToRegister, handleContinueAnonymous} = useOnboardingEnd();
+  const {handleGoToRegister, handleContinueAnonymous, showICIQWarning, handleICIQWarningContinue} = useOnboardingEnd();
   const theme = useDynamicTheme();
 
   return (
@@ -127,6 +128,11 @@ const OnboardingEnd: React.FC = () => {
           </S.Card>
         </S.CardContainer>
       </S.Wrapper>
+      <ICIQWarningModal
+        visible={showICIQWarning}
+        onClose={handleICIQWarningContinue}
+        onContinue={handleICIQWarningContinue}
+      />
     </ScreenContainer>
   );
 };

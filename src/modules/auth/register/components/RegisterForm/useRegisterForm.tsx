@@ -53,7 +53,8 @@ const useRegisterForm = () => {
         };
 
         await authRegister(payload);
-        navigate('MainTabs');
+        // Redirecionar para tela de login após registro bem-sucedido
+        navigate('Auth', {screen: 'Login'});
 
         reset();
       } catch (error) {

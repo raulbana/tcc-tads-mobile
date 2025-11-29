@@ -5,9 +5,11 @@ import {NavigationStackProp} from '../../../navigation/routes';
 import {useDiary} from '../../../contexts/DiaryContext';
 import {useMemo, useEffect} from 'react';
 import {useNotificationPermissionModal} from '../../../hooks/useNotificationPermissionModal';
+import {MMKVStorage, EXERCISES_BLOCKED_KEY} from '../../../storage/mmkvStorage';
+import {shouldBlockExercises} from '../../../utils/profileUtils';
 
 const useHome = () => {
-  const {user, isAnonymous, isLoading: isAuthLoading} = useAuth();
+  const {user, isAnonymous, isLoading: isAuthLoading, getPatientProfile} = useAuth();
   const {workoutPlan, isLoading: isExercisesLoading} = useExercises();
   const {calendarData, isLoading: isDiaryLoading} = useDiary();
   const {navigate} = useNavigation<NavigationStackProp>();
@@ -18,6 +20,15 @@ const useHome = () => {
   } = useNotificationPermissionModal();
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
+
+  // Verificar se os exercícios estão bloqueados
+  const isExercisesBlocked = useMemo(() => {
+    const profile = getPatientProfile();
+    if (profile) {
+      return shouldBlockExercises(profile);
+    }
+    return MMKVStorage.getString(EXERCISES_BLOCKED_KEY) === 'true';
+  }, [getPatientProfile]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -75,6 +86,7 @@ const useHome = () => {
     titleText,
     notificationModalVisible,
     hideNotificationModal,
+    isExercisesBlocked,
   };
 };
 

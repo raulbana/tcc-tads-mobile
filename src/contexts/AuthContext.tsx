@@ -243,8 +243,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         // Se há usuário e token salvos, validar token em background
         if (loggedUser && token) {
           try {
-          const parsedUser = JSON.parse(loggedUser) as User;
-          if (!mounted) return;
+            const parsedUser = JSON.parse(loggedUser) as User;
+            if (!mounted) return;
 
             const isValid = await validateToken(parsedUser.id);
             if (!mounted) return;
@@ -252,8 +252,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             if (isValid) {
               // Atualizar estado se necessário (pode já estar atualizado pelo estado inicial)
               if (mounted) {
-              setUser(parsedUser);
-              setIsLoggedIn(true);
+                setUser(parsedUser);
+                setIsLoggedIn(true);
                 setIsAnonymous(false);
               }
 
@@ -371,6 +371,18 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();
 
+        // Sincronizar dados offline após login bem-sucedido
+        try {
+          const offlineSyncService = (
+            await import('../services/offlineSyncService')
+          ).default;
+          const userId = response.user.id.toString();
+          await offlineSyncService.syncAllOfflineData(userId);
+        } catch (syncError) {
+          console.error('Erro ao sincronizar dados offline:', syncError);
+          // Continuar mesmo se falhar, não bloquear o login
+        }
+
         if (hasPermission && response.user?.id) {
           try {
             await registerToken(response.user.id);
@@ -451,12 +463,9 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         }
 
         const response = await authServices.register(userData);
-        const loginCredentials = {
-          email: userData.email,
-          password: userData.password,
-        };
-        await login(loginCredentials);
 
+        // Limpar dados de onboarding após registro bem-sucedido
+        // Nota: A sincronização de dados offline será feita quando o usuário fizer login
         await clearOnboardingData();
         setPendingRegister(false);
       } catch (error) {
@@ -468,12 +477,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [
-      login,
-      getOnboardingDataForRegister,
-      clearOnboardingData,
-      setPendingRegister,
-    ],
+    [getOnboardingDataForRegister, clearOnboardingData, setPendingRegister],
   );
 
   const saveTempUserData = useCallback(

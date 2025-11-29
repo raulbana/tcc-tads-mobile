@@ -20,9 +20,9 @@ export interface DayRegisterModalProps {
 }
 
 const amountLabel: Record<string, string> = {
-  LOW: 'Baixo',
-  MEDIUM: 'Médio',
-  HIGH: 'Alto',
+  LOW: 'Pouco (até 100ml)',
+  MEDIUM: 'Médio (100-300ml)',
+  HIGH: 'Alto (acima de 300ml)',
 };
 
 const formatTimeForDisplay = (time: string | string[]): string => {

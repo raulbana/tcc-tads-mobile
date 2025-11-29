@@ -89,11 +89,40 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
   );
 
   const checkUserWorkoutPlan = useCallback(async () => {
-    const result = await refetchUserWorkoutPlan();
-    if (!result.data) {
-      throw new Error('Usuário não possui um plano de treino ativo. Por favor, complete o onboarding para iniciar um plano de treino.');
+    try {
+      const result = await refetchUserWorkoutPlan();
+      
+      // Verificar se há erro na query
+      if (result.error) {
+        console.error('Error fetching user workout plan:', result.error);
+        throw new Error('Erro ao verificar plano de treino. Tente novamente.');
+      }
+
+      // Verificar se os dados existem e se há um plano válido
+      if (!result.data) {
+        // Verificar também se há workouts disponíveis (pode indicar que há plano mesmo sem resposta da API)
+        if (workouts.length === 0) {
+          throw new Error('Usuário não possui um plano de treino ativo. Por favor, complete o onboarding para iniciar um plano de treino.');
+        }
+        // Se há workouts, provavelmente há um plano, então permitir continuar
+        return;
+      }
+
+      // Se chegou aqui, há um plano válido
+    } catch (error) {
+      // Se for um erro que já foi lançado, re-lançar
+      if (error instanceof Error && error.message.includes('plano de treino')) {
+        throw error;
+      }
+      // Para outros erros, verificar se há workouts como fallback
+      if (workouts.length > 0) {
+        // Se há workouts disponíveis, provavelmente há um plano
+        return;
+      }
+      // Se não há workouts e há erro, lançar erro genérico
+      throw new Error('Erro ao verificar plano de treino. Tente novamente.');
     }
-  }, [refetchUserWorkoutPlan]);
+  }, [refetchUserWorkoutPlan, workouts]);
 
   const value = useMemo(
     () => ({

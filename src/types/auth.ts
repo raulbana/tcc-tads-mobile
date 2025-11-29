@@ -16,6 +16,7 @@ export interface PatientProfile {
   q2Score: number;
   q3Score: number;
   q4Score: number;
+  iciqScore: number;
 }
 
 export interface Preferences {

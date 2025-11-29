@@ -15,6 +15,7 @@ export interface WorkoutCardProps {
   badge: string;
   onPress: () => void;
   showBadge?: boolean;
+  disabled?: boolean;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
@@ -26,6 +27,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   badge,
   onPress,
   showBadge = false,
+  disabled = false,
 }) => {
 
   const theme = useDynamicTheme();
@@ -105,6 +107,7 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
           onPress={onPress}
           type="PRIMARY"
           size="MEDIUM"
+          disabled={disabled}
         />
       </S.ButtonContainer>
     </S.Container>

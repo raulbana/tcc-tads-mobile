@@ -37,14 +37,25 @@ const Navigator: React.FC = () => {
     <Stack.Navigator
       initialRouteName={initialRouteName as keyof RootParamList}
       screenOptions={{headerShown: false}}>
-      {routes.map(route => (
-        <Stack.Screen
-          key={route.name}
-          name={route.name as keyof RootParamList}
-          component={route.component}
-          options={route.options}
-        />
-      ))}
+      {routes.map(route => {
+        // Desabilitar gesto de voltar na MainTabs quando logado
+        const screenOptions =
+          route.name === 'MainTabs' && isLoggedIn
+            ? {
+                gestureEnabled: false,
+                headerBackVisible: false,
+              }
+            : undefined;
+
+        return (
+          <Stack.Screen
+            key={route.name}
+            name={route.name as keyof RootParamList}
+            component={route.component}
+            options={screenOptions || route.options}
+          />
+        );
+      })}
     </Stack.Navigator>
   );
 };

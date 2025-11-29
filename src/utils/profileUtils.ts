@@ -1,6 +1,24 @@
 import {PatientProfile, PatientProfileDTO} from '../types/auth';
 
 /**
+ * Calcula o score ICIQ baseado nos scores das questões
+ * @param profile - Perfil do paciente
+ * @returns Score ICIQ total
+ */
+export const calculateICIQScore = (profile: PatientProfile): number => {
+  return profile.q1Score + profile.q2Score + profile.q3Score + profile.q4Score;
+};
+
+/**
+ * Verifica se os exercícios devem ser bloqueados baseado no score ICIQ
+ * @param profile - Perfil do paciente
+ * @returns true se score > 12, false caso contrário
+ */
+export const shouldBlockExercises = (profile: PatientProfile): boolean => {
+  return profile.iciqScore > 12;
+};
+
+/**
  * Transforma o PatientProfile local em PatientProfileDTO para a API
  * @param profile - Perfil do paciente no formato local
  * @param urinationLoss - String com as respostas da questão q6_when (quando ocorre a perda)
@@ -18,7 +36,7 @@ export const transformProfileToDTO = (
     return `${year}-${month}-${day}`;
   };
 
-  const iciqScore = profile.q1Score + profile.q2Score + profile.q3Score + profile.q4Score;
+  const iciqScore = calculateICIQScore(profile);
 
   return {
     birthDate: formatDate(profile.birthDate),
@@ -30,4 +48,3 @@ export const transformProfileToDTO = (
     urinationLoss: urinationLoss || '',
   };
 };
-
