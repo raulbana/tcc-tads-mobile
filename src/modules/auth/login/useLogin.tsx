@@ -4,10 +4,17 @@ import { useAuth } from '../../../contexts/AuthContext';
 
 const useLogin = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
-  const {user} = useAuth();
+  const {user, hasOnboardingData, setPendingRegister} = useAuth();
 
   const handleGoToRegister = () => {
-    navigate('Auth', {screen: 'Register'});
+    if (hasOnboardingData()) {
+      // Se tem dados de onboarding, vai direto para cadastro
+      navigate('Auth', {screen: 'Register'});
+    } else {
+      // Se não tem, marca como pending e vai para onboarding
+      setPendingRegister(true);
+      navigate('Onboarding', {screen: 'OnboardingHome'});
+    }
   };
 
   const handleGoToForgotPassword = () => {

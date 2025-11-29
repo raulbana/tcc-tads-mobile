@@ -148,6 +148,7 @@ const ContentDetails = () => {
               ? content.categories[0]
               : 'Sem categoria'
           }
+          likesCount={content.likesCount}
         />
         <S.CommentSectionAnchor onLayout={handleCommentSectionLayout}>
           <CommentSection

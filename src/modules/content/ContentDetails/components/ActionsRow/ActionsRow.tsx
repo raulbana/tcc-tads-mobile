@@ -1,6 +1,7 @@
 import Badge from '../../../../../components/Badge/Badge';
 import LikeButton from '../../../../../components/LikeButton/LikeButton';
 import SaveButton from '../../../../../components/SaveButton/SaveButton';
+import Label from '../../../../../components/Label/Label';
 import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 import RepostButton from '../RepostButton/RepostButton';
 import * as S from './styles';
@@ -13,6 +14,7 @@ export interface ActionsRowProps {
   isSaved?: boolean;
   onSavePress: () => void;
   category: string;
+  likesCount?: number;
 }
 
 const ActionsRow: React.FC<ActionsRowProps> = ({
@@ -23,6 +25,7 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
   isSaved,
   onSavePress,
   category,
+  likesCount = 0,
 }) => {
   const theme = useDynamicTheme();
 
@@ -34,7 +37,16 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
         textColor={theme.colors.purple_04}
       />
       <S.RightActions>
-        <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
+        <S.LikeContainer>
+          <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
+          {likesCount > 0 && (
+            <Label
+              typography={theme.typography.paragraph.sm2}
+              color={isLiked ? theme.colors.purple_03 : theme.colors.gray_06}
+              text={likesCount.toString()}
+            />
+          )}
+        </S.LikeContainer>
         <SaveButton onPress={onSavePress} size={28} isSaved={isSaved} />
       </S.RightActions>
     </S.ActionsRowContainer>

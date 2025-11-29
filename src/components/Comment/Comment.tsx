@@ -91,7 +91,17 @@ const Comment: React.FC<CommentProps> = ({
 
   return (
     <S.Container>
-      <S.Avatar source={{uri: author.profilePicture}} />
+      {author?.profilePicture ? (
+        <S.Avatar source={{uri: author.profilePicture}} />
+      ) : (
+        <S.AvatarPlaceholder>
+          <Label
+            typography={theme.typography.paragraph.sb2}
+            color={theme.colors.gray_06}
+            text={author?.name?.charAt(0)?.toUpperCase() || 'U'}
+          />
+        </S.AvatarPlaceholder>
+      )}
       <S.Content>
         <S.HeaderRow>
           <Label
@@ -101,7 +111,7 @@ const Comment: React.FC<CommentProps> = ({
                 : theme.typography.paragraph.sb3
             }
             color={theme.colors.gray_08}
-            text={author.name}
+            text={author?.name || 'Usuário'}
           />
           <Label
             typography={theme.typography.paragraph.sm1}

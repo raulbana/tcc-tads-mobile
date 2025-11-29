@@ -29,10 +29,22 @@ const useRegisterForm = () => {
 
   const {navigate} = useNavigation<NavigationStackProp>();
 
-  const {register: authRegister, isLoading: authLoading} = useAuth();
+  const {
+    register: authRegister,
+    isLoading: authLoading,
+    hasOnboardingData,
+    setPendingRegister,
+  } = useAuth();
 
   const onSubmit = useCallback(
     async (values: RegisterFormData) => {
+      // Verificar se tem dados de onboarding antes de processar o registro
+      if (!hasOnboardingData()) {
+        setPendingRegister(true);
+        navigate('Onboarding', {screen: 'OnboardingHome'});
+        return;
+      }
+
       try {
         const payload = {
           name: values.name,
@@ -48,7 +60,7 @@ const useRegisterForm = () => {
         throw error;
       }
     },
-    [authRegister, navigate, reset],
+    [authRegister, navigate, reset, hasOnboardingData, setPendingRegister],
   );
 
   return {

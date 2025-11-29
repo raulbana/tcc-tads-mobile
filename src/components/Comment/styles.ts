@@ -27,6 +27,15 @@ export const Avatar = styled.Image`
   background-color: ${({theme}) => theme.colors.gray_03};
 `;
 
+export const AvatarPlaceholder = styled.View`
+  width: ${horizontalScale(36)}px;
+  height: ${verticalScale(36)}px;
+  border-radius: ${moderateScale(18)}px;
+  background-color: ${({theme}) => theme.colors.gray_04};
+  align-items: center;
+  justify-content: center;
+`;
+
 export const Content = styled.View`
   flex: 1;
 `;
