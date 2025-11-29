@@ -68,7 +68,7 @@ const Input = React.forwardRef<TextInput, InputProps>(
             {required && (
               <Label
                 typography={theme.typography.paragraph.r3}
-                color={theme.colors.error}
+                color={theme.colors.gray_08}
                 text=" *"
               />
             )}

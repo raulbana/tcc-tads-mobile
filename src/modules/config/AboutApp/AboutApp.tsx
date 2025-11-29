@@ -106,4 +106,3 @@ const AboutApp: React.FC = () => {
 };
 
 export default AboutApp;
-

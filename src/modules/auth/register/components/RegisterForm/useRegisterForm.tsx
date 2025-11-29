@@ -12,6 +12,7 @@ const useRegisterForm = () => {
     handleSubmit,
     formState: {isValid, errors},
     setValue,
+    setError,
     watch,
     reset,
     register,
@@ -57,11 +58,19 @@ const useRegisterForm = () => {
         navigate('Auth', {screen: 'Login'});
 
         reset();
-      } catch (error) {
-        throw error;
+      } catch (error: any) {
+        const message =
+          error?.message && typeof error.message === 'string'
+            ? error.message
+            : 'Erro ao realizar cadastro. Tente novamente.';
+
+        setError('email', {
+          type: 'manual',
+          message,
+        });
       }
     },
-    [authRegister, navigate, reset, hasOnboardingData, setPendingRegister],
+    [authRegister, navigate, reset, hasOnboardingData, setPendingRegister, setError],
   );
 
   return {

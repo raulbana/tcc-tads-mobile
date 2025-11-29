@@ -66,7 +66,10 @@ function App(): React.ReactElement {
         await notificationService.initialize();
         console.log('[App] Serviço de notificações inicializado');
       } catch (error) {
-        console.error('[App] Erro ao inicializar serviço de notificações:', error);
+        console.error(
+          '[App] Erro ao inicializar serviço de notificações:',
+          error,
+        );
       }
     };
 

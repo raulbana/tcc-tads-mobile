@@ -213,6 +213,38 @@ const useContentDetails = () => {
     }
   }, [content, user, toggleSaveMutation]);
 
+  const handleLoadReplies = useCallback(async (commentId: string) => {
+    try {
+      const replies = await contentServices.getCommentReplies(commentId);
+      const limitDepth = (
+        commentList: Comment[],
+        depth: number = 0,
+      ): Comment[] => {
+        if (depth >= 2) {
+          return commentList.map(comment => ({
+            ...comment,
+            replies: [],
+          }));
+        }
+        return commentList.map(comment => ({
+          ...comment,
+          replies: comment.replies
+            ? limitDepth(comment.replies, depth + 1)
+            : [],
+        }));
+      };
+      const limitedReplies = limitDepth(replies, 1);
+      setComments(prev =>
+        updateCommentById(prev, commentId, comment => ({
+          ...comment,
+          replies: limitedReplies,
+        })),
+      );
+    } catch (err) {
+      console.error('Error loading replies:', err);
+    }
+  }, []);
+
   const handleSendComment = useCallback(
     async (text?: string, parentId?: string) => {
       if (!content || !user) return;
@@ -226,16 +258,15 @@ const useContentDetails = () => {
       if (!finalText.trim()) return;
 
       try {
-        // Se está respondendo a um comentário, garantir que as respostas estejam carregadas
         if (resolvedParentId) {
-          const parentComment = comments.find(
-            c => c.id === resolvedParentId,
-          ) || comments.find(c => 
-            c.replies?.some(r => r.id === resolvedParentId)
-          );
-          
-          // Se o comentário pai não tem respostas carregadas, carregar antes
-          if (parentComment && (!parentComment.replies || parentComment.replies.length === 0)) {
+          const parentComment =
+            comments.find(c => c.id === resolvedParentId) ||
+            comments.find(c => c.replies?.some(r => r.id === resolvedParentId));
+
+          if (
+            parentComment &&
+            (!parentComment.replies || parentComment.replies.length === 0)
+          ) {
             await handleLoadReplies(resolvedParentId);
           }
         }
@@ -258,7 +289,7 @@ const useContentDetails = () => {
 
         // Refetch para garantir que todas as respostas sejam atualizadas
         const updatedContent = await refetchContent({cancelRefetch: false});
-        
+
         // Se há um parentId, garantir que todas as respostas sejam carregadas após o refetch
         if (resolvedParentId && updatedContent.data) {
           const organizedComments = organizeCommentsHierarchy(
@@ -321,38 +352,6 @@ const useContentDetails = () => {
   const handleRefresh = useCallback(() => {
     refetchContent();
   }, [refetchContent]);
-
-  const handleLoadReplies = useCallback(async (commentId: string) => {
-    try {
-      const replies = await contentServices.getCommentReplies(commentId);
-      const limitDepth = (
-        commentList: Comment[],
-        depth: number = 0,
-      ): Comment[] => {
-        if (depth >= 2) {
-          return commentList.map(comment => ({
-            ...comment,
-            replies: [],
-          }));
-        }
-        return commentList.map(comment => ({
-          ...comment,
-          replies: comment.replies
-            ? limitDepth(comment.replies, depth + 1)
-            : [],
-        }));
-      };
-      const limitedReplies = limitDepth(replies, 1);
-      setComments(prev =>
-        updateCommentById(prev, commentId, comment => ({
-          ...comment,
-          replies: limitedReplies,
-        })),
-      );
-    } catch (err) {
-      console.error('Error loading replies:', err);
-    }
-  }, []);
 
   const handleOpenReportModal = useCallback((contentId: string) => {
     setReportContentId(contentId);

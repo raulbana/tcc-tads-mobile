@@ -55,15 +55,22 @@ function DataTable<
       displayValue = raw ? 'Sim' : 'Não';
     }
 
+    const isReasonColumn = column.key === ('reason' as K);
+    const textValue =
+      typeof displayValue === 'string' ? displayValue : String(displayValue ?? '');
+    const limitedText = isReasonColumn ? textValue.slice(0, 5) : textValue;
+
     return (
       <S.Cell
         key={column.key}
         width={column.width}
         align={column.align || 'center'}>
-        <Label 
+        <Label
           typography={theme.typography.paragraph.sm1}
-          color={theme.colors.gray_08}>
-          {displayValue as React.ReactNode}
+          color={theme.colors.gray_08}
+          numberOfLines={1}
+          ellipsizeMode="tail">
+          {isReasonColumn ? (limitedText as React.ReactNode) : (displayValue as React.ReactNode)}
         </Label>
       </S.Cell>
     );

@@ -35,6 +35,8 @@ const ContentCard: React.FC<ContentCardProps> = ({
             typography={theme.typography.paragraph.b3}
             color={textColor}
             text={title}
+            numberOfLines={2}
+            ellipsizeMode="tail"
           />
         </S.Content>
       </S.BackgroundImage>

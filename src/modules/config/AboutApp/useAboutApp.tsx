@@ -14,4 +14,3 @@ const useAboutApp = () => {
 };
 
 export default useAboutApp;
-

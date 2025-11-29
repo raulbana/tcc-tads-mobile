@@ -432,11 +432,26 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         }
 
         navigate('MainTabs');
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Erro ao fazer login';
+      } catch (error: any) {
+        let errorMessage = 'Erro ao fazer login';
+
+        if (error?.response) {
+          const status = error.response.status;
+          const apiMessage = error.response.data?.message;
+
+          if (status === 401 || status === 400) {
+            errorMessage =
+              apiMessage ||
+              'Credenciais incorretas. Verifique seu e-mail e senha.';
+          } else if (apiMessage) {
+            errorMessage = apiMessage;
+          }
+        } else if (error instanceof Error && error.message) {
+          errorMessage = error.message;
+        }
+
         setError(errorMessage);
-        throw error;
+        throw new Error(errorMessage);
       } finally {
         setIsLoading(false);
       }

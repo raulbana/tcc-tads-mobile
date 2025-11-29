@@ -35,4 +35,3 @@ export const FeatureList = styled.View`
 export const FeatureItem = styled.View`
   width: 100%;
 `;
-

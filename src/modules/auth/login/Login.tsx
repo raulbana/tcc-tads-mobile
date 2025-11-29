@@ -6,7 +6,7 @@ import * as S from './styles';
 import useLogin from './useLogin';
 import Label from '../../../components/Label/Label';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
-import { useDynamicTheme } from '../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 
 const Login: React.FC = () => {
   const {handleGoToRegister, handleGoToForgotPassword, handleSkipLogin} =

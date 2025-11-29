@@ -66,14 +66,16 @@ const ContentDetails = () => {
     if (replyTo && scrollRef.current && commentInputOffsetRef.current > 0) {
       const targetOffset = Math.max(commentInputOffsetRef.current - 24, 0);
       scrollRef.current.scrollTo({y: targetOffset, animated: true});
-      
+
       setTimeout(() => {
         commentInputRef.current?.focus();
       }, 300);
     }
   }, [replyTo]);
 
-  const videoMedia = content?.media?.find(m => m?.contentType?.startsWith('video/'));
+  const videoMedia = content?.media?.find(m =>
+    m?.contentType?.startsWith('video/'),
+  );
 
   return isLoading || !content ? (
     <Loader overlay />
@@ -100,9 +102,14 @@ const ContentDetails = () => {
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={content.description}
-            textAlign="justify"
-          />
+            textAlign="justify">
+            {content.description.split('\n').map((line, index) => (
+              <React.Fragment key={index}>
+                {line}
+                {index < content.description.split('\n').length - 1 && '\n'}
+              </React.Fragment>
+            ))}
+          </Label>
         )}
 
         <CarouselSection
@@ -124,17 +131,33 @@ const ContentDetails = () => {
         {content.subtitle && (
           <Label
             typography={theme.typography.paragraph.sb3}
-            color={theme.colors.gray_08}
-            text={content.subtitle}
-          />
+            color={theme.colors.gray_08}>
+            {(() => {
+              const lines = (content.subtitle ?? '').split('\n');
+              return lines.map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < lines.length - 1 && '\n'}
+                </React.Fragment>
+              ));
+            })()}
+          </Label>
         )}
         {content.subcontent && (
           <Label
             typography={theme.typography.paragraph.r2}
             color={theme.colors.gray_08}
-            text={content.subcontent}
-            textAlign="justify"
-          />
+            textAlign="justify">
+            {(() => {
+              const lines = (content.subcontent ?? '').split('\n');
+              return lines.map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < lines.length - 1 && '\n'}
+                </React.Fragment>
+              ));
+            })()}
+          </Label>
         )}
         <ActionsRow
           isLiked={content.isLiked}
