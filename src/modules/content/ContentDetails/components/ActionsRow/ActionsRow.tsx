@@ -38,7 +38,7 @@ const ActionsRow: React.FC<ActionsRowProps> = ({
       />
       <S.RightActions>
         <S.LikeContainer>
-          <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
+        <LikeButton onPress={onLikePress} size={28} isLiked={isLiked} />
           {likesCount > 0 && (
             <Label
               typography={theme.typography.paragraph.sm2}

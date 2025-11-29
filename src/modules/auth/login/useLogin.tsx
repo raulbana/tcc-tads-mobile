@@ -9,7 +9,7 @@ const useLogin = () => {
   const handleGoToRegister = () => {
     if (hasOnboardingData()) {
       // Se tem dados de onboarding, vai direto para cadastro
-      navigate('Auth', {screen: 'Register'});
+    navigate('Auth', {screen: 'Register'});
     } else {
       // Se não tem, marca como pending e vai para onboarding
       setPendingRegister(true);

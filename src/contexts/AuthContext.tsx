@@ -243,8 +243,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         // Se há usuário e token salvos, validar token em background
         if (loggedUser && token) {
           try {
-            const parsedUser = JSON.parse(loggedUser) as User;
-            if (!mounted) return;
+          const parsedUser = JSON.parse(loggedUser) as User;
+          if (!mounted) return;
 
             const isValid = await validateToken(parsedUser.id);
             if (!mounted) return;
@@ -252,8 +252,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
             if (isValid) {
               // Atualizar estado se necessário (pode já estar atualizado pelo estado inicial)
               if (mounted) {
-                setUser(parsedUser);
-                setIsLoggedIn(true);
+              setUser(parsedUser);
+              setIsLoggedIn(true);
                 setIsAnonymous(false);
               }
 
