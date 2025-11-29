@@ -21,12 +21,17 @@ import {
   ONBOARDING_PROFILE_DTO_KEY,
   ONBOARDING_URINATION_LOSS_KEY,
   PENDING_REGISTER_KEY,
+  DIARY_CALENDAR_KEY,
+  EXERCISES_DATA_KEY,
+  MMKV_CACHE_USER_KEY,
+  EXERCISES_BLOCKED_KEY,
 } from '../storage/mmkvStorage';
 import {transformProfileToDTO} from '../utils/profileUtils';
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
 import useNotifications from '../hooks/useNotifications';
+import {queryClient} from '../../App';
 
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
@@ -142,6 +147,31 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     }
   }, []);
 
+  const clearUserData = useCallback(async () => {
+    try {
+      // Limpar dados do diário
+      MMKVStorage.delete(DIARY_CALENDAR_KEY);
+
+      // Limpar dados de exercícios
+      MMKVStorage.delete(EXERCISES_DATA_KEY);
+      MMKVStorage.delete(EXERCISES_BLOCKED_KEY);
+
+      // Limpar cache do usuário
+      MMKVStorage.delete(MMKV_CACHE_USER_KEY);
+
+      // Limpar dados de onboarding (caso ainda existam)
+      MMKVStorage.delete(ONBOARDING_DATA_KEY);
+      MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
+      MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
+      MMKVStorage.delete(PENDING_REGISTER_KEY);
+
+      // Limpar cache do React Query
+      queryClient.clear();
+    } catch (error) {
+      console.error('Error clearing user data:', error);
+    }
+  }, []);
+
   const saveTempUser = useCallback(async (userObj: User) => {
     try {
       const userJson = JSON.stringify(userObj);
@@ -174,8 +204,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         }
       }
 
+      // Limpar todos os dados do usuário
+      await clearUserData();
       await clearAuthData();
       await clearTempUser();
+
       setUser(null);
       setIsLoggedIn(false);
       setIsAnonymous(false);
@@ -186,7 +219,14 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuthData, user, removeToken, navigate, clearTempUser]);
+  }, [
+    clearAuthData,
+    clearUserData,
+    user,
+    removeToken,
+    navigate,
+    clearTempUser,
+  ]);
 
   const validateToken = useCallback(
     async (userId?: number): Promise<boolean> => {

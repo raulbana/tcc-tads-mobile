@@ -110,7 +110,11 @@ const TalkToUsForm: React.FC = () => {
           onPress={handleSubmit(onSubmit)}
           disabled={isLoading}
         />
-        {isLoading && <Loader />}
+        {isLoading && (
+          <S.LoaderContainer>
+            <Loader />
+          </S.LoaderContainer>
+        )}
       </S.ButtonContainer>
     </S.FormContainer>
   );

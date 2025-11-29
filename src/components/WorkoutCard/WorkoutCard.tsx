@@ -4,7 +4,7 @@ import Button from '../Button/Button';
 import Icon from '../Icon/Icon';
 import * as S from './styles';
 import Badge from '../Badge/Badge';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 export interface WorkoutCardProps {
   title: string;
@@ -29,9 +29,8 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   showBadge = false,
   disabled = false,
 }) => {
-
   const theme = useDynamicTheme();
-  
+
   return (
     <S.Container>
       <S.Header>
@@ -44,7 +43,11 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
         </S.TitleContainer>
         {showBadge && (
           <S.BadgeContainer>
-          <Badge borderColor={theme.colors.purple_02} backgroundColor={theme.colors.purple_02} content={badge} />
+            <Badge
+              borderColor={theme.colors.purple_02}
+              backgroundColor={theme.colors.purple_02}
+              content={badge}
+            />
           </S.BadgeContainer>
         )}
       </S.Header>

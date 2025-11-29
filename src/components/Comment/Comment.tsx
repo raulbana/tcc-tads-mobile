@@ -50,11 +50,14 @@ const Comment: React.FC<CommentProps> = ({
   const {toggleReplies, repliesVisible} = useComment();
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const normalizedCurrentUserId = currentUserId ?? '';
-  const normalizedContentOwnerId = contentOwnerId ?? '';
-  const authorId = comment.author.id.toString();
+  const normalizedCurrentUserId = currentUserId ? currentUserId.toString() : '';
+  const normalizedContentOwnerId = contentOwnerId
+    ? contentOwnerId.toString()
+    : '';
+  const authorId = comment.author?.id?.toString() || '';
   const canManage =
     !!normalizedCurrentUserId &&
+    !!authorId &&
     (normalizedCurrentUserId === authorId ||
       normalizedCurrentUserId === normalizedContentOwnerId);
 

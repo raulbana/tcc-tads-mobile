@@ -15,7 +15,7 @@ import notificationService from './src/services/notificationService';
 if (__DEV__) {
   require('./ReactotronConfig');
 }
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const AppContent = () => {
   const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();

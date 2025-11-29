@@ -7,7 +7,7 @@ const TalkToUs = () => {
   const {onGoBack} = useTalkToUs();
 
   return (
-    <ScreenContainer headerShown goBack={onGoBack} goBackTo="Minha Conta">
+    <ScreenContainer headerShown goBack={onGoBack} goBackTo="Minha Conta" scrollable>
       <S.Container>
         <TalkToUsForm />
       </S.Container>

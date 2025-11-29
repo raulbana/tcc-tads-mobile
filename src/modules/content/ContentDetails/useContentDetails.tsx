@@ -226,6 +226,20 @@ const useContentDetails = () => {
       if (!finalText.trim()) return;
 
       try {
+        // Se está respondendo a um comentário, garantir que as respostas estejam carregadas
+        if (resolvedParentId) {
+          const parentComment = comments.find(
+            c => c.id === resolvedParentId,
+          ) || comments.find(c => 
+            c.replies?.some(r => r.id === resolvedParentId)
+          );
+          
+          // Se o comentário pai não tem respostas carregadas, carregar antes
+          if (parentComment && (!parentComment.replies || parentComment.replies.length === 0)) {
+            await handleLoadReplies(resolvedParentId);
+          }
+        }
+
         await createCommentMutation.mutateAsync({
           contentId: parseInt(contentId),
           authorId: user.id,
@@ -242,7 +256,16 @@ const useContentDetails = () => {
           setCommentText('');
         }
 
-        await refetchContent({cancelRefetch: false});
+        // Refetch para garantir que todas as respostas sejam atualizadas
+        const updatedContent = await refetchContent({cancelRefetch: false});
+        
+        // Se há um parentId, garantir que todas as respostas sejam carregadas após o refetch
+        if (resolvedParentId && updatedContent.data) {
+          const organizedComments = organizeCommentsHierarchy(
+            updatedContent.data.comments || [],
+          );
+          setComments(organizedComments);
+        }
       } catch (err) {
         console.error('Error adding comment:', err);
       }
@@ -257,6 +280,7 @@ const useContentDetails = () => {
       user,
       createCommentMutation,
       refetchContent,
+      handleLoadReplies,
     ],
   );
 
@@ -373,10 +397,14 @@ const useContentDetails = () => {
     if (!commentPendingDeletion) return;
     try {
       await deleteCommentMutation.mutateAsync(commentPendingDeletion);
+      // Remover comentário da lista local imediatamente
       setComments(prev => removeCommentById(prev, commentPendingDeletion));
+      // Refetch para garantir sincronização com o servidor
       await refetchContent({cancelRefetch: false});
     } catch (err) {
       console.error('Error deleting comment:', err);
+      // Em caso de erro, refetch para restaurar o estado correto
+      await refetchContent({cancelRefetch: false});
     } finally {
       handleCloseDeleteCommentModal();
     }

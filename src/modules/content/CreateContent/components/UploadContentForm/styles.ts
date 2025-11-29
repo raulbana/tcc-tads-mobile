@@ -26,3 +26,8 @@ export const ButtonContainer = styled.View`
   padding-horizontal: ${horizontalScale(16)}px;
   justify-content: flex-end;
 `;
+
+export const CategoryLabelContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;

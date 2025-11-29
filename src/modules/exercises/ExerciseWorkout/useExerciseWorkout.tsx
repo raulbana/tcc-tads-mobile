@@ -29,6 +29,19 @@ const formatLocalDateTime = (date: Date): string => {
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 };
 
+const extractErrorMessage = (error: any): string => {
+  // Try to extract message from axios error response
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
+  }
+  // Fallback to error message
+  if (error?.message) {
+    return error.message;
+  }
+  // Default fallback
+  return 'Ocorreu um erro inesperado. Tente novamente.';
+};
+
 const useExerciseWorkout = () => {
   const route = useRoute<ExerciseWorkoutRouteProp>();
   const {workout: workoutFromRoute} = route.params;
@@ -75,7 +88,7 @@ const useExerciseWorkout = () => {
     } catch (error: any) {
       console.error('Erro ao verificar plano de treino:', error);
       const errorMsg =
-        error.message ||
+        extractErrorMessage(error) ||
         'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.';
       setErrorMessage(errorMsg);
       setIsToastOpen(true);
@@ -159,7 +172,7 @@ const useExerciseWorkout = () => {
           } catch (error: any) {
             console.error('Erro ao enviar completion do treino:', error);
             const errorMsg =
-              error.message ||
+              extractErrorMessage(error) ||
               'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
             setErrorMessage(errorMsg);
             setIsToastOpen(true);

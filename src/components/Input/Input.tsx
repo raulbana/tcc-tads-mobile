@@ -52,14 +52,37 @@ const Input = React.forwardRef<TextInput, InputProps>(
       ? 'none'
       : rest.autoCapitalize || 'none';
 
+    const maxLength = rest.maxLength;
+    const showCharCounter = maxLength !== undefined;
+    const charCount = value?.length || 0;
+
     return (
       <S.Wrapper>
         {label && (
-          <Label
-            typography={theme.typography.paragraph.r3}
-            color={theme.colors.gray_08}
-            text={label + (required ? ' *' : '')}
-          />
+          <S.LabelContainer>
+            <Label
+              typography={theme.typography.paragraph.r3}
+              color={theme.colors.gray_08}
+              text={label}
+            />
+            {required && (
+              <Label
+                typography={theme.typography.paragraph.r3}
+                color={theme.colors.error}
+                text=" *"
+              />
+            )}
+            {showCharCounter && (
+              <S.CharCounter
+                color={
+                  charCount > maxLength
+                    ? theme.colors.error
+                    : theme.colors.gray_06
+                }>
+                {`${charCount}/${maxLength}`}
+              </S.CharCounter>
+            )}
+          </S.LabelContainer>
         )}
         <S.InputContainer disabled={disabled} error={!!error}>
           <S.StyledInput
