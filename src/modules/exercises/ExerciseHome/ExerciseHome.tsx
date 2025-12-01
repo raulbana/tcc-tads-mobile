@@ -30,7 +30,6 @@ const ExerciseHome = () => {
 
   const theme = useDynamicTheme();
 
-  // Se os exercícios estiverem bloqueados, exibir tela de acesso restrito
   if (isExercisesBlocked) {
     return (
       <ScreenContainer scrollable>

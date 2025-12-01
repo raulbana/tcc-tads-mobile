@@ -41,14 +41,25 @@ const useEditProfile = () => {
 
   useEffect(() => {
     if (user) {
+      const validGenders: Array<'male' | 'female' | 'other'> = [
+        'male',
+        'female',
+        'other',
+      ];
+      const userGender = user.profile?.gender;
+      const gender =
+        userGender && validGenders.includes(userGender)
+          ? userGender
+          : undefined;
+
       reset({
         name: user.name,
         email: user.email,
-        gender: user.profile.gender,
+        gender: gender,
         profilePictureUrl: user.profilePictureUrl || '',
       });
     }
-  }, [user]);
+  }, [user, reset]);
 
   const handleProfilePictureChange = useCallback(
     (imageUri: string) => {
@@ -95,10 +106,12 @@ const useEditProfile = () => {
         profile: {
           ...response.profile,
           gender: response.profile.gender as User['profile']['gender'],
+          iciqScore: response.profile.iciqScore as User['profile']['iciqScore'],
         },
         preferences: {
           ...response.preferences,
-          workoutMediaType: response.preferences.workoutMediaType as User['preferences']['workoutMediaType'],
+          workoutMediaType: response.preferences
+            .workoutMediaType as User['preferences']['workoutMediaType'],
         },
       };
 

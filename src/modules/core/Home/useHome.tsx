@@ -21,7 +21,6 @@ const useHome = () => {
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
 
-  // Verificar se os exercícios estão bloqueados
   const isExercisesBlocked = useMemo(() => {
     const profile = getPatientProfile();
     if (profile) {
@@ -42,7 +41,7 @@ const useHome = () => {
   const hasDiaryEntriesToday = Object.values(calendarData || {}).some(
     day => day.isToday,
   );
-  const hasTrainingData = Array.isArray(workoutPlan) && workoutPlan.length > 0;
+  const hasTrainingData = workoutPlan !== null && workoutPlan.workouts.length > 0;
 
   const handleNavigateToDiary = () => {
     navigate('MainTabs', {screen: 'Diary'});
@@ -50,12 +49,10 @@ const useHome = () => {
 
   const handleNavigateToTrainingDetails = () => {
     const firstWorkout =
-      Array.isArray(workoutPlan) &&
-      workoutPlan.length > 0 &&
-      workoutPlan[0] &&
-      Array.isArray(workoutPlan[0].workouts) &&
-      workoutPlan[0].workouts.length > 0
-        ? workoutPlan[0].workouts[0]
+      workoutPlan &&
+      Array.isArray(workoutPlan.workouts) &&
+      workoutPlan.workouts.length > 0
+        ? workoutPlan.workouts[0]
         : undefined;
 
     if (firstWorkout) {

@@ -3,7 +3,7 @@ import {TouchableOpacity} from 'react-native';
 import {Pencil, Trash} from 'phosphor-react-native';
 import * as S from './styles';
 import Label from '../Label/Label';
-import { useDynamicTheme } from '../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../hooks/useDynamicTheme';
 
 type CellValue = string | number | boolean | null | undefined | React.ReactNode;
 
@@ -37,9 +37,8 @@ function DataTable<
   showEditIcon = true,
   showDeleteIcon = true,
 }: DataTableProps<T, K>) {
-
   const theme = useDynamicTheme();
-  
+
   const handleEditPress = (row: T) => {
     onEditRow?.(row);
   };
@@ -57,7 +56,9 @@ function DataTable<
 
     const isReasonColumn = column.key === ('reason' as K);
     const textValue =
-      typeof displayValue === 'string' ? displayValue : String(displayValue ?? '');
+      typeof displayValue === 'string'
+        ? displayValue
+        : String(displayValue ?? '');
     const limitedText = isReasonColumn ? textValue.slice(0, 5) : textValue;
 
     return (
@@ -70,7 +71,9 @@ function DataTable<
           color={theme.colors.gray_08}
           numberOfLines={1}
           ellipsizeMode="tail">
-          {isReasonColumn ? (limitedText as React.ReactNode) : (displayValue as React.ReactNode)}
+          {isReasonColumn
+            ? (limitedText as React.ReactNode)
+            : (displayValue as React.ReactNode)}
         </Label>
       </S.Cell>
     );

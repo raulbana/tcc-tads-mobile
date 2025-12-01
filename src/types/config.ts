@@ -35,6 +35,7 @@ export interface EditProfileResponse {
   profilePictureUrl?: string;
   role?: string;
   profile: {
+    iciqScore: number;
     id: string;
     birthDate: string;
     gender: string;

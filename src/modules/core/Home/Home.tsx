@@ -12,15 +12,14 @@ import useHome from './useHome';
 import NotificationPermissionModal from '../../../components/NotificationPermissionModal/NotificationPermissionModal';
 import {useNavigation} from '@react-navigation/native';
 import {useFocusEffect} from '@react-navigation/native';
+import { Exercise } from '../../../types/exercise';
 
 const Home = () => {
   const navigation = useNavigation();
 
-  // Interceptar botão voltar quando estiver na home
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        // Se estiver na home, mostrar diálogo de confirmação para sair
         Alert.alert(
           'Sair do aplicativo',
           'Deseja realmente sair do aplicativo?',
@@ -35,7 +34,7 @@ const Home = () => {
             },
           ],
         );
-        return true; // Prevenir comportamento padrão
+        return true;
       };
 
       const subscription = BackHandler.addEventListener(
@@ -82,7 +81,7 @@ const Home = () => {
           hasTrainingData && (
             <TrainingSection
               onRedirectToAllExercises={handleNavigateToAllExercises}
-              exercise={workoutPlan[0]?.workouts?.[0]?.exercises?.[0]}
+              exercise={workoutPlan?.workouts?.[0]?.exercises?.[0] as Exercise}
               onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
               showBadge={false}
             />

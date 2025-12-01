@@ -41,11 +41,11 @@ export const useContentCard = () => {
     if (highContrast) {
       return theme.colors.gray_01;
     } else if (darkMode) {
-      return theme.colors.gray_08;
+      return theme.colors.gray_01;
     } else {
       return theme.colors.white;
     }
-  }, [highContrast, darkMode, theme.colors.gray_01, theme.colors.gray_08, theme.colors.white]);
+  }, [highContrast, darkMode, theme.colors.gray_01, theme.colors.white]);
 
   return {
     gradientColors,
@@ -53,4 +53,3 @@ export const useContentCard = () => {
     theme,
   };
 };
-

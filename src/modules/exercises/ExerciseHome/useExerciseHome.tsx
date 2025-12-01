@@ -11,10 +11,14 @@ import {shouldBlockExercises} from '../../../utils/profileUtils';
 const useExerciseHome = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
-  const {getPatientProfile} = useAuth();
+  const {getPatientProfile, isLoggedIn} = useAuth();
 
-  const queries = useExerciseQueries(['exercises']);
-  const {data: workoutsApi = [], isLoading, error} = queries.listWorkouts();
+  const queries = useExerciseQueries(['exercises'], isLoggedIn);
+  const {
+    data: userWorkoutPlan = null,
+    isLoading,
+    error,
+  } = queries.getUserWorkoutPlan();
 
   const isExercisesBlocked = useMemo(() => {
     const profile = getPatientProfile();
@@ -25,25 +29,27 @@ const useExerciseHome = () => {
   }, [getPatientProfile]);
 
   const workouts = useMemo<Exercise[]>(() => {
-    if (workoutsApi.length > 0) {
-      return workoutsApi.flatMap((w): Exercise[] => w.exercises || []);
+    if (userWorkoutPlan?.workouts) {
+      return userWorkoutPlan.workouts.flatMap(
+        (w): Exercise[] => w.exercises || [],
+      );
     }
     return [];
-  }, [workoutsApi]);
+  }, [userWorkoutPlan]);
 
   const handleWorkoutPress = useCallback(
     (exerciseId: string) => {
       if (isExercisesBlocked) {
         return;
       }
-      const workout = workoutsApi.find((w: Workout) =>
+      const workout = userWorkoutPlan?.workouts.find((w: Workout) =>
         w.exercises.some((e: Exercise) => e.id === exerciseId),
       );
       if (workout) {
         navigation.navigate('ExerciseDetails', {workout});
       }
     },
-    [navigation, workoutsApi, isExercisesBlocked],
+    [navigation, userWorkoutPlan, isExercisesBlocked],
   );
 
   return {
