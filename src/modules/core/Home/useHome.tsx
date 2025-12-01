@@ -9,7 +9,12 @@ import {MMKVStorage, EXERCISES_BLOCKED_KEY} from '../../../storage/mmkvStorage';
 import {shouldBlockExercises} from '../../../utils/profileUtils';
 
 const useHome = () => {
-  const {user, isAnonymous, isLoading: isAuthLoading, getPatientProfile} = useAuth();
+  const {
+    user,
+    isAnonymous,
+    isLoading: isAuthLoading,
+    getPatientProfile,
+  } = useAuth();
   const {workoutPlan, isLoading: isExercisesLoading} = useExercises();
   const {calendarData, isLoading: isDiaryLoading} = useDiary();
   const {navigate} = useNavigation<NavigationStackProp>();
@@ -41,7 +46,8 @@ const useHome = () => {
   const hasDiaryEntriesToday = Object.values(calendarData || {}).some(
     day => day.isToday,
   );
-  const hasTrainingData = workoutPlan !== null && workoutPlan.workouts.length > 0;
+  const hasTrainingData =
+    workoutPlan !== null && workoutPlan.workouts.length > 0;
 
   const handleNavigateToDiary = () => {
     navigate('MainTabs', {screen: 'Diary'});
@@ -68,7 +74,9 @@ const useHome = () => {
   };
 
   const titleText = useMemo(() => {
-    return user && !isAnonymous ? `Olá, ${user.name}!` : 'Bem vindo(a) ao DailyIU!';
+    return user && !isAnonymous
+      ? `Olá, ${user.name}!`
+      : 'Bem vindo(a) ao DailyIU!';
   }, [user, isAnonymous]);
 
   return {
