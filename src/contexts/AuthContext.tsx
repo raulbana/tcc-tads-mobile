@@ -20,6 +20,7 @@ import {
   ONBOARDING_DATA_KEY,
   ONBOARDING_PROFILE_DTO_KEY,
   ONBOARDING_URINATION_LOSS_KEY,
+  ONBOARDING_WORKOUT_PLAN_KEY,
   PENDING_REGISTER_KEY,
   DIARY_CALENDAR_KEY,
   EXERCISES_DATA_KEY,
@@ -61,6 +62,12 @@ interface AuthContextType {
     urinationLoss?: string,
   ) => Promise<void>;
   saveOnboardingProfileDTO: (profileDTO: PatientProfileDTO) => Promise<void>;
+  saveOnboardingWorkoutPlan: (
+    workoutPlan: import('../types/onboarding').UserWorkoutPlanDTO,
+  ) => Promise<void>;
+  getOnboardingWorkoutPlanForRegister: () =>
+    | import('../types/onboarding').UserWorkoutPlanDTO
+    | null;
   setAnonymousMode: (isAnonymous: boolean) => Promise<void>;
   hasOnboardingData: () => boolean;
   validateToken: () => Promise<boolean>;
@@ -163,6 +170,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(ONBOARDING_DATA_KEY);
       MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
       MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
+      MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
       MMKVStorage.delete(PENDING_REGISTER_KEY);
 
       // Limpar cache do React Query
@@ -464,6 +472,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(ONBOARDING_DATA_KEY);
       MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
       MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
+      MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
     } catch (error) {
       console.error('Error clearing onboarding data:', error);
     }
@@ -506,6 +515,26 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       }
     }, []);
 
+  const getOnboardingWorkoutPlanForRegister = useCallback(():
+    | import('../types/onboarding').UserWorkoutPlanDTO
+    | null => {
+    try {
+      const workoutPlanStr = MMKVStorage.getString(ONBOARDING_WORKOUT_PLAN_KEY);
+      if (!workoutPlanStr) {
+        return null;
+      }
+      return JSON.parse(
+        workoutPlanStr,
+      ) as import('../types/onboarding').UserWorkoutPlanDTO;
+    } catch (error) {
+      console.error(
+        'Error getting onboarding workout plan for register:',
+        error,
+      );
+      return null;
+    }
+  }, []);
+
   const register = useCallback(
     async (userData: registerRequest) => {
       try {
@@ -517,12 +546,29 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           userData.profile = profileDTO;
         }
 
+        const workoutPlan = getOnboardingWorkoutPlanForRegister();
+        if (workoutPlan && !userData.workoutPlan) {
+          // Transformar UserWorkoutPlanDTO para UserWorkoutPlanCreatorDTO
+          userData.workoutPlan = {
+            planId: workoutPlan.plan.id,
+            startDate: workoutPlan.startDate,
+            endDate: workoutPlan.endDate,
+            totalProgress: workoutPlan.totalProgress,
+            weekProgress: workoutPlan.weekProgress,
+            currentWeek: workoutPlan.currentWeek,
+            completed: workoutPlan.completed,
+          };
+        }
+
         const response = await authServices.register(userData);
 
         // Limpar dados de onboarding após registro bem-sucedido
         // Nota: A sincronização de dados offline será feita quando o usuário fizer login
         await clearOnboardingData();
         setPendingRegister(false);
+
+        // Redirecionar para tela de login após registro bem-sucedido
+        navigate('Auth', {screen: 'Login'});
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Erro ao registrar usuário';
@@ -532,7 +578,13 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         setIsLoading(false);
       }
     },
-    [getOnboardingDataForRegister, clearOnboardingData, setPendingRegister],
+    [
+      getOnboardingDataForRegister,
+      getOnboardingWorkoutPlanForRegister,
+      clearOnboardingData,
+      setPendingRegister,
+      navigate,
+    ],
   );
 
   const saveTempUserData = useCallback(
@@ -705,8 +757,29 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     [],
   );
 
+  const saveOnboardingWorkoutPlan = useCallback(
+    async (workoutPlan: import('../types/onboarding').UserWorkoutPlanDTO) => {
+      try {
+        MMKVStorage.set(
+          ONBOARDING_WORKOUT_PLAN_KEY,
+          JSON.stringify(workoutPlan),
+        );
+      } catch (error) {
+        console.error('Save onboarding workout plan error:', error);
+        throw new Error('Erro ao salvar workout plan de onboarding');
+      }
+    },
+    [],
+  );
+
   const hasOnboardingData = useCallback((): boolean => {
     try {
+      // Se o usuário está logado e tem profile, sempre retornar true
+      // Isso evita redirecionamento para onboarding após login
+      if (isLoggedIn && user?.profile?.id) {
+        return true;
+      }
+      // Se não está logado, verificar dados offline de onboarding
       if (user?.profile?.id) {
         return true;
       }
@@ -716,7 +789,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       console.error('Error checking onboarding data:', error);
       return false;
     }
-  }, [user]);
+  }, [user, isLoggedIn]);
 
   const validateTokenExposed = useCallback(async (): Promise<boolean> => {
     if (user) {
@@ -767,6 +840,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         savePreferences,
         saveOfflineOnboardingData,
         saveOnboardingProfileDTO,
+        saveOnboardingWorkoutPlan,
+        getOnboardingWorkoutPlanForRegister,
         setAnonymousMode,
         hasOnboardingData,
         validateToken: validateTokenExposed,

@@ -22,6 +22,13 @@ const Navigator: React.FC = () => {
       return 'Auth';
     }
     
+    // Se o usuário está logado, não redirecionar para onboarding
+    // mesmo se hasOnboardingData() retornar false (pode ser um problema temporário)
+    if (isLoggedIn) {
+      return 'MainTabs';
+    }
+    
+    // Só verificar onboarding se não estiver logado
     if (!hasOnboardingData()) {
       return 'Onboarding';
     }

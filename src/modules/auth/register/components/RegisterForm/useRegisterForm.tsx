@@ -3,8 +3,6 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../../../../contexts/AuthContext';
 import {registerSchema, RegisterFormData} from '../../schema/registerSchema';
-import {useNavigation} from '@react-navigation/native';
-import {NavigationStackProp} from '../../../../../navigation/routes';
 
 const useRegisterForm = () => {
   const {
@@ -28,7 +26,6 @@ const useRegisterForm = () => {
     mode: 'onSubmit',
   });
 
-  const {navigate} = useNavigation<NavigationStackProp>();
 
   const {
     register: authRegister,
@@ -42,7 +39,6 @@ const useRegisterForm = () => {
       // Verificar se tem dados de onboarding antes de processar o registro
       if (!hasOnboardingData()) {
         setPendingRegister(true);
-        navigate('Onboarding', {screen: 'OnboardingHome'});
         return;
       }
 
@@ -54,10 +50,11 @@ const useRegisterForm = () => {
         };
 
         await authRegister(payload);
-        // Redirecionar para tela de login após registro bem-sucedido
-        navigate('Auth', {screen: 'Login'});
-
+        
+        // Resetar formulário
         reset();
+        
+        // Redirecionamento será feito no AuthContext após limpar dados
       } catch (error: any) {
         const message =
           error?.message && typeof error.message === 'string'
@@ -70,7 +67,7 @@ const useRegisterForm = () => {
         });
       }
     },
-    [authRegister, navigate, reset, hasOnboardingData, setPendingRegister, setError],
+    [authRegister, reset, hasOnboardingData, setPendingRegister, setError],
   );
 
   return {
