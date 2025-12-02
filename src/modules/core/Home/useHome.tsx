@@ -5,9 +5,16 @@ import {NavigationStackProp} from '../../../navigation/routes';
 import {useDiary} from '../../../contexts/DiaryContext';
 import {useMemo, useEffect} from 'react';
 import {useNotificationPermissionModal} from '../../../hooks/useNotificationPermissionModal';
+import {MMKVStorage, EXERCISES_BLOCKED_KEY} from '../../../storage/mmkvStorage';
+import {shouldBlockExercises} from '../../../utils/profileUtils';
 
 const useHome = () => {
-  const {user, isAnonymous, isLoading: isAuthLoading} = useAuth();
+  const {
+    user,
+    isAnonymous,
+    isLoading: isAuthLoading,
+    getPatientProfile,
+  } = useAuth();
   const {workoutPlan, isLoading: isExercisesLoading} = useExercises();
   const {calendarData, isLoading: isDiaryLoading} = useDiary();
   const {navigate} = useNavigation<NavigationStackProp>();
@@ -18,6 +25,14 @@ const useHome = () => {
   } = useNotificationPermissionModal();
 
   const isLoading = isAuthLoading || isExercisesLoading || isDiaryLoading;
+
+  const isExercisesBlocked = useMemo(() => {
+    const profile = getPatientProfile();
+    if (profile) {
+      return shouldBlockExercises(profile);
+    }
+    return MMKVStorage.getString(EXERCISES_BLOCKED_KEY) === 'true';
+  }, [getPatientProfile]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -31,7 +46,8 @@ const useHome = () => {
   const hasDiaryEntriesToday = Object.values(calendarData || {}).some(
     day => day.isToday,
   );
-  const hasTrainingData = Array.isArray(workoutPlan) && workoutPlan.length > 0;
+  const hasTrainingData =
+    workoutPlan !== null && workoutPlan.workouts.length > 0;
 
   const handleNavigateToDiary = () => {
     navigate('MainTabs', {screen: 'Diary'});
@@ -39,12 +55,10 @@ const useHome = () => {
 
   const handleNavigateToTrainingDetails = () => {
     const firstWorkout =
-      Array.isArray(workoutPlan) &&
-      workoutPlan.length > 0 &&
-      workoutPlan[0] &&
-      Array.isArray(workoutPlan[0].workouts) &&
-      workoutPlan[0].workouts.length > 0
-        ? workoutPlan[0].workouts[0]
+      workoutPlan &&
+      Array.isArray(workoutPlan.workouts) &&
+      workoutPlan.workouts.length > 0
+        ? workoutPlan.workouts[0]
         : undefined;
 
     if (firstWorkout) {
@@ -60,7 +74,9 @@ const useHome = () => {
   };
 
   const titleText = useMemo(() => {
-    return user && !isAnonymous ? `Olá, ${user.name}!` : 'Bem vindo(a) ao DailyIU!';
+    return user && !isAnonymous
+      ? `Olá, ${user.name}!`
+      : 'Bem vindo(a) ao DailyIU!';
   }, [user, isAnonymous]);
 
   return {
@@ -75,6 +91,7 @@ const useHome = () => {
     titleText,
     notificationModalVisible,
     hideNotificationModal,
+    isExercisesBlocked,
   };
 };
 

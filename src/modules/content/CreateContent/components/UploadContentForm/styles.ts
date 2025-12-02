@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { horizontalScale, verticalScale } from '../../../../../utils/scales';
+import {horizontalScale, verticalScale} from '../../../../../utils/scales';
 
 export const Container = styled.View`
   width: 100%;
@@ -25,4 +25,9 @@ export const ButtonContainer = styled.View`
   width: 100%;
   padding-horizontal: ${horizontalScale(16)}px;
   justify-content: flex-end;
+`;
+
+export const CategoryLabelContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
 `;

@@ -5,10 +5,11 @@ import Input from '../../../../../components/Input/Input';
 import Button from '../../../../../components/Button/Button';
 import useForgotPasswordRequestForm from './useForgotPasswordRequestForm';
 import Label from '../../../../../components/Label/Label';
+import Toast from '../../../../../components/Toast/Toast';
 import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
 
 interface ForgotPasswordRequestFormProps {
-  onSuccess: () => void;
+  onSuccess: (email: string) => void;
 }
 
 const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
@@ -22,12 +23,23 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
     onSubmit,
     navigateToLogin,
     isLoading,
+    toastMessage,
+    toastType,
+    isToastOpen,
+    closeToast,
   } = useForgotPasswordRequestForm(onSuccess);
 
   const theme = useDynamicTheme();
 
   return (
     <S.Container>
+      <Toast
+        type={toastType}
+        message={toastMessage || ''}
+        isOpen={isToastOpen}
+        duration={5000}
+        onClose={closeToast}
+      />
       <Controller
         control={control}
         name="email"
@@ -39,7 +51,11 @@ const ForgotPasswordRequestForm: React.FC<ForgotPasswordRequestFormProps> = ({
             onChangeText={field.onChange}
             placeholder="Digite seu e-mail"
             error={errors.email?.message as string | undefined}
-            autoCapitalize="words"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit(onSubmit)}
             onChange={field.onChange}
           />
         )}

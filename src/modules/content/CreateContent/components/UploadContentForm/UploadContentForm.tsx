@@ -69,6 +69,8 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 placeholder="Digite o título"
                 error={errors.title?.message}
                 label="Título"
+                required
+                maxLength={255}
               />
             )}
           />
@@ -84,6 +86,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 placeholder="Digite a descrição"
                 error={errors.description?.message}
                 label="Descrição"
+                required
                 multiline
                 numberOfLines={6}
                 textAlignVertical="top"
@@ -104,6 +107,7 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 placeholder="Digite o subtítulo"
                 error={errors.subtitle?.message}
                 label="Subtítulo"
+                maxLength={255}
               />
             )}
           />
@@ -129,6 +133,18 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
           />
         </S.FieldGroup>
         <S.FieldGroup>
+          <S.CategoryLabelContainer>
+            <Label
+              text="Categoria"
+              typography={theme.typography.paragraph.r3}
+              color={theme.colors.gray_08}
+            />
+            <Label
+              text=" *"
+              typography={theme.typography.paragraph.r3}
+              color={theme.colors.error}
+            />
+          </S.CategoryLabelContainer>
           <CarouselSection
             carouselData={{
               data: categoriesList,
@@ -139,8 +155,15 @@ const UploadContentForm: React.FC<UploadContentFormProps> = ({
                 />
               ),
             }}
-            sectionTitle="Categoria"
+            sectionTitle=""
           />
+          {errors.categories && (
+            <Label
+              typography={theme.typography.paragraph.sm1}
+              color={theme.colors.error}
+              text={errors.categories.message || ''}
+            />
+          )}
         </S.FieldGroup>
       </S.FormContainer>
       <S.ButtonContainer>

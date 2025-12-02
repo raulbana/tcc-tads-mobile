@@ -23,6 +23,9 @@ const Register: React.FC = () => {
       setPendingRegister(true);
       navigate('Onboarding', {screen: 'OnboardingHome'});
     }
+    if (hasChecked.current && !isPendingRegister() && hasOnboardingData()) {
+      hasChecked.current = false;
+    }
   }, [hasOnboardingData, setPendingRegister, navigate, isPendingRegister]);
 
   return (

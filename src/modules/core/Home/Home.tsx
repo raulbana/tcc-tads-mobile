@@ -1,14 +1,48 @@
+import React from 'react';
+import {BackHandler, Alert} from 'react-native';
 import * as S from './styles';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
 import RecommendationCard from './components/RecomendationCard/RecommendationCard';
 import Label from '../../../components/Label/Label';
 import TrainingSection from './components/TrainingSection/TrainingSection';
+import ExerciseBlockedCard from './components/ExerciseBlockedCard';
 import CalendarRow from '../../../components/Calendar/components/CalendarRow/CalendarRow';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import useHome from './useHome';
 import NotificationPermissionModal from '../../../components/NotificationPermissionModal/NotificationPermissionModal';
+import {useFocusEffect} from '@react-navigation/native';
+import { Exercise } from '../../../types/exercise';
 
 const Home = () => {
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert(
+          'Sair do aplicativo',
+          'Deseja realmente sair do aplicativo?',
+          [
+            {
+              text: 'Cancelar',
+              style: 'cancel',
+            },
+            {
+              text: 'Sair',
+              onPress: () => BackHandler.exitApp(),
+            },
+          ],
+        );
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, []),
+  );
   const theme = useDynamicTheme();
   const {
     handleNavigateToDiary,
@@ -20,6 +54,7 @@ const Home = () => {
     titleText,
     notificationModalVisible,
     hideNotificationModal,
+    isExercisesBlocked,
   } = useHome();
   return (
     <ScreenContainer>
@@ -38,13 +73,17 @@ const Home = () => {
             buttonLabel="Meu diário"
           />
         )}
-        {hasTrainingData && (
-          <TrainingSection
-            onRedirectToAllExercises={handleNavigateToAllExercises}
-            exercise={workoutPlan[0]?.workouts?.[0]?.exercises?.[0]}
-            onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
-            showBadge={false}
-          />
+        {isExercisesBlocked ? (
+          <ExerciseBlockedCard />
+        ) : (
+          hasTrainingData && (
+            <TrainingSection
+              onRedirectToAllExercises={handleNavigateToAllExercises}
+              exercise={workoutPlan?.workouts?.[0]?.exercises?.[0] as Exercise}
+              onRedirectToTrainingDetails={handleNavigateToTrainingDetails}
+              showBadge={false}
+            />
+          )
         )}
       </S.Container>
       <NotificationPermissionModal

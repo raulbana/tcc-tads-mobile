@@ -16,6 +16,7 @@ export interface PatientProfile {
   q2Score: number;
   q3Score: number;
   q4Score: number;
+  iciqScore: number;
 }
 
 export interface Preferences {
@@ -44,11 +45,22 @@ export interface loginResponse {
   user: User;
 }
 
+export interface UserWorkoutPlanCreatorDTO {
+  planId: number;
+  startDate: string;
+  endDate?: string;
+  totalProgress: number;
+  weekProgress: number;
+  currentWeek: number;
+  completed: boolean;
+}
+
 export interface registerRequest {
   name: string;
   email: string;
   password: string;
   profile?: PatientProfileDTO;
+  workoutPlan?: UserWorkoutPlanCreatorDTO;
 }
 
 export interface PatientProfileDTO {

@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import useAuthQueries from '../../../services/authQueryFactory';
@@ -11,7 +11,10 @@ import {
   forgotPasswordRequestSchema,
 } from '../schema/forgotPassword';
 
-const useRegisterForm = (onSuccess: () => void) => {
+const useRegisterForm = (onSuccess: (email: string) => void) => {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<'SUCCESS' | 'ERROR'>('ERROR');
+  const [isToastOpen, setIsToastOpen] = useState(false);
   const {
     control,
     handleSubmit,
@@ -43,9 +46,19 @@ const useRegisterForm = (onSuccess: () => void) => {
     navigate('Auth', {screen: 'Login'});
   };
 
+  const showToast = useCallback((message: string, type: 'SUCCESS' | 'ERROR') => {
+    setToastMessage(message);
+    setToastType(type);
+    setIsToastOpen(true);
+  }, []);
+
+  const closeToast = useCallback(() => {
+    setIsToastOpen(false);
+    setToastMessage(null);
+  }, []);
+
   const onSubmit = useCallback(
     async (values: ForgotPasswordRequestFormData) => {
-      onSuccess();
       try {
         const payload: forgotPasswordRequestRequest = {
           email: values.email,
@@ -53,19 +66,27 @@ const useRegisterForm = (onSuccess: () => void) => {
 
         const res = await forgotPasswordRequestMutate(payload);
 
-        if (res.status === 'success') {
-          onSuccess();
+        if (res && res.status === 'success') {
+          onSuccess(values.email);
+          reset();
+          showToast('Código de verificação enviado para seu e-mail', 'SUCCESS');
         } else {
-          throw new Error('Forgot password request failed');
+          const errorMessage =
+            res?.message || 'Falha ao solicitar redefinição de senha. Tente novamente.';
+          showToast(errorMessage, 'ERROR');
         }
 
-        reset();
         return res;
       } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Erro ao solicitar redefinição de senha. Verifique o e-mail e tente novamente.';
+        showToast(errorMessage, 'ERROR');
         throw error;
       }
     },
-    [forgotPasswordRequestMutate, reset, onSuccess],
+    [forgotPasswordRequestMutate, reset, onSuccess, showToast],
   );
 
   return {
@@ -80,6 +101,10 @@ const useRegisterForm = (onSuccess: () => void) => {
     register,
     navigateToLogin,
     isLoading: isForgotPasswordRequesting,
+    toastMessage,
+    toastType,
+    isToastOpen,
+    closeToast,
   };
 };
 

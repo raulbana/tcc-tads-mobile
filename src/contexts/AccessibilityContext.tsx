@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import {ThemeProvider} from 'styled-components/native';
+import {ThemeProvider, DefaultTheme} from 'styled-components/native';
 import {useAuth} from './AuthContext';
 import {AccessibilityPreferences} from '../types/config';
 import configServices from '../modules/config/services/configServices';
@@ -45,10 +45,10 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const {user, isLoggedIn, savePreferences} = useAuth();
 
-  const currentTheme = useMemo(() => {
+  const currentTheme = useMemo((): DefaultTheme => {
     let themeColors = colors;
-    let themeKey = 'default';
-    
+    let themeKey: 'default' | 'high-contrast' | 'dark' = 'default';
+
     if (highContrast) {
       themeColors = accessibleColors;
       themeKey = 'high-contrast';
@@ -56,7 +56,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
       themeColors = darkColors;
       themeKey = 'dark';
     }
-    
+
     return {
       key: themeKey,
       colors: themeColors,
@@ -81,7 +81,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           );
           setHighContrast(preferences.isHighContrast);
           setBigFont(preferences.isBigFont);
-          setDarkMode(preferences.isDarkMode || false);
+          setDarkMode(preferences.isDarkMode);
         } catch (apiError) {
           console.warn(
             'Failed to load accessibility preferences from API, using local preferences',
@@ -89,13 +89,13 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
           const localPreferences = user.preferences;
           setHighContrast(localPreferences.highContrast);
           setBigFont(localPreferences.bigFont);
-          setDarkMode(localPreferences.darkMode || false);
+          setDarkMode(localPreferences.darkMode);
         }
       } else if (user) {
         const localPreferences = user.preferences;
         setHighContrast(localPreferences.highContrast);
         setBigFont(localPreferences.bigFont);
-        setDarkMode(localPreferences.darkMode || false);
+        setDarkMode(localPreferences.darkMode);
       }
     } catch (error) {
       console.error('Error loading accessibility preferences:', error);
@@ -114,15 +114,16 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
 
         setHighContrast(preferences.isHighContrast);
         setBigFont(preferences.isBigFont);
-        setDarkMode(preferences.isDarkMode || false);
+        setDarkMode(preferences.isDarkMode);
 
         if (user) {
           const updatedPreferences = {
             ...user.preferences,
             highContrast: preferences.isHighContrast,
             bigFont: preferences.isBigFont,
-            darkMode: preferences.isDarkMode || false,
+            darkMode: preferences.isDarkMode,
           };
+
           await savePreferences(updatedPreferences);
 
           if (isLoggedIn) {
@@ -142,10 +143,17 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
       } catch (error) {
         console.error('Error saving accessibility preferences:', error);
         setError('Erro ao salvar preferências de acessibilidade');
+        if (user) {
+          setHighContrast(user.preferences.highContrast);
+          setBigFont(user.preferences.bigFont);
+          setDarkMode(user.preferences.darkMode);
+        }
         throw error;
       } finally {
         setIsLoading(false);
-        setIsSaving(false);
+        setTimeout(() => {
+          setIsSaving(false);
+        }, 100);
       }
     },
     [user, isLoggedIn, savePreferences],
@@ -159,7 +167,7 @@ export const AccessibilityProvider = ({children}: {children: ReactNode}) => {
       setBigFont(false);
       setDarkMode(false);
     }
-  }, [user, loadAccessibilityPreferences, isSaving]);
+  }, [user?.id, loadAccessibilityPreferences, isSaving]);
 
   useEffect(() => {
     const newThemeKey = `theme-${highContrast}-${bigFont}-${darkMode}`;

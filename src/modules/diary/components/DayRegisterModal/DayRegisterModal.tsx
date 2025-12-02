@@ -20,9 +20,23 @@ export interface DayRegisterModalProps {
 }
 
 const amountLabel: Record<string, string> = {
-  LOW: 'Baixo',
-  MEDIUM: 'Médio',
-  HIGH: 'Alto',
+  LOW: 'Pouco (até 100ml)',
+  MEDIUM: 'Médio (100-300ml)',
+  HIGH: 'Alto (acima de 300ml)',
+};
+
+const formatReasonForDisplay = (reason?: string | null): string => {
+  if (!reason) {
+    return '—';
+  }
+
+  const trimmed = reason.trim();
+
+  if (trimmed.length <= 5) {
+    return trimmed;
+  }
+
+  return `${trimmed.substring(0, 5).trimEnd()}...`;
 };
 
 const formatTimeForDisplay = (time: string | string[]): string => {
@@ -41,11 +55,11 @@ const formatTimeForDisplay = (time: string | string[]): string => {
     }
 
     if (time.includes(':')) {
-      return time.substring(0, 5); 
+      return time.substring(0, 5);
     }
   }
 
-  return time; 
+  return time;
 };
 
 const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
@@ -92,7 +106,7 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
         amount: amountLabel[r.amount] ?? r.amount,
         urgency: r.urgency,
         leakage: r.leakage,
-        reason: r.reason || '—',
+        reason: formatReasonForDisplay(r.reason),
       })),
     [records, dateIsoString],
   );
@@ -109,37 +123,40 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
       showHandle
       showClose
       closeOnBackdropPress>
-      {rows.length > 0 && (
-        <DataTable
-          columns={columns}
-          data={rows}
-          onEditRow={row => {
-            const idx = rows.findIndex(r => r.id === row.id);
-            if (idx !== -1 && records[idx]) {
-              onEditRecord(records[idx]);
-            }
-          }}
-          onDeleteRow={row => {
-            const idx = rows.findIndex(r => r.id === row.id);
-            if (idx !== -1 && records[idx]) {
-              onDeleteRecord(records[idx]);
-            }
-          }}
-        />
-      )}
-      <S.Wrapper>
-        {!hasRealData && rows.length === 0 && (
-          <S.EmptyDataContainer>
-            <S.IllustrationSheet />
-            <Label
-              text="Sem registros de ocorrências nesta data"
-              typography={theme.typography.paragraph.m5}
-              color={theme.colors.gray_08}
-              textAlign="center"
-            />
-          </S.EmptyDataContainer>
+      <S.ScrollContainer>
+        {rows.length > 0 && (
+          <DataTable
+            columns={columns}
+            data={rows}
+            onEditRow={row => {
+              const idx = rows.findIndex(r => r.id === row.id);
+              if (idx !== -1 && records[idx]) {
+                onEditRecord(records[idx]);
+              }
+            }}
+            onDeleteRow={row => {
+              const idx = rows.findIndex(r => r.id === row.id);
+              if (idx !== -1 && records[idx]) {
+                onDeleteRecord(records[idx]);
+              }
+            }}
+          />
         )}
-
+        <S.Wrapper>
+          {!hasRealData && rows.length === 0 && (
+            <S.EmptyDataContainer>
+              <S.IllustrationSheet />
+              <Label
+                text="Sem registros de ocorrências nesta data"
+                typography={theme.typography.paragraph.m5}
+                color={theme.colors.gray_08}
+                textAlign="center"
+              />
+            </S.EmptyDataContainer>
+          )}
+        </S.Wrapper>
+      </S.ScrollContainer>
+      <S.Footer>
         <Button
           text={
             <Label
@@ -150,7 +167,7 @@ const DayRegisterModal: React.FC<DayRegisterModalProps> = ({
           }
           onPress={onAddRecord}
         />
-      </S.Wrapper>
+      </S.Footer>
     </BottomModal>
   );
 };

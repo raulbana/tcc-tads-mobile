@@ -13,4 +13,10 @@ export const RightActions = styled.View`
   gap: ${horizontalScale(12)}px;
 `;
 
+export const LikeContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: ${horizontalScale(4)}px;
+`;
+
 export const RepostButtonContainer = styled.View``;

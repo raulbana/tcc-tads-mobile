@@ -3,8 +3,6 @@ import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useAuth} from '../../../../../contexts/AuthContext';
 import {registerSchema, RegisterFormData} from '../../schema/registerSchema';
-import {useNavigation} from '@react-navigation/native';
-import {NavigationStackProp} from '../../../../../navigation/routes';
 
 const useRegisterForm = () => {
   const {
@@ -12,6 +10,7 @@ const useRegisterForm = () => {
     handleSubmit,
     formState: {isValid, errors},
     setValue,
+    setError,
     watch,
     reset,
     register,
@@ -27,12 +26,20 @@ const useRegisterForm = () => {
     mode: 'onSubmit',
   });
 
-  const {navigate} = useNavigation<NavigationStackProp>();
-
-  const {register: authRegister, isLoading: authLoading} = useAuth();
+  const {
+    register: authRegister,
+    isLoading: authLoading,
+    hasOnboardingData,
+    setPendingRegister,
+  } = useAuth();
 
   const onSubmit = useCallback(
     async (values: RegisterFormData) => {
+      if (!hasOnboardingData()) {
+        setPendingRegister(true);
+        return;
+      }
+
       try {
         const payload = {
           name: values.name,
@@ -41,14 +48,21 @@ const useRegisterForm = () => {
         };
 
         await authRegister(payload);
-        navigate('MainTabs');
 
         reset();
-      } catch (error) {
-        throw error;
+      } catch (error: any) {
+        const message =
+          error?.message && typeof error.message === 'string'
+            ? error.message
+            : 'Erro ao realizar cadastro. Tente novamente.';
+
+        setError('email', {
+          type: 'manual',
+          message,
+        });
       }
     },
-    [authRegister, navigate, reset],
+    [authRegister, reset, hasOnboardingData, setPendingRegister, setError],
   );
 
   return {

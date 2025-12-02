@@ -10,16 +10,31 @@ const Navigator: React.FC = () => {
   const {isLoggedIn, isInitializing, hasOnboardingData} = useAuth();
 
   const initialRouteName = useMemo(() => {
+    // Se está inicializando mas o usuário já está logado (baseado no estado inicial),
+    // começar na MainTabs para evitar mostrar a tela de login
+    if (isInitializing && isLoggedIn) {
+      return 'MainTabs';
+    }
+    
+    // Se está inicializando e não está logado, mostrar Auth (mas isso só acontece
+    // se não houver token/usuário salvo, então é seguro)
     if (isInitializing) {
       return 'Auth';
     }
     
+    // Se o usuário está logado, não redirecionar para onboarding
+    // mesmo se hasOnboardingData() retornar false (pode ser um problema temporário)
+    if (isLoggedIn) {
+      return 'MainTabs';
+    }
+    
+    // Só verificar onboarding se não estiver logado
     if (!hasOnboardingData()) {
       return 'Onboarding';
     }
 
     if (!isLoggedIn) {
-      return 'MainTabs';
+      return 'Auth';
     }
 
     return 'MainTabs';
@@ -29,14 +44,25 @@ const Navigator: React.FC = () => {
     <Stack.Navigator
       initialRouteName={initialRouteName as keyof RootParamList}
       screenOptions={{headerShown: false}}>
-      {routes.map(route => (
-        <Stack.Screen
-          key={route.name}
-          name={route.name as keyof RootParamList}
-          component={route.component}
-          options={route.options}
-        />
-      ))}
+      {routes.map(route => {
+        // Desabilitar gesto de voltar na MainTabs quando logado
+        const screenOptions =
+          route.name === 'MainTabs' && isLoggedIn
+            ? {
+                gestureEnabled: false,
+                headerBackVisible: false,
+              }
+            : undefined;
+
+        return (
+          <Stack.Screen
+            key={route.name}
+            name={route.name as keyof RootParamList}
+            component={route.component}
+            options={screenOptions || route.options}
+          />
+        );
+      })}
     </Stack.Navigator>
   );
 };

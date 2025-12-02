@@ -12,6 +12,7 @@ const useLoginForm = () => {
     handleSubmit,
     formState: {isValid, errors},
     setValue,
+    setError,
     watch,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -40,10 +41,20 @@ const useLoginForm = () => {
           remember: data.remember,
         });
       } catch (err) {
-        throw err;
+        const message = 'Usuário ou senha incorretos.';
+
+        setError('email', {
+          type: 'manual',
+          message,
+        });
+
+        setError('password', {
+          type: 'manual',
+          message,
+        });
       }
     },
-    [authLogin],
+    [authLogin, setError],
   );
 
   return {

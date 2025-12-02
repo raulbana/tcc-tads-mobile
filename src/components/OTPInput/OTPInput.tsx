@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import * as S from './styles';
 import useOTPInput from './useOTPInput';
 import {TextInput} from 'react-native';
@@ -37,6 +37,7 @@ const OTPInput: React.FC<OTPInputProps> = ({
   } = useOTPInput({length, value, onValueChange: onChange});
 
   const combinedValue = useMemo(() => values.join(''), [values]);
+  const hasFocusedRef = useRef(false);
 
   useEffect(() => {
     if (validationSchema && onValidate) {
@@ -44,6 +45,18 @@ const OTPInput: React.FC<OTPInputProps> = ({
       onValidate(result.success);
     }
   }, [combinedValue, validationSchema, onValidate]);
+
+  // Focar automaticamente no primeiro campo quando o componente for montado
+  useEffect(() => {
+    if (!hasFocusedRef.current && inputsRef.current[0] && values.every(v => v === '')) {
+      hasFocusedRef.current = true;
+      // Usar um pequeno delay para garantir que o componente está totalmente renderizado
+      const timer = setTimeout(() => {
+        inputsRef.current[0]?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [values]);
 
   const theme = useDynamicTheme();
 

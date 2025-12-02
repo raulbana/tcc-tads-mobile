@@ -82,7 +82,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           <Label
             typography={theme.typography.paragraph.sb2}
             color={theme.colors.gray_08}
-            text="Gênero"
+            text="Sexo"
           />
           <Controller
             name="gender"

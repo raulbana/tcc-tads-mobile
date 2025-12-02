@@ -67,6 +67,7 @@ const useOnboardingQuestion = () => {
   const {
     saveOfflineOnboardingData,
     saveOnboardingProfileDTO,
+    saveOnboardingWorkoutPlan,
     isLoggedIn,
     user,
   } = useAuth();
@@ -115,6 +116,8 @@ const useOnboardingQuestion = () => {
       };
 
       const createProfileData = (): PatientProfile => {
+        const iciqScore =
+          answers.q3_frequency + answers.q4_amount + answers.q5_interference;
         return {
           id: generateId(),
           birthDate: answers.birthdate,
@@ -123,6 +126,7 @@ const useOnboardingQuestion = () => {
           q2Score: answers.q4_amount,
           q3Score: answers.q5_interference,
           q4Score: answers.q6_when.length,
+          iciqScore,
         };
       };
 
@@ -144,6 +148,10 @@ const useOnboardingQuestion = () => {
           await saveOnboardingProfileDTO(result.profile);
         }
 
+        if (result.workoutPlan) {
+          await saveOnboardingWorkoutPlan(result.workoutPlan);
+        }
+
         const profileData = result.profile
           ? {
               id: generateId(),
@@ -155,6 +163,7 @@ const useOnboardingQuestion = () => {
               q4Score: result.profile.urinationLoss
                 ? result.profile.urinationLoss.split(',').length
                 : 0,
+              iciqScore: result.profile.iciqScore,
             }
           : createProfileData();
 
@@ -166,7 +175,6 @@ const useOnboardingQuestion = () => {
 
         navigate('Onboarding', {screen: 'OnboardingEnd'});
       } catch (error) {
-        console.error('Error submitting onboarding:', error);
         const errorMsg =
           error instanceof Error ? error.message : 'Erro ao enviar respostas.';
         setErrorMessage(errorMsg);
@@ -192,6 +200,7 @@ const useOnboardingQuestion = () => {
     submitAnswersMutation,
     saveOfflineOnboardingData,
     saveOnboardingProfileDTO,
+    saveOnboardingWorkoutPlan,
     navigate,
   ]);
 

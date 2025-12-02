@@ -1,9 +1,18 @@
 import RNPrint from 'react-native-print';
 import {ReportDTO, CalendarDayDTO} from '../../../types/diary';
 
+const amountLabel: Record<string, string> = {
+  LOW: 'Pouco (até 100ml)',
+  MEDIUM: 'Médio (100-300ml)',
+  HIGH: 'Alto (acima de 300ml)',
+};
+
 const formatDay = (day: CalendarDayDTO) => {
   const urinations = day.urinationData
-    .map(u => `${u.time} - ${u.amount}${u.leakage ? ' (escape)' : ''}`)
+    .map(u => {
+      const amountText = amountLabel[u.amount] || u.amount;
+      return `${u.time} - ${amountText}${u.leakage ? ' (escape)' : ''}`;
+    })
     .join('<br/>');
   return `
     <tr>

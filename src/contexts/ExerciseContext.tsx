@@ -16,14 +16,13 @@ import {useAuth} from './AuthContext';
 
 interface ExerciseContextType {
   workouts: Workout[];
-  workoutPlan: WorkoutPlan[];
+  workoutPlan: WorkoutPlan | null;
   isLoading: boolean;
   error: string | null;
-  loadWorkouts: () => Promise<void>;
   loadUserWorkoutPlan: () => Promise<void>;
   submitWorkoutFeedback: (data: ExerciseFeedbackCreatorDTO[]) => Promise<void>;
   submitWorkoutCompletion: (data: WorkoutCompletionDTO[]) => Promise<void>;
-  getWorkoutById: (id: string) => Promise<Workout | undefined>;
+  getWorkoutById: (id: string) => Workout | undefined;
   checkUserWorkoutPlan: () => Promise<void>;
 }
 
@@ -35,37 +34,29 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
   const {isLoggedIn} = useAuth();
   const exerciseQueries = useExerciseQueries(['exercises'], isLoggedIn);
 
-  const {
-    data: workouts = [],
-    isLoading: isLoadingWorkouts,
-    error: workoutsError,
-    refetch: refetchWorkouts,
-  } = exerciseQueries.listWorkouts();
-
-  const {
-    data: workoutPlan = [],
-    isLoading: isLoadingPlan,
-    error: planError,
-    refetch: refetchPlan,
-  } = exerciseQueries.listWorkoutPlans();
-
   const feedbackMutation = exerciseQueries.submitWorkoutFeedback();
   const completionMutation = exerciseQueries.submitWorkoutCompletion();
 
   const {
+    data: userWorkoutPlan,
+    isLoading,
+    error: userWorkoutPlanError,
     refetch: refetchUserWorkoutPlan,
   } = exerciseQueries.getUserWorkoutPlan();
 
-  const isLoading = isLoadingWorkouts || isLoadingPlan;
-  const error = workoutsError?.message || planError?.message || null;
+  const workouts = useMemo<Workout[]>(() => {
+    return userWorkoutPlan?.workouts || [];
+  }, [userWorkoutPlan]);
 
-  const loadWorkouts = useCallback(async () => {
-    await refetchWorkouts();
-  }, [refetchWorkouts]);
+  const workoutPlan = useMemo<WorkoutPlan | null>(() => {
+    return userWorkoutPlan?.plan || null;
+  }, [userWorkoutPlan]);
+
+  const error = userWorkoutPlanError?.message || null;
 
   const loadUserWorkoutPlan = useCallback(async () => {
-    await refetchPlan();
-  }, [refetchPlan]);
+    await refetchUserWorkoutPlan();
+  }, [refetchUserWorkoutPlan]);
 
   const submitWorkoutFeedback = useCallback(
     async (data: ExerciseFeedbackCreatorDTO[]) => {
@@ -82,16 +73,37 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
   );
 
   const getWorkoutById = useCallback(
-    async (id: string) => {
+    (id: string) => {
       return workouts.find(w => w.id === id);
     },
     [workouts],
   );
 
   const checkUserWorkoutPlan = useCallback(async () => {
-    const result = await refetchUserWorkoutPlan();
-    if (!result.data) {
-      throw new Error('Usuário não possui um plano de treino ativo. Por favor, complete o onboarding para iniciar um plano de treino.');
+    try {
+      const result = await refetchUserWorkoutPlan();
+
+      // Verificar se há erro na query
+      if (result.error) {
+        console.error('Error fetching user workout plan:', result.error);
+        throw new Error('Erro ao verificar plano de treino. Tente novamente.');
+      }
+
+      // Verificar se os dados existem e se há um plano válido
+      if (!result.data) {
+        throw new Error(
+          'Usuário não possui um plano de treino ativo. Por favor, complete o onboarding para iniciar um plano de treino.',
+        );
+      }
+
+      // Se chegou aqui, há um plano válido
+    } catch (error) {
+      // Se for um erro que já foi lançado, re-lançar
+      if (error instanceof Error && error.message.includes('plano de treino')) {
+        throw error;
+      }
+      // Para outros erros, lançar erro genérico
+      throw new Error('Erro ao verificar plano de treino. Tente novamente.');
     }
   }, [refetchUserWorkoutPlan]);
 
@@ -101,7 +113,6 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
       workoutPlan,
       isLoading,
       error,
-      loadWorkouts,
       loadUserWorkoutPlan,
       submitWorkoutFeedback,
       submitWorkoutCompletion,
@@ -113,7 +124,6 @@ export const ExerciseProvider = ({children}: {children: ReactNode}) => {
       workoutPlan,
       isLoading,
       error,
-      loadWorkouts,
       loadUserWorkoutPlan,
       submitWorkoutFeedback,
       submitWorkoutCompletion,

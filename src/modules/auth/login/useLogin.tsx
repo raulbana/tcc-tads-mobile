@@ -1,13 +1,18 @@
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
-import { useAuth } from '../../../contexts/AuthContext';
+import {useAuth} from '../../../contexts/AuthContext';
 
 const useLogin = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
-  const {user} = useAuth();
+  const {user, hasOnboardingData, setPendingRegister} = useAuth();
 
   const handleGoToRegister = () => {
-    navigate('Auth', {screen: 'Register'});
+    if (hasOnboardingData()) {
+      navigate('Auth', {screen: 'Register'});
+    } else {
+      setPendingRegister(true);
+      navigate('Onboarding', {screen: 'OnboardingHome'});
+    }
   };
 
   const handleGoToForgotPassword = () => {

@@ -20,13 +20,19 @@ import {
   ONBOARDING_DATA_KEY,
   ONBOARDING_PROFILE_DTO_KEY,
   ONBOARDING_URINATION_LOSS_KEY,
+  ONBOARDING_WORKOUT_PLAN_KEY,
   PENDING_REGISTER_KEY,
+  DIARY_CALENDAR_KEY,
+  EXERCISES_DATA_KEY,
+  MMKV_CACHE_USER_KEY,
+  EXERCISES_BLOCKED_KEY,
 } from '../storage/mmkvStorage';
 import {transformProfileToDTO} from '../utils/profileUtils';
 import authServices from '../modules/auth/services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../navigation/routes';
 import useNotifications from '../hooks/useNotifications';
+import {queryClient} from '../../App';
 
 const LOGGED_USER_KEY = 'auth_user_v1';
 const AUTH_TOKEN_KEY = 'auth_token_v1';
@@ -56,6 +62,12 @@ interface AuthContextType {
     urinationLoss?: string,
   ) => Promise<void>;
   saveOnboardingProfileDTO: (profileDTO: PatientProfileDTO) => Promise<void>;
+  saveOnboardingWorkoutPlan: (
+    workoutPlan: import('../types/onboarding').UserWorkoutPlanDTO,
+  ) => Promise<void>;
+  getOnboardingWorkoutPlanForRegister: () =>
+    | import('../types/onboarding').UserWorkoutPlanDTO
+    | null;
   setAnonymousMode: (isAnonymous: boolean) => Promise<void>;
   hasOnboardingData: () => boolean;
   validateToken: () => Promise<boolean>;
@@ -69,12 +81,59 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getInitialAuthState = () => {
+  try {
+    const rememberMe = MMKVStorage.getString(REMEMBER_ME_KEY);
+    if (rememberMe === 'false') {
+      return {user: null, isLoggedIn: false, isAnonymous: false};
+    }
+
+    const loggedUser = MMKVStorage.getString(LOGGED_USER_KEY);
+    const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
+
+    if (loggedUser && token) {
+      try {
+        const parsedUser = JSON.parse(loggedUser) as User;
+        return {user: parsedUser, isLoggedIn: true, isAnonymous: false};
+      } catch (error) {
+        return {user: null, isLoggedIn: false, isAnonymous: false};
+      }
+    }
+
+    const tempUser = MMKVStorage.getString(TEMP_USER_KEY);
+    const anonymousStatus = MMKVStorage.getString(IS_ANONYMOUS_KEY);
+    if (tempUser) {
+      try {
+        const parsedUser = JSON.parse(tempUser) as User;
+        return {
+          user: parsedUser,
+          isLoggedIn: false,
+          isAnonymous: anonymousStatus === 'true',
+        };
+      } catch (error) {}
+    }
+
+    return {
+      user: null,
+      isLoggedIn: false,
+      isAnonymous: anonymousStatus === 'true',
+    };
+  } catch (error) {
+    return {user: null, isLoggedIn: false, isAnonymous: false};
+  }
+};
+
 export const AuthProvider = ({children}: {children: ReactNode}) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const initialAuthState = getInitialAuthState();
+  const [user, setUser] = useState<User | null>(initialAuthState.user);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+    initialAuthState.isLoggedIn,
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(
+    initialAuthState.isAnonymous,
+  );
   const [error, setError] = useState<string | null>(null);
   const {navigate} = useNavigation<NavigationStackProp>();
   const {registerToken, removeToken, hasPermission} = useNotifications();
@@ -84,35 +143,71 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(LOGGED_USER_KEY);
       MMKVStorage.delete(AUTH_TOKEN_KEY);
       MMKVStorage.delete(REMEMBER_ME_KEY);
+    } catch (error) {}
+  }, []);
+
+  const clearUserData = useCallback(async () => {
+    try {
+      MMKVStorage.delete(DIARY_CALENDAR_KEY);
+      MMKVStorage.delete(EXERCISES_DATA_KEY);
+      MMKVStorage.delete(EXERCISES_BLOCKED_KEY);
+      MMKVStorage.delete(MMKV_CACHE_USER_KEY);
+      MMKVStorage.delete(ONBOARDING_DATA_KEY);
+      MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
+      MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
+      MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
+      MMKVStorage.delete(PENDING_REGISTER_KEY);
+      queryClient.clear();
+    } catch (error) {}
+  }, []);
+
+  const saveTempUser = useCallback(async (userObj: User) => {
+    try {
+      const userJson = JSON.stringify(userObj);
+      MMKVStorage.set(TEMP_USER_KEY, userJson);
     } catch (error) {
-      console.error('Error clearing auth data:', error);
+      throw new Error('Erro ao salvar dados temporários');
     }
+  }, []);
+
+  const clearTempUser = useCallback(async () => {
+    try {
+      MMKVStorage.delete(TEMP_USER_KEY);
+    } catch (error) {}
   }, []);
 
   const logout = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      // Remove FCM token from backend
+
       if (user?.id) {
         try {
           await removeToken(user.id);
-        } catch (error) {
-          console.error('Error removing FCM token:', error);
-        }
+        } catch (error) {}
       }
-      
+
+      await clearUserData();
       await clearAuthData();
+      await clearTempUser();
+
       setUser(null);
       setIsLoggedIn(false);
+      setIsAnonymous(false);
+      navigate('Auth', {screen: 'Login'});
     } catch (error) {
-      console.error('Logout error:', error);
       setError('Erro ao fazer logout');
     } finally {
       setIsLoading(false);
     }
-  }, [clearAuthData, user, removeToken]);
+  }, [
+    clearAuthData,
+    clearUserData,
+    user,
+    removeToken,
+    navigate,
+    clearTempUser,
+  ]);
 
   const validateToken = useCallback(
     async (userId?: number): Promise<boolean> => {
@@ -138,7 +233,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           return true;
         }
       } catch (error) {
-        console.error('Token validation error:', error);
         return false;
       }
     },
@@ -167,39 +261,51 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const token = MMKVStorage.getString(AUTH_TOKEN_KEY);
 
         if (loggedUser && token) {
-          const parsedUser = JSON.parse(loggedUser) as User;
-          if (!mounted) return;
-
           try {
+            const parsedUser = JSON.parse(loggedUser) as User;
+            if (!mounted) return;
+
             const isValid = await validateToken(parsedUser.id);
+            if (!mounted) return;
+
             if (isValid) {
-              setUser(parsedUser);
-              setIsLoggedIn(true);
-              
-              // Register FCM token if permission granted
+              if (mounted) {
+                setUser(parsedUser);
+                setIsLoggedIn(true);
+                setIsAnonymous(false);
+              }
+
               if (hasPermission && parsedUser?.id) {
                 try {
                   await registerToken(parsedUser.id);
-                } catch (error) {
-                  console.error('Error registering FCM token:', error);
-                }
+                } catch (error) {}
               }
-              
+
               navigate('MainTabs');
             } else {
               await clearAuthData();
-              await loadTempUser();
+              await clearTempUser();
+              if (mounted) {
+                setUser(null);
+                setIsLoggedIn(false);
+                setIsAnonymous(false);
+              }
               navigate('Auth', {screen: 'Login'});
             }
           } catch (error) {
             await clearAuthData();
-            await loadTempUser();
+            await clearTempUser();
+            if (mounted) {
+              setUser(null);
+              setIsLoggedIn(false);
+              setIsAnonymous(false);
+            }
+            navigate('Auth', {screen: 'Login'});
           }
         } else {
           await loadTempUser();
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
         setError('Erro ao inicializar autenticação');
         await loadTempUser();
       } finally {
@@ -222,16 +328,21 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         if (anonymousStatus === 'true' && mounted) {
           setIsAnonymous(true);
         }
-      } catch (error) {
-        console.error('Error loading temp user:', error);
-      }
+      } catch (error) {}
     };
 
     initializeAuth();
     return () => {
       mounted = false;
     };
-  }, [clearAuthData, navigate, validateToken, registerToken, hasPermission]);
+  }, [
+    clearAuthData,
+    navigate,
+    validateToken,
+    registerToken,
+    hasPermission,
+    clearTempUser,
+  ]);
 
   const saveLoggedUser = useCallback(
     async (userObj: User, token: string, remember: boolean = true) => {
@@ -241,30 +352,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         MMKVStorage.set(AUTH_TOKEN_KEY, token);
         MMKVStorage.set(REMEMBER_ME_KEY, remember.toString());
       } catch (error) {
-        console.error('Error saving logged user:', error);
         throw new Error('Erro ao salvar dados do usuário');
       }
     },
     [],
   );
-
-  const saveTempUser = useCallback(async (userObj: User) => {
-    try {
-      const userJson = JSON.stringify(userObj);
-      MMKVStorage.set(TEMP_USER_KEY, userJson);
-    } catch (error) {
-      console.error('Error saving temp user:', error);
-      throw new Error('Erro ao salvar dados temporários');
-    }
-  }, []);
-
-  const clearTempUser = useCallback(async () => {
-    try {
-      MMKVStorage.delete(TEMP_USER_KEY);
-    } catch (error) {
-      console.error('Error clearing temp user:', error);
-    }
-  }, []);
 
   const clearError = useCallback(() => {
     setError(null);
@@ -283,22 +375,42 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         const shouldRemember = credentials.remember !== false;
         await saveLoggedUser(response.user, response.token, shouldRemember);
         await clearTempUser();
-        
-        // Register FCM token after successful login
+
+        try {
+          const offlineSyncService = (
+            await import('../services/offlineSyncService')
+          ).default;
+          const userId = response.user.id.toString();
+          await offlineSyncService.syncAllOfflineData(userId);
+        } catch (syncError) {}
+
         if (hasPermission && response.user?.id) {
           try {
             await registerToken(response.user.id);
-          } catch (error) {
-            console.error('Error registering FCM token:', error);
-          }
+          } catch (error) {}
         }
-        
+
         navigate('MainTabs');
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Erro ao fazer login';
+      } catch (error: any) {
+        let errorMessage = 'Erro ao fazer login';
+
+        if (error?.response) {
+          const status = error.response.status;
+          const apiMessage = error.response.data?.message;
+
+          if (status === 401 || status === 400) {
+            errorMessage =
+              apiMessage ||
+              'Credenciais incorretas. Verifique seu e-mail e senha.';
+          } else if (apiMessage) {
+            errorMessage = apiMessage;
+          }
+        } else if (error instanceof Error && error.message) {
+          errorMessage = error.message;
+        }
+
         setError(errorMessage);
-        throw error;
+        throw new Error(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -311,17 +423,14 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(ONBOARDING_DATA_KEY);
       MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
       MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
-    } catch (error) {
-      console.error('Error clearing onboarding data:', error);
-    }
+      MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
+    } catch (error) {}
   }, []);
 
   const setPendingRegister = useCallback((pending: boolean) => {
     try {
       MMKVStorage.set(PENDING_REGISTER_KEY, pending.toString());
-    } catch (error) {
-      console.error('Error setting pending register:', error);
-    }
+    } catch (error) {}
   }, []);
 
   const getOnboardingDataForRegister =
@@ -348,10 +457,25 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
         return profileDTO;
       } catch (error) {
-        console.error('Error getting onboarding data for register:', error);
         return null;
       }
     }, []);
+
+  const getOnboardingWorkoutPlanForRegister = useCallback(():
+    | import('../types/onboarding').UserWorkoutPlanDTO
+    | null => {
+    try {
+      const workoutPlanStr = MMKVStorage.getString(ONBOARDING_WORKOUT_PLAN_KEY);
+      if (!workoutPlanStr) {
+        return null;
+      }
+      return JSON.parse(
+        workoutPlanStr,
+      ) as import('../types/onboarding').UserWorkoutPlanDTO;
+    } catch (error) {
+      return null;
+    }
+  }, []);
 
   const register = useCallback(
     async (userData: registerRequest) => {
@@ -364,15 +488,25 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           userData.profile = profileDTO;
         }
 
+        const workoutPlan = getOnboardingWorkoutPlanForRegister();
+        if (workoutPlan && !userData.workoutPlan) {
+          userData.workoutPlan = {
+            planId: workoutPlan.plan.id,
+            startDate: workoutPlan.startDate,
+            endDate: workoutPlan.endDate,
+            totalProgress: workoutPlan.totalProgress,
+            weekProgress: workoutPlan.weekProgress,
+            currentWeek: workoutPlan.currentWeek,
+            completed: workoutPlan.completed,
+          };
+        }
+
         const response = await authServices.register(userData);
-        const loginCredentials = {
-          email: userData.email,
-          password: userData.password,
-        };
-        await login(loginCredentials);
 
         await clearOnboardingData();
         setPendingRegister(false);
+
+        navigate('Auth', {screen: 'Login'});
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Erro ao registrar usuário';
@@ -383,10 +517,11 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       }
     },
     [
-      login,
       getOnboardingDataForRegister,
+      getOnboardingWorkoutPlanForRegister,
       clearOnboardingData,
       setPendingRegister,
+      navigate,
     ],
   );
 
@@ -424,7 +559,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         rememberMe !== 'false',
       );
     } catch (error) {
-      console.error('Refresh user error:', error);
       setError('Erro ao atualizar dados do usuário');
       if (error instanceof Error && error.message.includes('401')) {
         await logout();
@@ -447,7 +581,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           await saveTempUser(updatedUser);
         }
       } catch (error) {
-        console.error('Update user error:', error);
         setError('Erro ao atualizar dados do usuário');
         throw error;
       }
@@ -480,7 +613,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         };
         await updateUser(updatedUser);
       } catch (error) {
-        console.error('Save patient profile error:', error);
         setError('Erro ao salvar perfil do paciente');
         throw error;
       }
@@ -501,7 +633,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         };
         await updateUser(updatedUser);
       } catch (error) {
-        console.error('Save preferences error:', error);
         setError('Erro ao salvar preferências');
         throw error;
       }
@@ -541,7 +672,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           await saveTempUser(tempUser);
         }
       } catch (error) {
-        console.error('Save offline onboarding data error:', error);
         throw new Error('Erro ao salvar dados de onboarding');
       }
     },
@@ -553,8 +683,21 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       try {
         MMKVStorage.set(ONBOARDING_PROFILE_DTO_KEY, JSON.stringify(profileDTO));
       } catch (error) {
-        console.error('Save onboarding profile DTO error:', error);
         throw new Error('Erro ao salvar profile DTO de onboarding');
+      }
+    },
+    [],
+  );
+
+  const saveOnboardingWorkoutPlan = useCallback(
+    async (workoutPlan: import('../types/onboarding').UserWorkoutPlanDTO) => {
+      try {
+        MMKVStorage.set(
+          ONBOARDING_WORKOUT_PLAN_KEY,
+          JSON.stringify(workoutPlan),
+        );
+      } catch (error) {
+        throw new Error('Erro ao salvar workout plan de onboarding');
       }
     },
     [],
@@ -562,16 +705,18 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
 
   const hasOnboardingData = useCallback((): boolean => {
     try {
+      if (isLoggedIn && user?.profile?.id) {
+        return true;
+      }
       if (user?.profile?.id) {
         return true;
       }
       const onboardingData = MMKVStorage.getString(ONBOARDING_DATA_KEY);
       return !!onboardingData;
     } catch (error) {
-      console.error('Error checking onboarding data:', error);
       return false;
     }
-  }, [user]);
+  }, [user, isLoggedIn]);
 
   const validateTokenExposed = useCallback(async (): Promise<boolean> => {
     if (user) {
@@ -585,7 +730,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.set(IS_ANONYMOUS_KEY, anonymous.toString());
       setIsAnonymous(anonymous);
     } catch (error) {
-      console.error('Error setting anonymous mode:', error);
       throw new Error('Erro ao definir modo anônimo');
     }
   }, []);
@@ -595,7 +739,6 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       const pending = MMKVStorage.getString(PENDING_REGISTER_KEY);
       return pending === 'true';
     } catch (error) {
-      console.error('Error checking pending register:', error);
       return false;
     }
   }, []);
@@ -622,6 +765,8 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         savePreferences,
         saveOfflineOnboardingData,
         saveOnboardingProfileDTO,
+        saveOnboardingWorkoutPlan,
+        getOnboardingWorkoutPlanForRegister,
         setAnonymousMode,
         hasOnboardingData,
         validateToken: validateTokenExposed,
