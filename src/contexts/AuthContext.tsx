@@ -110,8 +110,7 @@ const getInitialAuthState = () => {
           isLoggedIn: false,
           isAnonymous: anonymousStatus === 'true',
         };
-      } catch (error) {
-      }
+      } catch (error) {}
     }
 
     return {
@@ -144,8 +143,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(LOGGED_USER_KEY);
       MMKVStorage.delete(AUTH_TOKEN_KEY);
       MMKVStorage.delete(REMEMBER_ME_KEY);
-    } catch (error) {
-    }
+    } catch (error) {}
   }, []);
 
   const clearUserData = useCallback(async () => {
@@ -160,8 +158,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
       MMKVStorage.delete(PENDING_REGISTER_KEY);
       queryClient.clear();
-    } catch (error) {
-    }
+    } catch (error) {}
   }, []);
 
   const saveTempUser = useCallback(async (userObj: User) => {
@@ -176,8 +173,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const clearTempUser = useCallback(async () => {
     try {
       MMKVStorage.delete(TEMP_USER_KEY);
-    } catch (error) {
-    }
+    } catch (error) {}
   }, []);
 
   const logout = useCallback(async () => {
@@ -188,8 +184,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       if (user?.id) {
         try {
           await removeToken(user.id);
-        } catch (error) {
-        }
+        } catch (error) {}
       }
 
       await clearUserData();
@@ -283,8 +278,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
               if (hasPermission && parsedUser?.id) {
                 try {
                   await registerToken(parsedUser.id);
-                } catch (error) {
-                }
+                } catch (error) {}
               }
 
               navigate('MainTabs');
@@ -334,8 +328,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
         if (anonymousStatus === 'true' && mounted) {
           setIsAnonymous(true);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     initializeAuth();
@@ -355,12 +348,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
     async (userObj: User, token: string, remember: boolean = true) => {
       try {
         const userJson = JSON.stringify(userObj);
-      MMKVStorage.set(LOGGED_USER_KEY, userJson);
-      MMKVStorage.set(AUTH_TOKEN_KEY, token);
-      MMKVStorage.set(REMEMBER_ME_KEY, remember.toString());
-    } catch (error) {
-      throw new Error('Erro ao salvar dados do usuário');
-    }
+        MMKVStorage.set(LOGGED_USER_KEY, userJson);
+        MMKVStorage.set(AUTH_TOKEN_KEY, token);
+        MMKVStorage.set(REMEMBER_ME_KEY, remember.toString());
+      } catch (error) {
+        throw new Error('Erro ao salvar dados do usuário');
+      }
     },
     [],
   );
@@ -389,14 +382,12 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
           ).default;
           const userId = response.user.id.toString();
           await offlineSyncService.syncAllOfflineData(userId);
-        } catch (syncError) {
-        }
+        } catch (syncError) {}
 
         if (hasPermission && response.user?.id) {
           try {
             await registerToken(response.user.id);
-          } catch (error) {
-          }
+          } catch (error) {}
         }
 
         navigate('MainTabs');
@@ -433,15 +424,13 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
       MMKVStorage.delete(ONBOARDING_PROFILE_DTO_KEY);
       MMKVStorage.delete(ONBOARDING_URINATION_LOSS_KEY);
       MMKVStorage.delete(ONBOARDING_WORKOUT_PLAN_KEY);
-    } catch (error) {
-    }
+    } catch (error) {}
   }, []);
 
   const setPendingRegister = useCallback((pending: boolean) => {
     try {
       MMKVStorage.set(PENDING_REGISTER_KEY, pending.toString());
-    } catch (error) {
-    }
+    } catch (error) {}
   }, []);
 
   const getOnboardingDataForRegister =

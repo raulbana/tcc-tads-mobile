@@ -50,8 +50,8 @@ const Input = React.forwardRef<TextInput, InputProps>(
     const finalAutoCapitalize = emailKeyboardType
       ? 'none'
       : rest.autoCapitalize !== undefined
-        ? rest.autoCapitalize
-        : 'none';
+      ? rest.autoCapitalize
+      : 'none';
 
     const maxLength = rest.maxLength;
     const showCharCounter = maxLength !== undefined;

@@ -1,8 +1,5 @@
 import styled from 'styled-components/native';
-import {
-  verticalScale,
-  horizontalScale,
-} from '../../../../../utils/scales';
+import {verticalScale, horizontalScale} from '../../../../../utils/scales';
 
 export const Wrapper = styled.ScrollView`
   width: 100%;
