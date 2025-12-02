@@ -8,9 +8,19 @@ import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer
 import {Exercise, ExerciseStatusLabels} from '../../../types/exercise';
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import Icon from '../../../components/Icon/Icon';
+import ICIQReassessmentModal from './components/ICIQReassessmentModal';
 
 const ExerciseHome = () => {
-  const {workouts, handleWorkoutPress, isLoading, error, isExercisesBlocked} = useExerciseHome();
+  const {
+    workouts,
+    handleWorkoutPress,
+    isLoading,
+    error,
+    isExercisesBlocked,
+    isReassessmentModalOpen,
+    handleCloseReassessmentModal,
+    handleReassessmentSuccess,
+  } = useExerciseHome();
 
   const renderWorkoutCard = ({item}: {item: Exercise}) => {
     const statusLabel = ExerciseStatusLabels[item.status];
@@ -78,32 +88,39 @@ const ExerciseHome = () => {
   }
 
   return (
-    <ScreenContainer scrollable>
-      <S.Container>
-        <Label
-          text="Plano de Treinos"
-          typography={theme.typography.title.b2}
-          color={theme.colors.gray_08}
-        />
-        <FlatList
-          data={workouts}
-          keyExtractor={item => item.id}
-          renderItem={renderWorkoutCard}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 20}}
-          scrollEnabled={false}
-          ListEmptyComponent={
-            !isLoading && !error ? (
-              <Label
-                text="Nenhum treino disponível"
-                typography={theme.typography.paragraph.b3}
-                color={theme.colors.gray_06}
-              />
-            ) : null
-          }
-        />
-      </S.Container>
-    </ScreenContainer>
+    <>
+      <ScreenContainer scrollable>
+        <S.Container>
+          <Label
+            text="Plano de Treinos"
+            typography={theme.typography.title.b2}
+            color={theme.colors.gray_08}
+          />
+          <FlatList
+            data={workouts}
+            keyExtractor={item => item.id}
+            renderItem={renderWorkoutCard}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: 20}}
+            scrollEnabled={false}
+            ListEmptyComponent={
+              !isLoading && !error ? (
+                <Label
+                  text="Nenhum treino disponível"
+                  typography={theme.typography.paragraph.b3}
+                  color={theme.colors.gray_06}
+                />
+              ) : null
+            }
+          />
+        </S.Container>
+      </ScreenContainer>
+      <ICIQReassessmentModal
+        isOpen={isReassessmentModalOpen}
+        onClose={handleCloseReassessmentModal}
+        onSuccess={handleReassessmentSuccess}
+      />
+    </>
   );
 };
 

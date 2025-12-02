@@ -1,4 +1,4 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback, useMemo, useState, useEffect} from 'react';
 import {Exercise, Workout} from '../../../types/exercise';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -12,12 +12,14 @@ const useExerciseHome = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<ExercisesParamList>>();
   const {getPatientProfile, isLoggedIn} = useAuth();
+  const [isReassessmentModalOpen, setIsReassessmentModalOpen] = useState(false);
 
   const queries = useExerciseQueries(['exercises'], isLoggedIn);
   const {
     data: userWorkoutPlan = null,
     isLoading,
     error,
+    refetch: refetchWorkoutPlan,
   } = queries.getUserWorkoutPlan();
 
   const isExercisesBlocked = useMemo(() => {
@@ -27,6 +29,21 @@ const useExerciseHome = () => {
     }
     return MMKVStorage.getString(EXERCISES_BLOCKED_KEY) === 'true';
   }, [getPatientProfile]);
+
+  const hasNoActivePlan = useMemo(() => {
+    if (isLoading) return false;
+    if (!userWorkoutPlan) return true;
+    if (!userWorkoutPlan.workouts || userWorkoutPlan.workouts.length === 0)
+      return true;
+    if (userWorkoutPlan.completed) return true;
+    return false;
+  }, [userWorkoutPlan, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && hasNoActivePlan && !isExercisesBlocked) {
+      setIsReassessmentModalOpen(true);
+    }
+  }, [isLoading, hasNoActivePlan, isExercisesBlocked]);
 
   const workouts = useMemo<Exercise[]>(() => {
     if (userWorkoutPlan?.workouts) {
@@ -52,12 +69,25 @@ const useExerciseHome = () => {
     [navigation, userWorkoutPlan, isExercisesBlocked],
   );
 
+  const handleCloseReassessmentModal = useCallback(() => {
+    setIsReassessmentModalOpen(false);
+  }, []);
+
+  const handleReassessmentSuccess = useCallback(async () => {
+    setIsReassessmentModalOpen(false);
+    await refetchWorkoutPlan();
+  }, [refetchWorkoutPlan]);
+
   return {
     workouts,
     handleWorkoutPress,
     isLoading,
     error,
     isExercisesBlocked,
+    isReassessmentModalOpen,
+    handleCloseReassessmentModal,
+    handleReassessmentSuccess,
+    hasNoActivePlan,
   };
 };
 
