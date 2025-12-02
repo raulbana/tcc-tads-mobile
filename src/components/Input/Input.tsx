@@ -46,11 +46,12 @@ const Input = React.forwardRef<TextInput, InputProps>(
 
     const theme = useDynamicTheme();
 
-    // Garantir que autoCapitalize="none" seja sempre aplicado para inputs de email
     const emailKeyboardType = rest.keyboardType === 'email-address';
     const finalAutoCapitalize = emailKeyboardType
       ? 'none'
-      : rest.autoCapitalize || 'none';
+      : rest.autoCapitalize !== undefined
+        ? rest.autoCapitalize
+        : 'none';
 
     const maxLength = rest.maxLength;
     const showCharCounter = maxLength !== undefined;

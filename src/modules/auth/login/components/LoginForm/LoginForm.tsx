@@ -56,6 +56,7 @@ const LoginForm: React.FC = () => {
         name="password"
         render={({field}) => (
           <Input
+            {...register('password')}
             ref={passwordInputRef}
             label="Senha"
             value={field.value}

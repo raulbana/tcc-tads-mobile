@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {BackHandler, Alert} from 'react-native';
 import * as S from './styles';
 import ScreenContainer from '../../../components/ScreenContainer/ScreenContainer';
@@ -10,12 +10,10 @@ import CalendarRow from '../../../components/Calendar/components/CalendarRow/Cal
 import {useDynamicTheme} from '../../../hooks/useDynamicTheme';
 import useHome from './useHome';
 import NotificationPermissionModal from '../../../components/NotificationPermissionModal/NotificationPermissionModal';
-import {useNavigation} from '@react-navigation/native';
 import {useFocusEffect} from '@react-navigation/native';
 import { Exercise } from '../../../types/exercise';
 
 const Home = () => {
-  const navigation = useNavigation();
 
   useFocusEffect(
     React.useCallback(() => {

@@ -2,7 +2,6 @@ import styled from 'styled-components/native';
 import {
   horizontalScale,
   verticalScale,
-  moderateScale,
 } from '../../../utils/scales';
 
 export const Container = styled.View`

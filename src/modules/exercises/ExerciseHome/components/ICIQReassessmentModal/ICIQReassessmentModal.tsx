@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
 import BottomModal from '../../../../../components/BottomModal/BottomModal';
 import DialogModal from '../../../../../components/DialogModal/DialogModal';
 import * as S from './styles';
@@ -31,7 +30,6 @@ const ICIQReassessmentModal: React.FC<ICIQReassessmentModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const theme = useDynamicTheme();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [showQuestionsModal, setShowQuestionsModal] = useState(false);
 
@@ -43,7 +41,6 @@ const ICIQReassessmentModal: React.FC<ICIQReassessmentModalProps> = ({
     onCloseToast,
     navigateBack,
     isLoading,
-    onSubmitAnswer,
     resetForm,
     iciqQuestions,
     onContinue,
@@ -76,16 +73,6 @@ const ICIQReassessmentModal: React.FC<ICIQReassessmentModalProps> = ({
     setShowConfirmationDialog(false);
     setShowQuestionsModal(false);
     onClose();
-  };
-
-  const handleContinue = async () => {
-    if (currentQuestionIndex === iciqQuestions.length - 1) {
-      const success = await onSubmitAnswer();
-      if (success) {
-        handleClose();
-        onSuccess();
-      }
-    }
   };
 
   return (
