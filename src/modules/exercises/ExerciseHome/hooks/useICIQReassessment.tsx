@@ -80,7 +80,6 @@ const useICIQReassessment = () => {
 
     const submitForm = handleSubmit(
       async (answers: ICIQReassessmentAnswers) => {
-        // Obter dados do perfil atual do usuário para manter birthdate e gender
         const currentProfile = user?.profile;
         if (!currentProfile) {
           setErrorMessage('Erro: perfil do usuário não encontrado.');
@@ -90,7 +89,6 @@ const useICIQReassessment = () => {
         }
 
         const formatAnswersForAPI = (): Record<string, string> => {
-          // Incluir birthdate e gender do perfil atual
           const birthdate =
             currentProfile.birthDate || new Date().toISOString().split('T')[0];
           const gender = currentProfile.gender || '';
@@ -132,15 +130,12 @@ const useICIQReassessment = () => {
             await saveOnboardingWorkoutPlan(result.workoutPlan);
           }
 
-          // Atualizar dados do usuário para refletir o novo perfil
           if (isLoggedIn && user) {
             await refreshUser();
           }
 
-          // Marcar como sucesso
           success = true;
         } catch (error) {
-          console.error('Error submitting ICIQ reassessment:', error);
           const errorMsg =
             error instanceof Error
               ? error.message
@@ -237,7 +232,7 @@ const useICIQReassessment = () => {
 
   const questionInputs: QuestionProps[] = iciqQuestions.map(question => ({
     question,
-    control: control as any, // Type assertion necessário pois QuestionProps espera ICIQAnswers
+    control: control as any,
     onContinue: () => onContinue(question.id as keyof ICIQReassessmentAnswers),
     selectedValue: getValues(question.id as keyof ICIQReassessmentAnswers),
     setValue: setValue as any,

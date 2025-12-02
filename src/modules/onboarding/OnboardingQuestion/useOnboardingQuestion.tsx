@@ -175,7 +175,6 @@ const useOnboardingQuestion = () => {
 
         navigate('Onboarding', {screen: 'OnboardingEnd'});
       } catch (error) {
-        console.error('Error submitting onboarding:', error);
         const errorMsg =
           error instanceof Error ? error.message : 'Erro ao enviar respostas.';
         setErrorMessage(errorMsg);

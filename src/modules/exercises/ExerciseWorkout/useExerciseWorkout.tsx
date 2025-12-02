@@ -86,7 +86,6 @@ const useExerciseWorkout = () => {
       setCurrentExercise({...first, status: 'IN_PROGRESS'});
       setWorkout({...workout, status: 'IN_PROGRESS'});
     } catch (error: any) {
-      console.error('Erro ao verificar plano de treino:', error);
       const errorMsg =
         extractErrorMessage(error) ||
         'Você precisa ter um plano de treino ativo para iniciar um treino. Por favor, complete o onboarding.';
@@ -170,15 +169,12 @@ const useExerciseWorkout = () => {
               },
             ]);
           } catch (error: any) {
-            console.error('Erro ao enviar completion do treino:', error);
             const errorMsg =
               extractErrorMessage(error) ||
               'Não foi possível registrar a conclusão do treino. Verifique se você possui um plano de treino ativo.';
             setErrorMessage(errorMsg);
             setIsToastOpen(true);
           }
-        } else {
-          console.error('Workout ID inválido:', workout.id);
         }
       }
       setStep('EVALUATE');

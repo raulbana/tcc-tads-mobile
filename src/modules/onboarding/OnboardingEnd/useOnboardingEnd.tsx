@@ -2,13 +2,22 @@ import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
 import {useAuth} from '../../../contexts/AuthContext';
 import {useEffect, useRef, useState} from 'react';
-import {MMKVStorage, EXERCISES_BLOCKED_KEY, ONBOARDING_DATA_KEY} from '../../../storage/mmkvStorage';
+import {
+  MMKVStorage,
+  EXERCISES_BLOCKED_KEY,
+  ONBOARDING_DATA_KEY,
+} from '../../../storage/mmkvStorage';
 import {shouldBlockExercises} from '../../../utils/profileUtils';
 import {PatientProfile} from '../../../types/auth';
 
 const useOnboardingEnd = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
-  const {setAnonymousMode, isPendingRegister, setPendingRegister, getPatientProfile} = useAuth();
+  const {
+    setAnonymousMode,
+    isPendingRegister,
+    setPendingRegister,
+    getPatientProfile,
+  } = useAuth();
   const hasNavigated = useRef(false);
   const [showICIQWarning, setShowICIQWarning] = useState(false);
 
@@ -16,7 +25,7 @@ const useOnboardingEnd = () => {
     // Verificar se deve mostrar o aviso ICIQ
     // Primeiro tenta pegar do contexto, depois do storage
     let profile = getPatientProfile();
-    
+
     if (!profile) {
       // Tentar pegar do storage
       try {
@@ -24,9 +33,7 @@ const useOnboardingEnd = () => {
         if (onboardingDataStr) {
           profile = JSON.parse(onboardingDataStr) as PatientProfile;
         }
-      } catch (error) {
-        console.error('Error reading onboarding data from storage:', error);
-      }
+      } catch (error) {}
     }
 
     if (profile && shouldBlockExercises(profile)) {

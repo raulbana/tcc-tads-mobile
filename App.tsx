@@ -58,19 +58,11 @@ const AppContent = () => {
 function App(): React.ReactElement {
   moment.locale('pt-br');
 
-  // Inicializar serviço de notificações (registrar dispositivo iOS para mensagens remotas)
   React.useEffect(() => {
     const initializeNotifications = async () => {
       try {
-        console.log('[App] Inicializando serviço de notificações...');
         await notificationService.initialize();
-        console.log('[App] Serviço de notificações inicializado');
-      } catch (error) {
-        console.error(
-          '[App] Erro ao inicializar serviço de notificações:',
-          error,
-        );
-      }
+      } catch (error) {}
     };
 
     initializeNotifications();

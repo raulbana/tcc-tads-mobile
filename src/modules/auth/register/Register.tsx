@@ -18,14 +18,11 @@ const Register: React.FC = () => {
   const hasChecked = useRef(false);
 
   useEffect(() => {
-    // Só redirecionar para onboarding se não tiver dados E não estiver pendente de registro
-    // E não tiver acabado de fazer um registro bem-sucedido (isPendingRegister será false após sucesso)
     if (!hasChecked.current && !hasOnboardingData() && !isPendingRegister()) {
       hasChecked.current = true;
       setPendingRegister(true);
       navigate('Onboarding', {screen: 'OnboardingHome'});
     }
-    // Resetar hasChecked se o registro foi bem-sucedido (isPendingRegister volta a false)
     if (hasChecked.current && !isPendingRegister() && hasOnboardingData()) {
       hasChecked.current = false;
     }

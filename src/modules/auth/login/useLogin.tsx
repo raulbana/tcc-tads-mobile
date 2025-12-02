@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {NavigationStackProp} from '../../../navigation/routes';
-import { useAuth } from '../../../contexts/AuthContext';
+import {useAuth} from '../../../contexts/AuthContext';
 
 const useLogin = () => {
   const {navigate} = useNavigation<NavigationStackProp>();
@@ -8,10 +8,8 @@ const useLogin = () => {
 
   const handleGoToRegister = () => {
     if (hasOnboardingData()) {
-      // Se tem dados de onboarding, vai direto para cadastro
-    navigate('Auth', {screen: 'Register'});
+      navigate('Auth', {screen: 'Register'});
     } else {
-      // Se não tem, marca como pending e vai para onboarding
       setPendingRegister(true);
       navigate('Onboarding', {screen: 'OnboardingHome'});
     }

@@ -26,7 +26,6 @@ const useRegisterForm = () => {
     mode: 'onSubmit',
   });
 
-
   const {
     register: authRegister,
     isLoading: authLoading,
@@ -36,7 +35,6 @@ const useRegisterForm = () => {
 
   const onSubmit = useCallback(
     async (values: RegisterFormData) => {
-      // Verificar se tem dados de onboarding antes de processar o registro
       if (!hasOnboardingData()) {
         setPendingRegister(true);
         return;
@@ -50,11 +48,8 @@ const useRegisterForm = () => {
         };
 
         await authRegister(payload);
-        
-        // Resetar formulário
+
         reset();
-        
-        // Redirecionamento será feito no AuthContext após limpar dados
       } catch (error: any) {
         const message =
           error?.message && typeof error.message === 'string'
