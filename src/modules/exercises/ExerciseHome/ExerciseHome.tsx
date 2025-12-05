@@ -112,7 +112,11 @@ const ExerciseHome = () => {
               />
               {userWorkoutPlan.totalProgress !== undefined && (
                 <Label
-                  text={`Progresso: ${((userWorkoutPlan.weekProgress / userWorkoutPlan.totalProgress) * 100).toFixed(2)}%`}
+                  text={`Progresso: ${(
+                    (userWorkoutPlan.weekProgress /
+                      userWorkoutPlan.totalProgress) *
+                    100
+                  ).toFixed(2)}%`}
                   typography={theme.typography.paragraph.r2}
                   color={theme.colors.gray_07}
                 />
