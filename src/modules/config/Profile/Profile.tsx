@@ -24,6 +24,7 @@ const Profile: React.FC = () => {
     handleContentPress,
     handleTabChange,
     DialogPortal,
+    stats,
   } = useProfile();
 
   const theme = useDynamicTheme();
@@ -68,7 +69,11 @@ const Profile: React.FC = () => {
       goBackTo="Configurações"
       headerShown={true}>
       <S.Wrapper>
-        <ProfileHeader user={user} onEditProfile={handleEditProfile} />
+        <ProfileHeader
+          user={user}
+          onEditProfile={handleEditProfile}
+          stats={stats}
+        />
 
         <ContentTabs activeTab={activeTab} onTabChange={handleTabChange} />
 

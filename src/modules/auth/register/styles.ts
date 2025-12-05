@@ -6,10 +6,10 @@ import {
 } from '../../../utils/scales';
 
 export const Outer = styled.View`
-  flex: 1;
+  width: 100%;
   align-items: center;
-  justify-content: center;
   padding-horizontal: ${horizontalScale(16)}px;
+  padding-vertical: ${verticalScale(24)}px;
   background-color: ${({theme}) => theme.colors.white};
 `;
 

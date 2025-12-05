@@ -54,6 +54,19 @@ const useExerciseHome = () => {
     return [];
   }, [userWorkoutPlan]);
 
+  const nextWorkout = useMemo(() => {
+    if (!userWorkoutPlan?.nextWorkout || !userWorkoutPlan?.workouts) {
+      return null;
+    }
+    const workoutIndex = userWorkoutPlan.nextWorkout - 1; // Converter para 0-based
+    return userWorkoutPlan.workouts[workoutIndex] || null;
+  }, [userWorkoutPlan]);
+
+  const nextWorkoutExerciseIds = useMemo(() => {
+    if (!nextWorkout) return new Set<string>();
+    return new Set(nextWorkout.exercises.map((e: Exercise) => e.id));
+  }, [nextWorkout]);
+
   const handleWorkoutPress = useCallback(
     (exerciseId: string) => {
       if (isExercisesBlocked) {
@@ -88,6 +101,9 @@ const useExerciseHome = () => {
     handleCloseReassessmentModal,
     handleReassessmentSuccess,
     hasNoActivePlan,
+    nextWorkout,
+    nextWorkoutExerciseIds,
+    userWorkoutPlan,
   };
 };
 
