@@ -20,10 +20,14 @@ const ExerciseHome = () => {
     isReassessmentModalOpen,
     handleCloseReassessmentModal,
     handleReassessmentSuccess,
+    nextWorkout,
+    nextWorkoutExerciseIds,
+    userWorkoutPlan,
   } = useExerciseHome();
 
   const renderWorkoutCard = ({item}: {item: Exercise}) => {
     const statusLabel = ExerciseStatusLabels[item.status];
+    const isNextWorkout = nextWorkoutExerciseIds.has(item.id);
     return (
       <WorkoutCard
         title={item.title}
@@ -34,6 +38,7 @@ const ExerciseHome = () => {
         badge={statusLabel}
         onPress={() => handleWorkoutPress(item.id)}
         disabled={isExercisesBlocked}
+        isNextWorkout={isNextWorkout}
       />
     );
   };
@@ -96,6 +101,42 @@ const ExerciseHome = () => {
             typography={theme.typography.title.b2}
             color={theme.colors.gray_08}
           />
+          {userWorkoutPlan && (
+            <S.ProgressContainer>
+              <Label
+                text={`Semana ${userWorkoutPlan.currentWeek}${
+                  userWorkoutPlan.plan ? ' do plano de treino' : ''
+                }`}
+                typography={theme.typography.paragraph.r2}
+                color={theme.colors.gray_07}
+              />
+              {userWorkoutPlan.totalProgress !== undefined && (
+                <Label
+                  text={`Progresso: ${(
+                    (userWorkoutPlan.weekProgress /
+                      userWorkoutPlan.totalProgress) *
+                    100
+                  ).toFixed(2)}%`}
+                  typography={theme.typography.paragraph.r2}
+                  color={theme.colors.gray_07}
+                />
+              )}
+            </S.ProgressContainer>
+          )}
+          {nextWorkout && (
+            <S.NextWorkoutSection>
+              <Label
+                text="Próximo Treino Recomendado"
+                typography={theme.typography.title.b3}
+                color={theme.colors.gray_08}
+              />
+              <Label
+                text={nextWorkout.name}
+                typography={theme.typography.paragraph.r2}
+                color={theme.colors.gray_08}
+              />
+            </S.NextWorkoutSection>
+          )}
           <FlatList
             data={workouts}
             keyExtractor={item => item.id}

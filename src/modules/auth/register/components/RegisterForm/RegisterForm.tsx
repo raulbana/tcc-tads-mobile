@@ -7,7 +7,7 @@ import Input from '../../../../../components/Input/Input';
 import Label from '../../../../../components/Label/Label';
 import Button from '../../../../../components/Button/Button';
 import SwitchToggle from '../../../../../components/SwitchToggle/SwitchToggle';
-import { useDynamicTheme } from '../../../../../hooks/useDynamicTheme';
+import {useDynamicTheme} from '../../../../../hooks/useDynamicTheme';
 
 const RegisterForm: React.FC = () => {
   const {
@@ -19,6 +19,8 @@ const RegisterForm: React.FC = () => {
     onSubmit,
     watch,
     isLoading,
+    isSubmitted,
+    trigger,
   } = useRegisterForm();
 
   const terms = watch('acceptTerms');
@@ -132,22 +134,53 @@ const RegisterForm: React.FC = () => {
       />
 
       <S.TermsRow>
-        <SwitchToggle
-          value={!!terms}
-          onValueChange={val => setValue('acceptTerms', val)}
-        />
-        <Label
-          text="Aceito os termos de uso"
-          typography={theme.typography.paragraph.r2}
-          color={theme.colors.gray_07}
+        <Controller
+          control={control}
+          name="acceptTerms"
+          render={({field, fieldState}) => (
+            <>
+              <SwitchToggle
+                value={field.value}
+                onValueChange={val => {
+                  field.onChange(val);
+                  if (isSubmitted || errors.acceptTerms) {
+                    trigger('acceptTerms');
+                  }
+                }}
+              />
+              <Label
+                text="Aceito os termos de uso"
+                typography={theme.typography.paragraph.r2}
+                color={
+                  fieldState.error || errors.acceptTerms
+                    ? theme.colors.red_01 || '#EF4444'
+                    : theme.colors.gray_07
+                }
+              />
+            </>
+          )}
         />
       </S.TermsRow>
+      {(errors.acceptTerms || (isSubmitted && !terms)) && (
+        <Label
+          text={
+            errors.acceptTerms?.message || 'Você deve aceitar os termos de uso'
+          }
+          typography={theme.typography.paragraph.r2}
+          color={theme.colors.red_01 || '#EF4444'}
+        />
+      )}
 
       <Button
         type="PRIMARY"
         text="Criar Conta"
         onPress={() => {
-          handleSubmit(onSubmit)();
+          handleSubmit(onSubmit, errors => {
+            // Forçar validação de acceptTerms se não foi aceito
+            if (!terms) {
+              trigger('acceptTerms');
+            }
+          })();
         }}
         loading={isLoading}
         disabled={isLoading}

@@ -29,7 +29,7 @@ const Register: React.FC = () => {
   }, [hasOnboardingData, setPendingRegister, navigate, isPendingRegister]);
 
   return (
-    <ScreenContainer>
+    <ScreenContainer scrollable>
       <S.Outer>
         <S.LogoWrapper>
           <DailyIULogo width={48} height={48} />

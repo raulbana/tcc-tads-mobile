@@ -16,6 +16,7 @@ export interface WorkoutCardProps {
   onPress: () => void;
   showBadge?: boolean;
   disabled?: boolean;
+  isNextWorkout?: boolean;
 }
 
 const WorkoutCard: React.FC<WorkoutCardProps> = ({
@@ -28,11 +29,12 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
   onPress,
   showBadge = false,
   disabled = false,
+  isNextWorkout = false,
 }) => {
   const theme = useDynamicTheme();
 
   return (
-    <S.Container>
+    <S.Container isNextWorkout={isNextWorkout}>
       <S.Header>
         <S.TitleContainer>
           <Label
@@ -41,7 +43,16 @@ const WorkoutCard: React.FC<WorkoutCardProps> = ({
             color={theme.colors.gray_08}
           />
         </S.TitleContainer>
-        {showBadge && (
+        {isNextWorkout && (
+          <S.BadgeContainer>
+            <Badge
+              borderColor={theme.colors.purple_02}
+              backgroundColor={theme.colors.purple_02}
+              content="Próximo treino"
+            />
+          </S.BadgeContainer>
+        )}
+        {showBadge && !isNextWorkout && (
           <S.BadgeContainer>
             <Badge
               borderColor={theme.colors.purple_02}

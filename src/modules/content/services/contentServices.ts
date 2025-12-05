@@ -284,10 +284,10 @@ const contentServices = {
   },
 
   getUserContent: async (userId: string): Promise<Content[]> => {
-    const response = await api.get(apiRoutes.content.user(userId),{
+    const response = await api.get(apiRoutes.content.all, {
       headers: {
         'x-user-id': userId,
-        'x-profile': true,
+        'x-profile': 'true',
       },
     });
     return response.data;

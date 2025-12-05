@@ -15,11 +15,17 @@ const useProfile = () => {
 
   const profileQueries = useProfileQueries(['profile']);
   const {
-    data: posts = [],
+    data: allPosts = [],
     isLoading: isLoadingPosts,
     error: postsError,
     refetch: refetchPosts,
   } = profileQueries.useGetUserContent(user?.id.toString() || '');
+
+  // Filtrar apenas conteúdos do usuário logado para garantir que não venham conteúdos de outros usuários
+  const posts = allPosts.filter(post => {
+    if (!user?.id || !post.author) return false;
+    return post.author.id === user.id || Number(post.author.id) === user.id;
+  });
 
   const {
     data: savedContent = [],
@@ -161,6 +167,14 @@ const useProfile = () => {
 
   const error = postsError?.message || savedError?.message;
 
+  // Calcular estatísticas
+  const totalLikes = posts.reduce(
+    (sum, post) => sum + (post.likesCount || 0),
+    0,
+  );
+  const totalPosts = posts.length;
+  const totalSaved = savedContent.length;
+
   return {
     user,
     posts,
@@ -177,6 +191,11 @@ const useProfile = () => {
     handleTabChange,
     error,
     DialogPortal,
+    stats: {
+      likes: totalLikes,
+      posts: totalPosts,
+      saved: totalSaved,
+    },
   };
 };
 

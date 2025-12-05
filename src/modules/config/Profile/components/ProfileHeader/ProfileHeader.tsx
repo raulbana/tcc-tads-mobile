@@ -11,9 +11,18 @@ import * as S from './styles';
 export interface ProfileHeaderProps {
   user: UserType;
   onEditProfile: () => void;
+  stats?: {
+    likes: number;
+    posts: number;
+    saved: number;
+  };
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({user, onEditProfile}) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  user,
+  onEditProfile,
+  stats,
+}) => {
   const theme = useDynamicTheme();
   const hasProfilePicture =
     user.profilePictureUrl && user.profilePictureUrl.trim() !== '';
@@ -52,7 +61,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({user, onEditProfile}) => {
           <Label
             typography={theme.typography.paragraph.sb2}
             color={theme.colors.gray_08}
-            text="0"
+            text={String(stats?.likes ?? 0)}
           />
           <Label
             typography={theme.typography.paragraph.sm2}
@@ -65,7 +74,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({user, onEditProfile}) => {
           <Label
             typography={theme.typography.paragraph.sb2}
             color={theme.colors.gray_08}
-            text="0"
+            text={String(stats?.saved ?? 0)}
           />
           <Label
             typography={theme.typography.paragraph.sm2}
@@ -78,7 +87,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({user, onEditProfile}) => {
           <Label
             typography={theme.typography.paragraph.sb2}
             color={theme.colors.gray_08}
-            text="0"
+            text={String(stats?.posts ?? 0)}
           />
           <Label
             typography={theme.typography.paragraph.sm2}

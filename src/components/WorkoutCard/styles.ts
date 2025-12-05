@@ -5,11 +5,15 @@ import {
   verticalScale,
 } from '../../utils/scales';
 
-export const Container = styled.View`
-  background-color: ${({theme}) => theme.colors.gray_03};
+export const Container = styled.View<{isNextWorkout?: boolean}>`
+  background-color: ${({theme, isNextWorkout}) =>
+    isNextWorkout ? theme.colors.purple_01 || '#F3E8FF' : theme.colors.gray_03};
   border-radius: ${moderateScale(16)}px;
   padding: ${verticalScale(20)}px ${horizontalScale(16)}px;
   margin-bottom: ${verticalScale(16)}px;
+  border-width: ${({isNextWorkout}) => (isNextWorkout ? 2 : 0)}px;
+  border-color: ${({theme, isNextWorkout}) =>
+    isNextWorkout ? theme.colors.purple_02 || '#9657B3' : 'transparent'};
   shadow-color: #000;
   shadow-offset: 0px 2px;
   shadow-opacity: 0.1;
