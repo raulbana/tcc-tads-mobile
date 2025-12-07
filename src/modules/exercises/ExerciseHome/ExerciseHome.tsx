@@ -45,6 +45,16 @@ const ExerciseHome = () => {
 
   const theme = useDynamicTheme();
 
+  const progressPercentage = React.useMemo(() => {
+    if (!userWorkoutPlan) return null;
+    const weekProgress = userWorkoutPlan.weekProgress ?? 0;
+    const totalProgress = userWorkoutPlan.totalProgress ?? 0;
+    if (totalProgress === 0 || isNaN(weekProgress) || isNaN(totalProgress)) {
+      return '0.00';
+    }
+    return ((weekProgress / totalProgress) * 100).toFixed(2);
+  }, [userWorkoutPlan]);
+
   if (isExercisesBlocked) {
     return (
       <ScreenContainer scrollable>
@@ -110,13 +120,9 @@ const ExerciseHome = () => {
                 typography={theme.typography.paragraph.r2}
                 color={theme.colors.gray_07}
               />
-              {userWorkoutPlan.totalProgress !== undefined && (
+              {progressPercentage !== null && (
                 <Label
-                  text={`Progresso: ${(
-                    (userWorkoutPlan.weekProgress /
-                      userWorkoutPlan.totalProgress) *
-                    100
-                  ).toFixed(2)}%`}
+                  text={`Progresso: ${progressPercentage}%`}
                   typography={theme.typography.paragraph.r2}
                   color={theme.colors.gray_07}
                 />
